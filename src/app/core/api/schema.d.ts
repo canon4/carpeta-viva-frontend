@@ -818,6 +818,111 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inventario/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar ítems de inventario de un hogar */
+        get: operations["listar_items_endpoint_api_v1_inventario_items_get"];
+        put?: never;
+        /** Crear ítem de inventario */
+        post: operations["crear_item_endpoint_api_v1_inventario_items_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventario/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar ítem de inventario */
+        put: operations["actualizar_item_endpoint_api_v1_inventario_items__item_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventario/convivientes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar convivientes de un hogar */
+        get: operations["listar_convivientes_endpoint_api_v1_inventario_convivientes_get"];
+        put?: never;
+        /** Registrar conviviente */
+        post: operations["crear_conviviente_endpoint_api_v1_inventario_convivientes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventario/convivientes/{conviviente_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar conviviente (incluye desactivar) */
+        put: operations["actualizar_conviviente_endpoint_api_v1_inventario_convivientes__conviviente_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventario/red-apoyo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar red de apoyo de un hogar */
+        get: operations["listar_red_apoyo_endpoint_api_v1_inventario_red_apoyo_get"];
+        put?: never;
+        /** Registrar contacto de red de apoyo */
+        post: operations["crear_red_apoyo_endpoint_api_v1_inventario_red_apoyo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventario/red-apoyo/{contacto_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar contacto de red de apoyo */
+        put: operations["actualizar_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/alimentos/_estado": {
         parameters: {
             query?: never;
@@ -828,6 +933,58 @@ export interface paths {
         /** Estado del módulo */
         get: operations["estado_api_v1_alimentos__estado_get"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alimentos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar alimentos de un hogar */
+        get: operations["listar_alimentos_endpoint_api_v1_alimentos_get"];
+        put?: never;
+        /** Registrar ingreso de alimento */
+        post: operations["crear_alimento_endpoint_api_v1_alimentos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alimentos/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar alimento */
+        put: operations["actualizar_alimento_endpoint_api_v1_alimentos__item_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alimentos/{item_id}/consumido": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Marcar alimento como consumido */
+        put: operations["marcar_consumido_endpoint_api_v1_alimentos__item_id__consumido_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -852,6 +1009,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/citas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar citas */
+        get: operations["listar_citas_endpoint_api_v1_citas_get"];
+        put?: never;
+        /** Crear cita */
+        post: operations["crear_cita_endpoint_api_v1_citas_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/citas/proximas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Próximas citas pendientes */
+        get: operations["listar_proximas_endpoint_api_v1_citas_proximas_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/citas/{cita_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener cita */
+        get: operations["obtener_cita_endpoint_api_v1_citas__cita_id__get"];
+        /** Reprogramar cita */
+        put: operations["actualizar_cita_endpoint_api_v1_citas__cita_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/citas/{cita_id}/estado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Cambiar estado de la cita */
+        put: operations["cambiar_estado_cita_endpoint_api_v1_citas__cita_id__estado_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/alertas/_estado": {
         parameters: {
             query?: never;
@@ -862,6 +1089,142 @@ export interface paths {
         /** Estado del módulo */
         get: operations["estado_api_v1_alertas__estado_get"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas/evasion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reportar evasión */
+        post: operations["reportar_evasion_endpoint_api_v1_alertas_evasion_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas/mis-pendientes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Mis alertas pendientes */
+        get: operations["mis_pendientes_endpoint_api_v1_alertas_mis_pendientes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas/panel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Panel de alertas activas */
+        get: operations["panel_endpoint_api_v1_alertas_panel_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas/generar-automaticas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generar alertas automáticas (RF9) */
+        post: operations["generar_automaticas_endpoint_api_v1_alertas_generar_automaticas_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar alertas */
+        get: operations["listar_alertas_endpoint_api_v1_alertas_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas/{alerta_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener alerta */
+        get: operations["obtener_alerta_endpoint_api_v1_alertas__alerta_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas/{alerta_id}/visto": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Marcar como vista (destinatario) */
+        put: operations["marcar_visto_endpoint_api_v1_alertas__alerta_id__visto_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alertas/{alerta_id}/cerrar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Cerrar alerta */
+        put: operations["cerrar_alerta_endpoint_api_v1_alertas__alerta_id__cerrar_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -958,6 +1321,138 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AlertaDestinatarioOut */
+        AlertaDestinatarioOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Usuario Id
+             * Format: uuid
+             */
+            usuario_id: string;
+            /** Visto En */
+            visto_en?: string | null;
+        };
+        /** AlertaOut */
+        AlertaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Tipo */
+            tipo: string;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Origen */
+            origen: string;
+            /** Generada Por */
+            generada_por?: string | null;
+            /** Descripcion */
+            descripcion: string;
+            /** Detalle */
+            detalle?: {
+                [key: string]: unknown;
+            } | null;
+            /** Estado */
+            estado: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Destinatarios */
+            destinatarios?: components["schemas"]["AlertaDestinatarioOut"][];
+        };
+        /** AlimentoItemCreate */
+        AlimentoItemCreate: {
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Descripcion */
+            descripcion: string;
+            /**
+             * Fecha Ingreso
+             * Format: date
+             */
+            fecha_ingreso: string;
+            /** Perecedero */
+            perecedero: boolean;
+            /** Fecha Vencimiento */
+            fecha_vencimiento?: string | null;
+            /** Cantidad */
+            cantidad: number;
+            /** Unidad */
+            unidad?: string | null;
+        };
+        /** AlimentoItemOut */
+        AlimentoItemOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Descripcion */
+            descripcion: string;
+            /**
+             * Fecha Ingreso
+             * Format: date
+             */
+            fecha_ingreso: string;
+            /** Perecedero */
+            perecedero: boolean;
+            /** Fecha Vencimiento */
+            fecha_vencimiento?: string | null;
+            /** Cantidad */
+            cantidad: number;
+            /** Unidad */
+            unidad?: string | null;
+            /** Consumido */
+            consumido: boolean;
+            /**
+             * Registrado Por
+             * Format: uuid
+             */
+            registrado_por: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** AlimentoItemUpdate */
+        AlimentoItemUpdate: {
+            /** Descripcion */
+            descripcion?: string | null;
+            /** Fecha Ingreso */
+            fecha_ingreso?: string | null;
+            /** Perecedero */
+            perecedero?: boolean | null;
+            /** Fecha Vencimiento */
+            fecha_vencimiento?: string | null;
+            /** Cantidad */
+            cantidad?: number | null;
+            /** Unidad */
+            unidad?: string | null;
+        };
         /** AsignacionCerrar */
         AsignacionCerrar: {
             /** Fecha Fin */
@@ -1123,6 +1618,164 @@ export interface components {
             /** Archivo */
             archivo: string;
         };
+        /** CitaCreate */
+        CitaCreate: {
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Tipo */
+            tipo: string;
+            /**
+             * Fecha Hora
+             * Format: date-time
+             */
+            fecha_hora: string;
+            /** Lugar */
+            lugar?: string | null;
+            /** Notas */
+            notas?: string | null;
+        };
+        /** CitaEstadoUpdate */
+        CitaEstadoUpdate: {
+            /** Estado */
+            estado: string;
+        };
+        /** CitaOut */
+        CitaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Tipo */
+            tipo: string;
+            /**
+             * Fecha Hora
+             * Format: date-time
+             */
+            fecha_hora: string;
+            /** Lugar */
+            lugar?: string | null;
+            /** Notas */
+            notas?: string | null;
+            /** Estado */
+            estado: string;
+            /**
+             * Registrado Por
+             * Format: uuid
+             */
+            registrado_por: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CitaUpdate */
+        CitaUpdate: {
+            /** Fecha Hora */
+            fecha_hora?: string | null;
+            /** Lugar */
+            lugar?: string | null;
+            /** Notas */
+            notas?: string | null;
+        };
+        /**
+         * ContactoEmergencia
+         * @description Teléfono del profesional realmente asignado; si no está registrado se dice explícitamente
+         *     (ADR-0009, sección 1) en vez de omitir el campo en silencio.
+         */
+        ContactoEmergencia: {
+            /** Rol Asignado */
+            rol_asignado: string;
+            /** Nombres */
+            nombres?: string | null;
+            /** Telefono */
+            telefono?: string | null;
+            /** Nota */
+            nota?: string | null;
+        };
+        /** ContactosEmergenciaOut */
+        ContactosEmergenciaOut: {
+            /** Policia Infancia Telefono */
+            policia_infancia_telefono: string;
+            /** Contactos */
+            contactos?: components["schemas"]["ContactoEmergencia"][];
+        };
+        /** ConvivienteCreate */
+        ConvivienteCreate: {
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Nombres */
+            nombres: string;
+            /** Relacion Con Madre */
+            relacion_con_madre: string;
+            /** Fecha Desde */
+            fecha_desde?: string | null;
+            /** Observaciones */
+            observaciones?: string | null;
+        };
+        /** ConvivienteOut */
+        ConvivienteOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Nombres */
+            nombres: string;
+            /** Relacion Con Madre */
+            relacion_con_madre: string;
+            /** Fecha Desde */
+            fecha_desde?: string | null;
+            /** Observaciones */
+            observaciones?: string | null;
+            /** Activo */
+            activo: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ConvivienteUpdate */
+        ConvivienteUpdate: {
+            /** Nombres */
+            nombres?: string | null;
+            /** Relacion Con Madre */
+            relacion_con_madre?: string | null;
+            /** Fecha Desde */
+            fecha_desde?: string | null;
+            /** Observaciones */
+            observaciones?: string | null;
+            /** Activo */
+            activo?: boolean | null;
+        };
         /** DocumentoDevolver */
         DocumentoDevolver: {
             /** Motivo */
@@ -1230,6 +1883,21 @@ export interface components {
          * @enum {string}
          */
         EstadoVital: "vivo" | "fallecido" | "desconocido";
+        /** EvasionCreate */
+        EvasionCreate: {
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Descripcion */
+            descripcion: string;
+        };
+        /** EvasionReportadaOut */
+        EvasionReportadaOut: {
+            alerta: components["schemas"]["AlertaOut"];
+            contactos_emergencia: components["schemas"]["ContactosEmergenciaOut"];
+        };
         /** FamiliarCreate */
         FamiliarCreate: {
             parentesco: components["schemas"]["Parentesco"];
@@ -1336,6 +2004,73 @@ export interface components {
             /** Capacidad Maxima */
             capacidad_maxima?: number | null;
             estado?: components["schemas"]["EstadoHogar"] | null;
+        };
+        /** InventarioItemCreate */
+        InventarioItemCreate: {
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Tipo */
+            tipo: string;
+            /** Descripcion */
+            descripcion: string;
+            /**
+             * Cantidad
+             * @default 1
+             */
+            cantidad: number;
+            /**
+             * Estado
+             * @default bueno
+             */
+            estado: string;
+        };
+        /** InventarioItemOut */
+        InventarioItemOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Tipo */
+            tipo: string;
+            /** Descripcion */
+            descripcion: string;
+            /** Cantidad */
+            cantidad: number;
+            /** Estado */
+            estado: string;
+            /**
+             * Registrado Por
+             * Format: uuid
+             */
+            registrado_por: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** InventarioItemUpdate */
+        InventarioItemUpdate: {
+            /** Descripcion */
+            descripcion?: string | null;
+            /** Cantidad */
+            cantidad?: number | null;
+            /** Estado */
+            estado?: string | null;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -1552,6 +2287,8 @@ export interface components {
             especialidad?: string | null;
             /** Numero Registro */
             numero_registro?: string | null;
+            /** Telefono */
+            telefono?: string | null;
         };
         /** ProfesionalOut */
         ProfesionalOut: {
@@ -1572,6 +2309,8 @@ export interface components {
             especialidad?: string | null;
             /** Numero Registro */
             numero_registro?: string | null;
+            /** Telefono */
+            telefono?: string | null;
         };
         /** ProfesionalUpdate */
         ProfesionalUpdate: {
@@ -1585,6 +2324,70 @@ export interface components {
             especialidad?: string | null;
             /** Numero Registro */
             numero_registro?: string | null;
+            /** Telefono */
+            telefono?: string | null;
+        };
+        /** RedApoyoCreate */
+        RedApoyoCreate: {
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Nombres */
+            nombres: string;
+            /** Relacion */
+            relacion: string;
+            /** Telefono */
+            telefono?: string | null;
+            /** Observaciones */
+            observaciones?: string | null;
+        };
+        /** RedApoyoOut */
+        RedApoyoOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Nombres */
+            nombres: string;
+            /** Relacion */
+            relacion: string;
+            /** Telefono */
+            telefono?: string | null;
+            /** Observaciones */
+            observaciones?: string | null;
+            /** Activo */
+            activo: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** RedApoyoUpdate */
+        RedApoyoUpdate: {
+            /** Nombres */
+            nombres?: string | null;
+            /** Relacion */
+            relacion?: string | null;
+            /** Telefono */
+            telefono?: string | null;
+            /** Observaciones */
+            observaciones?: string | null;
+            /** Activo */
+            activo?: boolean | null;
         };
         /** ReporteCreate */
         ReporteCreate: {
@@ -3587,6 +4390,303 @@ export interface operations {
             };
         };
     };
+    listar_items_endpoint_api_v1_inventario_items_get: {
+        parameters: {
+            query: {
+                hogar_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventarioItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_item_endpoint_api_v1_inventario_items_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InventarioItemCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventarioItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_item_endpoint_api_v1_inventario_items__item_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InventarioItemUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventarioItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_convivientes_endpoint_api_v1_inventario_convivientes_get: {
+        parameters: {
+            query: {
+                hogar_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConvivienteOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_conviviente_endpoint_api_v1_inventario_convivientes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConvivienteCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConvivienteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_conviviente_endpoint_api_v1_inventario_convivientes__conviviente_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conviviente_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConvivienteUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConvivienteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_red_apoyo_endpoint_api_v1_inventario_red_apoyo_get: {
+        parameters: {
+            query: {
+                hogar_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedApoyoOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_red_apoyo_endpoint_api_v1_inventario_red_apoyo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedApoyoCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedApoyoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contacto_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedApoyoUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedApoyoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     estado_api_v1_alimentos__estado_get: {
         parameters: {
             query?: never;
@@ -3605,6 +4705,139 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    listar_alimentos_endpoint_api_v1_alimentos_get: {
+        parameters: {
+            query: {
+                hogar_id: string;
+                perecedero?: boolean | null;
+                consumido?: boolean | null;
+                vencidos?: boolean | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlimentoItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_alimento_endpoint_api_v1_alimentos_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlimentoItemCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlimentoItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_alimento_endpoint_api_v1_alimentos__item_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlimentoItemUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlimentoItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    marcar_consumido_endpoint_api_v1_alimentos__item_id__consumido_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlimentoItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -3631,6 +4864,193 @@ export interface operations {
             };
         };
     };
+    listar_citas_endpoint_api_v1_citas_get: {
+        parameters: {
+            query?: {
+                menor_id?: string | null;
+                tipo?: string | null;
+                estado?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitaOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_cita_endpoint_api_v1_citas_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CitaCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_proximas_endpoint_api_v1_citas_proximas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitaOut"][];
+                };
+            };
+        };
+    };
+    obtener_cita_endpoint_api_v1_citas__cita_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cita_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_cita_endpoint_api_v1_citas__cita_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cita_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CitaUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cambiar_estado_cita_endpoint_api_v1_citas__cita_id__estado_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                cita_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CitaEstadoUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CitaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     estado_api_v1_alertas__estado_get: {
         parameters: {
             query?: never;
@@ -3649,6 +5069,227 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    reportar_evasion_endpoint_api_v1_alertas_evasion_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EvasionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvasionReportadaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mis_pendientes_endpoint_api_v1_alertas_mis_pendientes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertaOut"][];
+                };
+            };
+        };
+    };
+    panel_endpoint_api_v1_alertas_panel_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertaOut"][];
+                };
+            };
+        };
+    };
+    generar_automaticas_endpoint_api_v1_alertas_generar_automaticas_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertaOut"][];
+                };
+            };
+        };
+    };
+    listar_alertas_endpoint_api_v1_alertas_get: {
+        parameters: {
+            query?: {
+                menor_id?: string | null;
+                tipo?: string | null;
+                estado?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertaOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_alerta_endpoint_api_v1_alertas__alerta_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alerta_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    marcar_visto_endpoint_api_v1_alertas__alerta_id__visto_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alerta_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cerrar_alerta_endpoint_api_v1_alertas__alerta_id__cerrar_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alerta_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

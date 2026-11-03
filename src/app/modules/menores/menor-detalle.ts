@@ -215,6 +215,29 @@ const SIN_ACCESO = 'No tiene acceso a esta sección del expediente.';
       </section>
 
       <section class="tarjeta">
+        <h2>Citas y Recordatorios</h2>
+        <p>
+          <a [routerLink]="['/citas']" [queryParams]="{ menor_id: menorId }">
+            Ver citas médicas, psicosociales y reuniones de familia de este menor
+          </a>
+        </p>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Alertas y Evasiones</h2>
+        <p>
+          <a [routerLink]="['/alertas']" [queryParams]="{ menor_id: menorId }">
+            Ver alertas de este menor
+          </a>
+        </p>
+        <p>
+          <a [routerLink]="['/alertas/reportar-evasion']" [queryParams]="{ menor_id: menorId }">
+            Reportar una evasión de este menor
+          </a>
+        </p>
+      </section>
+
+      <section class="tarjeta">
         <h2>Permisos de la madre sobre secciones sensibles</h2>
         @if (sinAccesoPermisos()) {
           <p class="nota">{{ sinAccesoPermisos() }}</p>

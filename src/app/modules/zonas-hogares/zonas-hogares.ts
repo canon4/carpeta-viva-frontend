@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config';
@@ -15,7 +16,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 /** Zonas y Hogares: lista de zonas y, al elegir una, los hogares de esa zona. Roles coordinador/admin. */
 @Component({
   selector: 'app-zonas-hogares',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   template: `
     <h1>Zonas y Hogares</h1>
 
@@ -63,6 +64,11 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
               <p>Capacidad máxima: {{ h.capacidad_maxima }}</p>
               <p>Estado: {{ h.estado }}</p>
               <p>Madre asignada: {{ h.madre_id || 'Sin asignar' }}</p>
+              <p>
+                <a [routerLink]="['/inventario']" [queryParams]="{ hogar_id: h.id }">Inventario</a>
+                ·
+                <a [routerLink]="['/alimentos']" [queryParams]="{ hogar_id: h.id }">Control de alimentos</a>
+              </p>
               <form class="formulario" (ngSubmit)="actualizarHogar(h)">
                 <label [for]="'estado-' + h.id">Cambiar estado</label>
                 <select [id]="'estado-' + h.id" name="estado" [(ngModel)]="estadoEdicion[h.id]">

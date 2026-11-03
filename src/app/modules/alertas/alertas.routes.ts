@@ -3,8 +3,10 @@ import { Routes } from '@angular/router';
 export default [
   {
     path: '',
-    loadComponent: () =>
-      import('../../shared/modulo-pendiente/modulo-pendiente').then((m) => m.ModuloPendiente),
-    data: { titulo: 'Alertas y Evasiones', descripcion: 'Reporte de evasión, notificación y números de emergencia.', fase: 4 },
+    loadComponent: () => import('./alertas-lista').then((m) => m.AlertasLista),
+  },
+  {
+    path: 'reportar-evasion',
+    loadComponent: () => import('./reportar-evasion').then((m) => m.ReportarEvasion),
   },
 ] satisfies Routes;

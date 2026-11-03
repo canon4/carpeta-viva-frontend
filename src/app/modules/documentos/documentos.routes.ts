@@ -3,8 +3,10 @@ import { Routes } from '@angular/router';
 export default [
   {
     path: '',
-    loadComponent: () =>
-      import('../../shared/modulo-pendiente/modulo-pendiente').then((m) => m.ModuloPendiente),
-    data: { titulo: 'Gestión Documental', descripcion: 'Carga, clasificación, versionado y revisión de documentos.', fase: 3 },
+    loadComponent: () => import('./documentos-lista').then((m) => m.DocumentosLista),
+  },
+  {
+    path: ':id',
+    loadComponent: () => import('./documento-detalle').then((m) => m.DocumentoDetalle),
   },
 ] satisfies Routes;

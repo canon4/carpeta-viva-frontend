@@ -18,14 +18,18 @@ type TipoDocumento = components['schemas']['TipoDocumento'];
 type Parentesco = components['schemas']['Parentesco'];
 type EstadoVital = components['schemas']['EstadoVital'];
 type SeccionSensible = components['schemas']['SeccionSensible'];
+type Documento = components['schemas']['DocumentoOut'];
+type Reporte = components['schemas']['ReporteOut'];
+type SeccionExpediente = components['schemas']['SeccionExpedienteOut'];
 
 const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 const SIN_ACCESO = 'No tiene acceso a esta sección del expediente.';
 
 /**
- * Expediente de un menor: datos básicos, familia, salud/psicosocial (pendientes del módulo
- * Documentos, Fase 3), permisos de la madre sobre secciones sensibles, asignación vigente e historial.
- * El backend decide qué secciones devuelve según el rol; aquí solo se refleja lo que llega.
+ * Expediente de un menor: datos básicos, familia, salud y psicosocial (documentos y reportes del
+ * módulo Gestión Documental, Fase 3), permisos de la madre sobre secciones sensibles, asignación
+ * vigente e historial. El backend decide qué secciones devuelve según el rol; aquí solo se
+ * refleja lo que llega (403 se muestra como "sin acceso", no como error genérico).
  */
 @Component({
   selector: 'app-menor-detalle',
@@ -143,17 +147,70 @@ const SIN_ACCESO = 'No tiene acceso a esta sección del expediente.';
 
       <section class="tarjeta">
         <h2>Salud</h2>
-        <p class="nota">
-          El historial médico llegará con el módulo de Gestión Documental (Fase 3). Todavía no hay
-          información para mostrar.
-        </p>
+        @if (sinAccesoSalud()) {
+          <p class="nota">{{ sinAccesoSalud() }}</p>
+        } @else {
+          @if (cargandoSalud()) {
+            <p class="nota">Cargando historial médico...</p>
+          }
+          <ul class="lista-simple">
+            @for (d of saludDocumentos(); track d.id) {
+              <li>
+                <a [routerLink]="['/documentos', d.id]">{{ d.titulo }} ({{ d.nombre_original }})</a>
+                — {{ d.estado_flujo }}
+              </li>
+            }
+            @for (r of saludReportes(); track r.id) {
+              <li>Informe {{ r.tipo_reporte }} — {{ r.created_at }}</li>
+            }
+          </ul>
+          @if (!cargandoSalud() && saludDocumentos().length === 0 && saludReportes().length === 0) {
+            <p class="nota">No hay documentos ni informes médicos registrados todavía.</p>
+          }
+          <p>
+            <a [routerLink]="['/documentos']" [queryParams]="{ menor_id: menorId, categoria: 'salud' }">
+              Subir o ver documentos de salud
+            </a>
+          </p>
+        }
       </section>
 
       <section class="tarjeta">
         <h2>Psicosocial</h2>
-        <p class="nota">
-          El historial psicosocial llegará con el módulo de Gestión Documental (Fase 3). Todavía no hay
-          información para mostrar.
+        @if (sinAccesoPsicosocial()) {
+          <p class="nota">{{ sinAccesoPsicosocial() }}</p>
+        } @else {
+          @if (cargandoPsicosocial()) {
+            <p class="nota">Cargando historial psicosocial...</p>
+          }
+          <ul class="lista-simple">
+            @for (d of psicosocialDocumentos(); track d.id) {
+              <li>
+                <a [routerLink]="['/documentos', d.id]">{{ d.titulo }} ({{ d.nombre_original }})</a>
+                — {{ d.estado_flujo }}
+              </li>
+            }
+            @for (r of psicosocialReportes(); track r.id) {
+              <li>Informe {{ r.tipo_reporte }} — {{ r.created_at }}</li>
+            }
+          </ul>
+          @if (!cargandoPsicosocial() && psicosocialDocumentos().length === 0 && psicosocialReportes().length === 0) {
+            <p class="nota">No hay documentos ni informes psicosociales registrados todavía.</p>
+          }
+          <p>
+            <a [routerLink]="['/documentos']" [queryParams]="{ menor_id: menorId, categoria: 'psicosocial' }">
+              Subir o ver documentos psicosociales
+            </a>
+          </p>
+        }
+      </section>
+
+      <section class="tarjeta">
+        <h2>Gestión documental</h2>
+        <p>
+          <a [routerLink]="['/documentos']" [queryParams]="{ menor_id: menorId }">
+            Ver todos los documentos de este menor (identidad, educación, actas de traslado y más)
+          </a>
         </p>
       </section>
 
@@ -268,6 +325,16 @@ export class MenorDetalle {
     estado_vital: EstadoVital;
   } = { parentesco: 'madre', nombres: '', numero_identificacion: '', telefono: '', estado_vital: 'desconocido' };
 
+  protected readonly cargandoSalud = signal(false);
+  protected readonly sinAccesoSalud = signal('');
+  protected readonly saludDocumentos = signal<Documento[]>([]);
+  protected readonly saludReportes = signal<Reporte[]>([]);
+
+  protected readonly cargandoPsicosocial = signal(false);
+  protected readonly sinAccesoPsicosocial = signal('');
+  protected readonly psicosocialDocumentos = signal<Documento[]>([]);
+  protected readonly psicosocialReportes = signal<Reporte[]>([]);
+
   protected readonly permisos = signal<Permiso[]>([]);
   protected readonly sinAccesoPermisos = signal('');
   protected readonly guardandoPermiso = signal(false);
@@ -325,8 +392,36 @@ export class MenorDetalle {
       this.cargando.set(false);
       return;
     }
-    await Promise.all([this.cargarFamiliares(), this.cargarPermisos(), this.cargarAsignacionVigente()]);
+    await Promise.all([
+      this.cargarFamiliares(),
+      this.cargarPermisos(),
+      this.cargarAsignacionVigente(),
+      this.cargarSeccion('salud'),
+      this.cargarSeccion('psicosocial'),
+    ]);
     this.cargando.set(false);
+  }
+
+  private async cargarSeccion(seccion: 'salud' | 'psicosocial'): Promise<void> {
+    const cargandoSignal = seccion === 'salud' ? this.cargandoSalud : this.cargandoPsicosocial;
+    const sinAccesoSignal = seccion === 'salud' ? this.sinAccesoSalud : this.sinAccesoPsicosocial;
+    const documentosSignal = seccion === 'salud' ? this.saludDocumentos : this.psicosocialDocumentos;
+    const reportesSignal = seccion === 'salud' ? this.saludReportes : this.psicosocialReportes;
+    cargandoSignal.set(true);
+    try {
+      const datos = await firstValueFrom(
+        this.http.get<SeccionExpediente>(`${this.config.apiUrl}/documentos/menor/${this.menorId}/seccion/${seccion}`),
+      );
+      documentosSignal.set(datos.documentos);
+      reportesSignal.set(datos.reportes);
+      sinAccesoSignal.set('');
+    } catch (e) {
+      sinAccesoSignal.set(
+        e instanceof HttpErrorResponse && e.status === 403 ? SIN_ACCESO : MENSAJE_GENERICO,
+      );
+    } finally {
+      cargandoSignal.set(false);
+    }
   }
 
   private async cargarFamiliares(): Promise<void> {

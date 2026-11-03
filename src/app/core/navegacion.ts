@@ -15,7 +15,7 @@ export const MODULOS: ModuloNav[] = [
   { ruta: 'profesionales', titulo: 'Profesionales', descripcion: 'Defensor, psicosocial y nutricionista de cada menor.', fase: 1, roles: ['coordinador', 'admin'] },
   { ruta: 'menores', titulo: 'Menores y Expedientes', descripcion: 'Carpeta digital de cada menor.', fase: 2, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'admin'] },
   { ruta: 'asignaciones', titulo: 'Asignaciones y Traslados', descripcion: 'Vinculación del menor con el hogar y actas de traslado.', fase: 2, roles: ['profesional', 'defensor', 'coordinador', 'admin'] },
-  { ruta: 'documentos', titulo: 'Gestión Documental', descripcion: 'Carga, clasificación, versionado y revisión de documentos.', fase: 3, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'auditor'] },
+  { ruta: 'documentos', titulo: 'Gestión Documental', descripcion: 'Carga, clasificación, versionado y revisión de documentos.', fase: 3, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'admin', 'auditor'] },
   { ruta: 'inventario', titulo: 'Inventario del Hogar', descripcion: 'Camas, muebles, personas que viven y red de apoyo.', fase: 4, roles: ['madre', 'profesional', 'coordinador'] },
   { ruta: 'alimentos', titulo: 'Control de Alimentos', descripcion: 'Ingreso de mercado, perecederos y vencimientos.', fase: 4, roles: ['madre', 'profesional', 'coordinador'] },
   { ruta: 'citas', titulo: 'Citas y Recordatorios', descripcion: 'Recordatorio de citas médicas, psicosociales y reuniones con familia biológica.', fase: 4, roles: ['madre', 'profesional', 'defensor', 'coordinador'] },

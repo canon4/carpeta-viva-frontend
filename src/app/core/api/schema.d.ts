@@ -578,6 +578,229 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/documentos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar documentos */
+        get: operations["listar_documentos_endpoint_api_v1_documentos_get"];
+        put?: never;
+        /** Crear documento */
+        post: operations["crear_documento_endpoint_api_v1_documentos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/auditor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Metadatos para auditor (sin contenido) */
+        get: operations["listar_para_auditor_endpoint_api_v1_documentos_auditor_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/menor/{menor_id}/seccion/{seccion}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Documentos y reportes de una sección */
+        get: operations["seccion_expediente_endpoint_api_v1_documentos_menor__menor_id__seccion__seccion__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/reportes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar reportes */
+        get: operations["listar_reportes_endpoint_api_v1_documentos_reportes_get"];
+        put?: never;
+        /** Crear reporte */
+        post: operations["crear_reporte_endpoint_api_v1_documentos_reportes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/reportes/{reporte_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener reporte */
+        get: operations["obtener_reporte_endpoint_api_v1_documentos_reportes__reporte_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/{documento_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener documento (metadatos) */
+        get: operations["obtener_documento_endpoint_api_v1_documentos__documento_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/{documento_id}/contenido": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar contenido descifrado */
+        get: operations["descargar_documento_endpoint_api_v1_documentos__documento_id__contenido_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/{documento_id}/enviar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Enviar a revisión */
+        put: operations["enviar_documento_endpoint_api_v1_documentos__documento_id__enviar_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/{documento_id}/aprobar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Aprobar documento */
+        put: operations["aprobar_documento_endpoint_api_v1_documentos__documento_id__aprobar_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/{documento_id}/devolver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Devolver documento */
+        put: operations["devolver_documento_endpoint_api_v1_documentos__documento_id__devolver_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/{documento_id}/version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Subir nueva versión */
+        post: operations["crear_version_endpoint_api_v1_documentos__documento_id__version_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/{documento_id}/versiones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar versiones anteriores */
+        get: operations["listar_versiones_endpoint_api_v1_documentos__documento_id__versiones_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documentos/{documento_id}/versiones/{version}/contenido": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar una versión anterior */
+        get: operations["descargar_version_endpoint_api_v1_documentos__documento_id__versiones__version__contenido_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inventario/_estado": {
         parameters: {
             query?: never;
@@ -869,6 +1092,118 @@ export interface components {
             menor_id?: string | null;
             /** Ip */
             ip?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** Body_crear_documento_endpoint_api_v1_documentos_post */
+        Body_crear_documento_endpoint_api_v1_documentos_post: {
+            /** Archivo */
+            archivo: string;
+            /** Categoria */
+            categoria: string;
+            /** Titulo */
+            titulo: string;
+            /** Menor Id */
+            menor_id?: string | null;
+            /** Hogar Id */
+            hogar_id?: string | null;
+            /**
+             * Migracion
+             * @default false
+             */
+            migracion: boolean;
+            /** Motivo */
+            motivo?: string | null;
+        };
+        /** Body_crear_version_endpoint_api_v1_documentos__documento_id__version_post */
+        Body_crear_version_endpoint_api_v1_documentos__documento_id__version_post: {
+            /** Archivo */
+            archivo: string;
+        };
+        /** DocumentoDevolver */
+        DocumentoDevolver: {
+            /** Motivo */
+            motivo: string;
+        };
+        /** DocumentoOut */
+        DocumentoOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Menor Id */
+            menor_id?: string | null;
+            /** Hogar Id */
+            hogar_id?: string | null;
+            /** Categoria */
+            categoria: string;
+            /** Titulo */
+            titulo: string;
+            /** Estado Flujo */
+            estado_flujo: string;
+            /** Version */
+            version: number;
+            /** Hash Sha256 */
+            hash_sha256?: string | null;
+            /** Sensible */
+            sensible: boolean;
+            /**
+             * Creado Por
+             * Format: uuid
+             */
+            creado_por: string;
+            /** Nombre Original */
+            nombre_original: string;
+            /** Mime Type */
+            mime_type: string;
+            /** Tamanio Bytes */
+            tamanio_bytes: number;
+            /** Revisado Por */
+            revisado_por?: string | null;
+            /** Revisado En */
+            revisado_en?: string | null;
+            /** Motivo Devolucion */
+            motivo_devolucion?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** DocumentoVersionOut */
+        DocumentoVersionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Documento Id
+             * Format: uuid
+             */
+            documento_id: string;
+            /** Version */
+            version: number;
+            /** Hash Sha256 */
+            hash_sha256?: string | null;
+            /** Nombre Original */
+            nombre_original?: string | null;
+            /** Mime Type */
+            mime_type?: string | null;
+            /** Tamanio Bytes */
+            tamanio_bytes?: number | null;
+            /** Estado Flujo */
+            estado_flujo: string;
+            /** Creado Por */
+            creado_por?: string | null;
+            /** Revisado Por */
+            revisado_por?: string | null;
+            /** Motivo Devolucion */
+            motivo_devolucion?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -1250,6 +1585,74 @@ export interface components {
             especialidad?: string | null;
             /** Numero Registro */
             numero_registro?: string | null;
+        };
+        /** ReporteCreate */
+        ReporteCreate: {
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Tipo Reporte */
+            tipo_reporte: string;
+            /** Contenido */
+            contenido?: {
+                [key: string]: unknown;
+            };
+            /** Referencia Archivo */
+            referencia_archivo?: string | null;
+        };
+        /** ReporteOut */
+        ReporteOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /**
+             * Autor Id
+             * Format: uuid
+             */
+            autor_id: string;
+            /** Tipo Autor */
+            tipo_autor: string;
+            /** Tipo Reporte */
+            tipo_reporte: string;
+            /** Contenido */
+            contenido: {
+                [key: string]: unknown;
+            };
+            /** Referencia Archivo */
+            referencia_archivo?: string | null;
+            /** Version */
+            version: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * SeccionExpedienteOut
+         * @description Agregador de `Documento` + `Reporte` de una sección (salud/psicosocial/familia).
+         */
+        SeccionExpedienteOut: {
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Seccion */
+            seccion: string;
+            /** Documentos */
+            documentos: components["schemas"]["DocumentoOut"][];
+            /** Reportes */
+            reportes: components["schemas"]["ReporteOut"][];
         };
         /**
          * SeccionSensible
@@ -2686,6 +3089,478 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    listar_documentos_endpoint_api_v1_documentos_get: {
+        parameters: {
+            query?: {
+                menor_id?: string | null;
+                hogar_id?: string | null;
+                categoria?: string | null;
+                estado_flujo?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_documento_endpoint_api_v1_documentos_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_crear_documento_endpoint_api_v1_documentos_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_para_auditor_endpoint_api_v1_documentos_auditor_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoOut"][];
+                };
+            };
+        };
+    };
+    seccion_expediente_endpoint_api_v1_documentos_menor__menor_id__seccion__seccion__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+                seccion: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeccionExpedienteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_reportes_endpoint_api_v1_documentos_reportes_get: {
+        parameters: {
+            query?: {
+                menor_id?: string | null;
+                tipo_reporte?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReporteOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_reporte_endpoint_api_v1_documentos_reportes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReporteCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReporteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_reporte_endpoint_api_v1_documentos_reportes__reporte_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reporte_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReporteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_documento_endpoint_api_v1_documentos__documento_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documento_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    descargar_documento_endpoint_api_v1_documentos__documento_id__contenido_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documento_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    enviar_documento_endpoint_api_v1_documentos__documento_id__enviar_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documento_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    aprobar_documento_endpoint_api_v1_documentos__documento_id__aprobar_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documento_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    devolver_documento_endpoint_api_v1_documentos__documento_id__devolver_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documento_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DocumentoDevolver"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_version_endpoint_api_v1_documentos__documento_id__version_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documento_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_crear_version_endpoint_api_v1_documentos__documento_id__version_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_versiones_endpoint_api_v1_documentos__documento_id__versiones_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documento_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentoVersionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    descargar_version_endpoint_api_v1_documentos__documento_id__versiones__version__contenido_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documento_id: string;
+                version: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

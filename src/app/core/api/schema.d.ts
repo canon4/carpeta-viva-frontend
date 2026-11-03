@@ -72,6 +72,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/zonas-hogares/zonas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar zonas */
+        get: operations["listar_zonas_endpoint_api_v1_zonas_hogares_zonas_get"];
+        put?: never;
+        /** Crear zona */
+        post: operations["crear_zona_endpoint_api_v1_zonas_hogares_zonas_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/zonas-hogares/zonas/{zona_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener zona */
+        get: operations["obtener_zona_endpoint_api_v1_zonas_hogares_zonas__zona_id__get"];
+        /** Actualizar zona */
+        put: operations["actualizar_zona_endpoint_api_v1_zonas_hogares_zonas__zona_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/zonas-hogares/hogares": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar hogares sustitutos */
+        get: operations["listar_hogares_endpoint_api_v1_zonas_hogares_hogares_get"];
+        put?: never;
+        /** Crear hogar sustituto */
+        post: operations["crear_hogar_endpoint_api_v1_zonas_hogares_hogares_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/zonas-hogares/hogares/{hogar_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener hogar sustituto */
+        get: operations["obtener_hogar_endpoint_api_v1_zonas_hogares_hogares__hogar_id__get"];
+        /** Actualizar hogar sustituto */
+        put: operations["actualizar_hogar_endpoint_api_v1_zonas_hogares_hogares__hogar_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/zonas-hogares/_estado": {
         parameters: {
             query?: never;
@@ -106,6 +178,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/madres/yo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Perfil de la madre autenticada */
+        get: operations["mi_perfil_api_v1_madres_yo_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/madres/yo/firma": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Cargar la firma de la madre autenticada */
+        put: operations["cargar_mi_firma_api_v1_madres_yo_firma_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/madres": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar madres sustitutas */
+        get: operations["listar_madres_endpoint_api_v1_madres_get"];
+        put?: never;
+        /** Crear madre sustituta */
+        post: operations["crear_madre_endpoint_api_v1_madres_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/madres/{madre_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener madre sustituta */
+        get: operations["obtener_madre_endpoint_api_v1_madres__madre_id__get"];
+        /** Actualizar madre sustituta */
+        put: operations["actualizar_madre_endpoint_api_v1_madres__madre_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/profesionales/_estado": {
         parameters: {
             query?: never;
@@ -116,6 +258,42 @@ export interface paths {
         /** Estado del módulo */
         get: operations["estado_api_v1_profesionales__estado_get"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/profesionales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar profesionales */
+        get: operations["listar_profesionales_endpoint_api_v1_profesionales_get"];
+        put?: never;
+        /** Crear profesional */
+        post: operations["crear_profesional_endpoint_api_v1_profesionales_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/profesionales/{profesional_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener profesional */
+        get: operations["obtener_profesional_endpoint_api_v1_profesionales__profesional_id__get"];
+        /** Actualizar profesional */
+        put: operations["actualizar_profesional_endpoint_api_v1_profesionales__profesional_id__put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -140,6 +318,146 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/menores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar expedientes de menores */
+        get: operations["listar_menores_endpoint_api_v1_menores_get"];
+        put?: never;
+        /** Crear expediente de menor */
+        post: operations["crear_menor_endpoint_api_v1_menores_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menores/panel/profesional": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Panel del profesional autenticado */
+        get: operations["panel_profesional_endpoint_api_v1_menores_panel_profesional_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menores/panel/zona": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Panel de la zona del coordinador */
+        get: operations["panel_zona_endpoint_api_v1_menores_panel_zona_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menores/{menor_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener expediente de menor */
+        get: operations["obtener_menor_endpoint_api_v1_menores__menor_id__get"];
+        /** Actualizar expediente de menor */
+        put: operations["actualizar_menor_endpoint_api_v1_menores__menor_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menores/{menor_id}/historial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historial del expediente */
+        get: operations["historial_menor_endpoint_api_v1_menores__menor_id__historial_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menores/{menor_id}/familiares": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar familiares del menor */
+        get: operations["listar_familiares_endpoint_api_v1_menores__menor_id__familiares_get"];
+        put?: never;
+        /** Registrar familiar del menor */
+        post: operations["crear_familiar_endpoint_api_v1_menores__menor_id__familiares_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menores/{menor_id}/permisos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar permisos de expediente */
+        get: operations["listar_permisos_endpoint_api_v1_menores__menor_id__permisos_get"];
+        put?: never;
+        /** Otorgar permiso de expediente a la madre (solo defensor asignado) */
+        post: operations["crear_permiso_endpoint_api_v1_menores__menor_id__permisos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/menores/{menor_id}/permisos/{permiso_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revocar permiso de expediente (solo defensor asignado) */
+        delete: operations["revocar_permiso_endpoint_api_v1_menores__menor_id__permisos__permiso_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/asignaciones/_estado": {
         parameters: {
             query?: never;
@@ -149,6 +467,92 @@ export interface paths {
         };
         /** Estado del módulo */
         get: operations["estado_api_v1_asignaciones__estado_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/asignaciones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar asignaciones */
+        get: operations["listar_asignaciones_endpoint_api_v1_asignaciones_get"];
+        put?: never;
+        /** Crear ingreso o traslado */
+        post: operations["crear_asignacion_endpoint_api_v1_asignaciones_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/asignaciones/menor/{menor_id}/vigente": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Asignación vigente de un menor */
+        get: operations["vigente_de_menor_endpoint_api_v1_asignaciones_menor__menor_id__vigente_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/asignaciones/{asignacion_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Obtener asignación */
+        get: operations["obtener_asignacion_endpoint_api_v1_asignaciones__asignacion_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/asignaciones/{asignacion_id}/cerrar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Cerrar asignación (egreso) */
+        put: operations["cerrar_asignacion_endpoint_api_v1_asignaciones__asignacion_id__cerrar_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/asignaciones/{asignacion_id}/historial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historial de la asignación */
+        get: operations["historial_asignacion_endpoint_api_v1_asignaciones__asignacion_id__historial_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -293,6 +697,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auditoria": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar accesos auditados */
+        get: operations["listar_accesos_endpoint_api_v1_auditoria_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/archivo/_estado": {
         parameters: {
             query?: never;
@@ -314,10 +735,272 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AsignacionCerrar */
+        AsignacionCerrar: {
+            /** Fecha Fin */
+            fecha_fin?: string | null;
+            /** Motivo */
+            motivo?: string | null;
+            /** Acta Referencia */
+            acta_referencia?: string | null;
+        };
+        /** AsignacionCreate */
+        AsignacionCreate: {
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /**
+             * Fecha Inicio
+             * Format: date
+             */
+            fecha_inicio: string;
+            /** @default ingreso */
+            tipo_movimiento: components["schemas"]["TipoMovimiento"];
+            /** Acta Referencia */
+            acta_referencia?: string | null;
+            /** Motivo */
+            motivo?: string | null;
+        };
+        /** AsignacionHistoryOut */
+        AsignacionHistoryOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Asignacion Id
+             * Format: uuid
+             */
+            asignacion_id: string;
+            /** Version */
+            version: number;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /**
+             * Fecha Inicio
+             * Format: date
+             */
+            fecha_inicio: string;
+            /** Fecha Fin */
+            fecha_fin?: string | null;
+            /** Estado */
+            estado: string;
+            /** Tipo Movimiento */
+            tipo_movimiento: string;
+            /** Acta Referencia */
+            acta_referencia?: string | null;
+            /** Motivo */
+            motivo?: string | null;
+            /** Cambiado Por */
+            cambiado_por?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** AsignacionOut */
+        AsignacionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /**
+             * Fecha Inicio
+             * Format: date
+             */
+            fecha_inicio: string;
+            /** Fecha Fin */
+            fecha_fin?: string | null;
+            /** Estado */
+            estado: string;
+            /** Version */
+            version: number;
+            /** Tipo Movimiento */
+            tipo_movimiento: string;
+            /** Acta Referencia */
+            acta_referencia?: string | null;
+            /** Motivo */
+            motivo?: string | null;
+            /** Registrado Por */
+            registrado_por?: string | null;
+        };
+        /** AuditoriaAccesoOut */
+        AuditoriaAccesoOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Usuario Id */
+            usuario_id?: string | null;
+            /** Accion */
+            accion: string;
+            /** Recurso */
+            recurso?: string | null;
+            /** Menor Id */
+            menor_id?: string | null;
+            /** Ip */
+            ip?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * EstadoCertificacion
+         * @enum {string}
+         */
+        EstadoCertificacion: "pendiente" | "vigente" | "vencida" | "suspendida";
+        /**
+         * EstadoHogar
+         * @enum {string}
+         */
+        EstadoHogar: "activo" | "inactivo" | "suspendido";
+        /**
+         * EstadoMenor
+         * @enum {string}
+         */
+        EstadoMenor: "activo" | "egresado" | "evadido" | "fallecido";
+        /**
+         * EstadoVital
+         * @enum {string}
+         */
+        EstadoVital: "vivo" | "fallecido" | "desconocido";
+        /** FamiliarCreate */
+        FamiliarCreate: {
+            parentesco: components["schemas"]["Parentesco"];
+            /** Nombres */
+            nombres?: string | null;
+            /** Numero Identificacion */
+            numero_identificacion?: string | null;
+            /** Telefono */
+            telefono?: string | null;
+            /** Direccion */
+            direccion?: string | null;
+            /** @default desconocido */
+            estado_vital: components["schemas"]["EstadoVital"];
+            /** Observaciones */
+            observaciones?: string | null;
+        };
+        /** FamiliarOut */
+        FamiliarOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Parentesco */
+            parentesco: string;
+            /** Nombres */
+            nombres?: string | null;
+            /** Numero Identificacion */
+            numero_identificacion?: string | null;
+            /** Telefono */
+            telefono?: string | null;
+            /** Direccion */
+            direccion?: string | null;
+            /** Estado Vital */
+            estado_vital: string;
+            /** Observaciones */
+            observaciones?: string | null;
+        };
+        /** FirmaUpdate */
+        FirmaUpdate: {
+            /** Firma Ref */
+            firma_ref: string;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HogarCreate */
+        HogarCreate: {
+            /**
+             * Zona Id
+             * Format: uuid
+             */
+            zona_id: string;
+            /**
+             * Capacidad Maxima
+             * @default 6
+             */
+            capacidad_maxima: number;
+            /** Fecha Habilitacion */
+            fecha_habilitacion?: string | null;
+        };
+        /** HogarOut */
+        HogarOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Zona Id
+             * Format: uuid
+             */
+            zona_id: string;
+            /** Madre Id */
+            madre_id?: string | null;
+            /** Capacidad Maxima */
+            capacidad_maxima: number;
+            /** Fecha Habilitacion */
+            fecha_habilitacion?: string | null;
+            /** Estado */
+            estado: string;
+        };
+        /** HogarPanelGroup */
+        HogarPanelGroup: {
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Menores */
+            menores: components["schemas"]["MenorOut"][];
+        };
+        /** HogarUpdate */
+        HogarUpdate: {
+            /** Madre Id */
+            madre_id?: string | null;
+            /** Capacidad Maxima */
+            capacidad_maxima?: number | null;
+            estado?: components["schemas"]["EstadoHogar"] | null;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -326,6 +1009,263 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** MadreCreate */
+        MadreCreate: {
+            /** Usuario Id */
+            usuario_id?: string | null;
+            /** Nombres */
+            nombres: string;
+            /** Apellidos */
+            apellidos: string;
+            /** Numero Identificacion */
+            numero_identificacion: string;
+            /** Direccion */
+            direccion?: string | null;
+            /** Telefono */
+            telefono?: string | null;
+        };
+        /** MadreOut */
+        MadreOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Usuario Id */
+            usuario_id?: string | null;
+            /** Nombres */
+            nombres: string;
+            /** Apellidos */
+            apellidos: string;
+            /** Numero Identificacion */
+            numero_identificacion: string;
+            /** Direccion */
+            direccion?: string | null;
+            /** Telefono */
+            telefono?: string | null;
+            /** Estado Certificacion */
+            estado_certificacion: string;
+            /** Firma Ref */
+            firma_ref?: string | null;
+        };
+        /** MadreUpdate */
+        MadreUpdate: {
+            /** Direccion */
+            direccion?: string | null;
+            /** Telefono */
+            telefono?: string | null;
+            estado_certificacion?: components["schemas"]["EstadoCertificacion"] | null;
+        };
+        /** MenorCreate */
+        MenorCreate: {
+            /** Nombres */
+            nombres: string;
+            /** Apellidos */
+            apellidos: string;
+            /**
+             * Fecha Nacimiento
+             * Format: date
+             */
+            fecha_nacimiento: string;
+            /** Genero */
+            genero?: string | null;
+            tipo_documento?: components["schemas"]["TipoDocumento"] | null;
+            /** Numero Documento */
+            numero_documento?: string | null;
+        };
+        /** MenorHistoryOut */
+        MenorHistoryOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Version */
+            version: number;
+            /** Nombres */
+            nombres: string;
+            /** Apellidos */
+            apellidos: string;
+            /**
+             * Fecha Nacimiento
+             * Format: date
+             */
+            fecha_nacimiento: string;
+            /** Genero */
+            genero?: string | null;
+            /** Tipo Documento */
+            tipo_documento?: string | null;
+            /** Numero Documento */
+            numero_documento?: string | null;
+            /** Estado Actual */
+            estado_actual: string;
+            /** Cambiado Por */
+            cambiado_por?: string | null;
+            /** Motivo */
+            motivo?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** MenorOut */
+        MenorOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nombres */
+            nombres: string;
+            /** Apellidos */
+            apellidos: string;
+            /**
+             * Fecha Nacimiento
+             * Format: date
+             */
+            fecha_nacimiento: string;
+            /** Genero */
+            genero?: string | null;
+            /** Tipo Documento */
+            tipo_documento?: string | null;
+            /** Numero Documento */
+            numero_documento?: string | null;
+            /** Estado Actual */
+            estado_actual: string;
+            /** Version */
+            version: number;
+        };
+        /** MenorUpdate */
+        MenorUpdate: {
+            /** Nombres */
+            nombres?: string | null;
+            /** Apellidos */
+            apellidos?: string | null;
+            /** Fecha Nacimiento */
+            fecha_nacimiento?: string | null;
+            /** Genero */
+            genero?: string | null;
+            tipo_documento?: components["schemas"]["TipoDocumento"] | null;
+            /** Numero Documento */
+            numero_documento?: string | null;
+            estado_actual?: components["schemas"]["EstadoMenor"] | null;
+            /** Motivo */
+            motivo?: string | null;
+        };
+        /**
+         * Parentesco
+         * @enum {string}
+         */
+        Parentesco: "padre" | "madre" | "otro";
+        /** PermisoCreate */
+        PermisoCreate: {
+            seccion: components["schemas"]["SeccionSensible"];
+            /**
+             * Usuario Id
+             * Format: uuid
+             */
+            usuario_id: string;
+            /** Notas */
+            notas?: string | null;
+        };
+        /** PermisoOut */
+        PermisoOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Seccion */
+            seccion: string;
+            /**
+             * Usuario Id
+             * Format: uuid
+             */
+            usuario_id: string;
+            /**
+             * Otorgado Por
+             * Format: uuid
+             */
+            otorgado_por: string;
+            /** Activo */
+            activo: boolean;
+            /** Notas */
+            notas?: string | null;
+        };
+        /** ProfesionalCreate */
+        ProfesionalCreate: {
+            /** Usuario Id */
+            usuario_id?: string | null;
+            /** Nombres */
+            nombres: string;
+            /** Apellidos */
+            apellidos: string;
+            /** Cargo */
+            cargo: string;
+            /** Especialidad */
+            especialidad?: string | null;
+            /** Numero Registro */
+            numero_registro?: string | null;
+        };
+        /** ProfesionalOut */
+        ProfesionalOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Usuario Id */
+            usuario_id?: string | null;
+            /** Nombres */
+            nombres: string;
+            /** Apellidos */
+            apellidos: string;
+            /** Cargo */
+            cargo: string;
+            /** Especialidad */
+            especialidad?: string | null;
+            /** Numero Registro */
+            numero_registro?: string | null;
+        };
+        /** ProfesionalUpdate */
+        ProfesionalUpdate: {
+            /** Nombres */
+            nombres?: string | null;
+            /** Apellidos */
+            apellidos?: string | null;
+            /** Cargo */
+            cargo?: string | null;
+            /** Especialidad */
+            especialidad?: string | null;
+            /** Numero Registro */
+            numero_registro?: string | null;
+        };
+        /**
+         * SeccionSensible
+         * @enum {string}
+         */
+        SeccionSensible: "familia" | "salud" | "psicosocial";
+        /**
+         * TipoDocumento
+         * @enum {string}
+         */
+        TipoDocumento: "registro_civil" | "tarjeta_identidad" | "cedula" | "pasaporte" | "sin_documento";
+        /**
+         * TipoMovimiento
+         * @enum {string}
+         */
+        TipoMovimiento: "ingreso" | "traslado" | "egreso";
         /** TokenOut */
         TokenOut: {
             /** Access Token */
@@ -362,6 +1302,42 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** ZonaCreate */
+        ZonaCreate: {
+            /** Nombre */
+            nombre: string;
+            /** Descripcion */
+            descripcion?: string | null;
+        };
+        /** ZonaOut */
+        ZonaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Nombre */
+            nombre: string;
+            /** Descripcion */
+            descripcion?: string | null;
+        };
+        /** ZonaPanelGroup */
+        ZonaPanelGroup: {
+            /**
+             * Zona Id
+             * Format: uuid
+             */
+            zona_id: string;
+            /** Hogares */
+            hogares: components["schemas"]["HogarPanelGroup"][];
+        };
+        /** ZonaUpdate */
+        ZonaUpdate: {
+            /** Nombre */
+            nombre?: string | null;
+            /** Descripcion */
+            descripcion?: string | null;
         };
     };
     responses: never;
@@ -469,6 +1445,255 @@ export interface operations {
             };
         };
     };
+    listar_zonas_endpoint_api_v1_zonas_hogares_zonas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZonaOut"][];
+                };
+            };
+        };
+    };
+    crear_zona_endpoint_api_v1_zonas_hogares_zonas_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ZonaCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZonaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_zona_endpoint_api_v1_zonas_hogares_zonas__zona_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                zona_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZonaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_zona_endpoint_api_v1_zonas_hogares_zonas__zona_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                zona_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ZonaUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZonaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_hogares_endpoint_api_v1_zonas_hogares_hogares_get: {
+        parameters: {
+            query?: {
+                zona_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HogarOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_hogar_endpoint_api_v1_zonas_hogares_hogares_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HogarCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HogarOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_hogar_endpoint_api_v1_zonas_hogares_hogares__hogar_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                hogar_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HogarOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_hogar_endpoint_api_v1_zonas_hogares_hogares__hogar_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                hogar_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HogarUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HogarOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     estado_api_v1_zonas_hogares__estado_get: {
         parameters: {
             query?: never;
@@ -513,6 +1738,178 @@ export interface operations {
             };
         };
     };
+    mi_perfil_api_v1_madres_yo_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MadreOut"];
+                };
+            };
+        };
+    };
+    cargar_mi_firma_api_v1_madres_yo_firma_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FirmaUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MadreOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_madres_endpoint_api_v1_madres_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MadreOut"][];
+                };
+            };
+        };
+    };
+    crear_madre_endpoint_api_v1_madres_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MadreCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MadreOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_madre_endpoint_api_v1_madres__madre_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                madre_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MadreOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_madre_endpoint_api_v1_madres__madre_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                madre_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MadreUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MadreOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     estado_api_v1_profesionales__estado_get: {
         parameters: {
             query?: never;
@@ -531,6 +1928,136 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    listar_profesionales_endpoint_api_v1_profesionales_get: {
+        parameters: {
+            query?: {
+                cargo?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfesionalOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_profesional_endpoint_api_v1_profesionales_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfesionalCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfesionalOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_profesional_endpoint_api_v1_profesionales__profesional_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profesional_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfesionalOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_profesional_endpoint_api_v1_profesionales__profesional_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profesional_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfesionalUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfesionalOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -557,6 +2084,373 @@ export interface operations {
             };
         };
     };
+    listar_menores_endpoint_api_v1_menores_get: {
+        parameters: {
+            query?: {
+                zona_id?: string | null;
+                hogar_id?: string | null;
+                estado_actual?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenorOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_menor_endpoint_api_v1_menores_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MenorCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenorOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    panel_profesional_endpoint_api_v1_menores_panel_profesional_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZonaPanelGroup"][];
+                };
+            };
+        };
+    };
+    panel_zona_endpoint_api_v1_menores_panel_zona_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HogarPanelGroup"][];
+                };
+            };
+        };
+    };
+    obtener_menor_endpoint_api_v1_menores__menor_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenorOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_menor_endpoint_api_v1_menores__menor_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MenorUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenorOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    historial_menor_endpoint_api_v1_menores__menor_id__historial_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MenorHistoryOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_familiares_endpoint_api_v1_menores__menor_id__familiares_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamiliarOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_familiar_endpoint_api_v1_menores__menor_id__familiares_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FamiliarCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FamiliarOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_permisos_endpoint_api_v1_menores__menor_id__permisos_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PermisoOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_permiso_endpoint_api_v1_menores__menor_id__permisos_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PermisoCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PermisoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revocar_permiso_endpoint_api_v1_menores__menor_id__permisos__permiso_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+                permiso_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PermisoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     estado_api_v1_asignaciones__estado_get: {
         parameters: {
             query?: never;
@@ -575,6 +2469,201 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    listar_asignaciones_endpoint_api_v1_asignaciones_get: {
+        parameters: {
+            query?: {
+                menor_id?: string | null;
+                hogar_id?: string | null;
+                zona_id?: string | null;
+                estado_actual?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AsignacionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_asignacion_endpoint_api_v1_asignaciones_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AsignacionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AsignacionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    vigente_de_menor_endpoint_api_v1_asignaciones_menor__menor_id__vigente_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AsignacionOut"] | null;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_asignacion_endpoint_api_v1_asignaciones__asignacion_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                asignacion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AsignacionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cerrar_asignacion_endpoint_api_v1_asignaciones__asignacion_id__cerrar_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                asignacion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AsignacionCerrar"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AsignacionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    historial_asignacion_endpoint_api_v1_asignaciones__asignacion_id__historial_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                asignacion_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AsignacionHistoryOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -751,6 +2840,42 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    listar_accesos_endpoint_api_v1_auditoria_get: {
+        parameters: {
+            query?: {
+                usuario_id?: string | null;
+                accion?: string | null;
+                desde?: string | null;
+                hasta?: string | null;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditoriaAccesoOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

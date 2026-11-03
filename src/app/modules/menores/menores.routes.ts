@@ -3,8 +3,14 @@ import { Routes } from '@angular/router';
 export default [
   {
     path: '',
-    loadComponent: () =>
-      import('../../shared/modulo-pendiente/modulo-pendiente').then((m) => m.ModuloPendiente),
-    data: { titulo: 'Menores y Expedientes', descripcion: 'Carpeta digital de cada menor.', fase: 2 },
+    loadComponent: () => import('./menores-lista').then((m) => m.MenoresLista),
+  },
+  {
+    path: 'panel',
+    loadComponent: () => import('./menores-panel').then((m) => m.MenoresPanel),
+  },
+  {
+    path: ':id',
+    loadComponent: () => import('./menor-detalle').then((m) => m.MenorDetalle),
   },
 ] satisfies Routes;

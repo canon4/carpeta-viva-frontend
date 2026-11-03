@@ -11,10 +11,10 @@ export interface ModuloNav {
 // Visibilidad provisional por rol: se confirma con los profesionales y el agente de seguridad.
 export const MODULOS: ModuloNav[] = [
   { ruta: 'zonas-hogares', titulo: 'Zonas y Hogares', descripcion: 'Zonas y hogares sustitutos con los datos de cada hogar.', fase: 1, roles: ['coordinador', 'admin'] },
-  { ruta: 'madres', titulo: 'Madres Sustitutas', descripcion: 'Perfil, habilitación, capacitaciones y firma única.', fase: 1, roles: ['coordinador', 'admin'] },
+  { ruta: 'madres', titulo: 'Madres Sustitutas', descripcion: 'Perfil, habilitación, capacitaciones y firma única.', fase: 1, roles: ['madre', 'coordinador', 'admin'] },
   { ruta: 'profesionales', titulo: 'Profesionales', descripcion: 'Defensor, psicosocial y nutricionista de cada menor.', fase: 1, roles: ['coordinador', 'admin'] },
-  { ruta: 'menores', titulo: 'Menores y Expedientes', descripcion: 'Carpeta digital de cada menor.', fase: 2, roles: ['madre', 'profesional', 'defensor', 'coordinador'] },
-  { ruta: 'asignaciones', titulo: 'Asignaciones y Traslados', descripcion: 'Vinculación del menor con el hogar y actas de traslado.', fase: 2, roles: ['profesional', 'defensor', 'coordinador'] },
+  { ruta: 'menores', titulo: 'Menores y Expedientes', descripcion: 'Carpeta digital de cada menor.', fase: 2, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'admin'] },
+  { ruta: 'asignaciones', titulo: 'Asignaciones y Traslados', descripcion: 'Vinculación del menor con el hogar y actas de traslado.', fase: 2, roles: ['profesional', 'defensor', 'coordinador', 'admin'] },
   { ruta: 'documentos', titulo: 'Gestión Documental', descripcion: 'Carga, clasificación, versionado y revisión de documentos.', fase: 3, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'auditor'] },
   { ruta: 'inventario', titulo: 'Inventario del Hogar', descripcion: 'Camas, muebles, personas que viven y red de apoyo.', fase: 4, roles: ['madre', 'profesional', 'coordinador'] },
   { ruta: 'alimentos', titulo: 'Control de Alimentos', descripcion: 'Ingreso de mercado, perecederos y vencimientos.', fase: 4, roles: ['madre', 'profesional', 'coordinador'] },

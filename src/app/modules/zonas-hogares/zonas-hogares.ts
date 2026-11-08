@@ -52,6 +52,9 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
     @if (zonaSeleccionada()) {
       <section class="tarjeta">
         <h2>Hogares en {{ zonaSeleccionada()!.nombre }}</h2>
+        <p>
+          <a [routerLink]="['/reportes', 'zona', zonaSeleccionada()!.id]">Ver reporte de esta zona</a>
+        </p>
         @if (cargandoHogares()) {
           <p class="nota">Cargando hogares...</p>
         }

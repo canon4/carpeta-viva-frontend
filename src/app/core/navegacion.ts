@@ -20,8 +20,12 @@ export const MODULOS: ModuloNav[] = [
   { ruta: 'alimentos', titulo: 'Control de Alimentos', descripcion: 'Ingreso de mercado, perecederos y vencimientos.', fase: 4, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'admin', 'auditor'] },
   { ruta: 'citas', titulo: 'Citas y Recordatorios', descripcion: 'Recordatorio de citas médicas, psicosociales y reuniones con familia biológica.', fase: 4, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'admin', 'auditor'] },
   { ruta: 'alertas', titulo: 'Alertas y Evasiones', descripcion: 'Reporte de evasión, notificación y números de emergencia.', fase: 4, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'admin', 'auditor'] },
-  { ruta: 'reportes', titulo: 'Reportes', descripcion: 'Reportes generales, por zona, por menor y por madre.', fase: 5, roles: ['profesional', 'defensor', 'coordinador', 'auditor', 'admin'] },
-  { ruta: 'ia', titulo: 'Asistente de IA', descripcion: 'Búsqueda y resumen con citas a la fuente.', fase: 5, roles: ['madre', 'profesional', 'defensor', 'coordinador'] },
-  { ruta: 'archivo', titulo: 'Archivo y Cierre', descripcion: 'Archivo del expediente al cierre del proceso.', fase: 5, roles: ['profesional', 'coordinador', 'admin'] },
+  // Reportes incluye a la madre: ADR-0010 sección 2 da acceso explícito a "madre/{madre_id}: la propia madre".
+  { ruta: 'reportes', titulo: 'Reportes', descripcion: 'Reportes generales, por zona, por menor y por madre.', fase: 5, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'auditor', 'admin'] },
+  // Se agrega admin: ADR-0010 sección 1.9 reserva GET /ia/estado (configuración del proveedor) para admin.
+  { ruta: 'ia', titulo: 'Asistente de IA', descripcion: 'Búsqueda y resumen con citas a la fuente.', fase: 5, roles: ['madre', 'profesional', 'defensor', 'coordinador', 'admin'] },
+  // Archivo y Cierre no menciona a "profesional" en ningún endpoint del ADR-0010 sección 3; se
+  // agrega auditor (listado de expedientes archivados sin contenido, ADR-0010 "Consecuencias").
+  { ruta: 'archivo', titulo: 'Archivo y Cierre', descripcion: 'Archivo del expediente al cierre del proceso.', fase: 5, roles: ['coordinador', 'admin', 'auditor'] },
   { ruta: 'auditoria', titulo: 'Auditoría', descripcion: 'Registro de accesos y cambios.', fase: 1, roles: ['auditor', 'admin'] },
 ];

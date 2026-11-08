@@ -214,6 +214,45 @@ const SIN_ACCESO = 'No tiene acceso a esta sección del expediente.';
         </p>
       </section>
 
+      @if (puedeVerIa()) {
+        <section class="tarjeta">
+          <h2>Asistente de IA</h2>
+          <p>
+            <a [routerLink]="['/ia', 'menores', menorId, 'resumen']">Ver resumen de IA de este expediente</a>
+          </p>
+          <p>
+            <a [routerLink]="['/ia']" [queryParams]="{ menor_id: menorId }">
+              Hacer una pregunta en lenguaje natural sobre este menor
+            </a>
+          </p>
+          @if (puedeRedactar()) {
+            <p>
+              <a [routerLink]="['/ia', 'redaccion']" [queryParams]="{ menor_id: menorId }">
+                Apoyo a la redacción de un informe para este menor
+              </a>
+            </p>
+          }
+        </section>
+      }
+
+      <section class="tarjeta">
+        <h2>Reportes</h2>
+        <p>
+          <a [routerLink]="['/reportes', 'menor', menorId]">Ver reporte de este menor</a>
+        </p>
+      </section>
+
+      @if (puedeVerArchivo()) {
+        <section class="tarjeta">
+          <h2>Archivo y Cierre</h2>
+          <p>
+            <a [routerLink]="['/archivo', 'menores', menorId]">
+              Ver estado de archivo{{ puedeArchivar() ? ' o archivar este expediente' : '' }}
+            </a>
+          </p>
+        </section>
+      }
+
       <section class="tarjeta">
         <h2>Citas y Recordatorios</h2>
         <p>
@@ -388,6 +427,22 @@ export class MenorDetalle {
   protected readonly puedeEditar = computed(() => {
     const rol = this.auth.rol();
     return rol === 'coordinador' || rol === 'admin' || rol === 'defensor';
+  });
+  protected readonly puedeVerIa = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'madre' || rol === 'profesional' || rol === 'defensor' || rol === 'coordinador' || rol === 'admin';
+  });
+  protected readonly puedeRedactar = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'profesional' || rol === 'defensor';
+  });
+  protected readonly puedeVerArchivo = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'coordinador' || rol === 'admin' || rol === 'auditor';
+  });
+  protected readonly puedeArchivar = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'coordinador' || rol === 'admin';
   });
 
   constructor() {

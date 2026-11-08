@@ -1249,6 +1249,125 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reportes/general": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reporte general */
+        get: operations["general_endpoint_api_v1_reportes_general_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/zona/{zona_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reporte por zona */
+        get: operations["zona_endpoint_api_v1_reportes_zona__zona_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/menor/{menor_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reporte por menor */
+        get: operations["menor_endpoint_api_v1_reportes_menor__menor_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/madre/{madre_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reporte por madre */
+        get: operations["madre_endpoint_api_v1_reportes_madre__madre_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/exportar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Exportar reporte */
+        post: operations["exportar_endpoint_api_v1_reportes_exportar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/exportados": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar informes exportados */
+        get: operations["listar_exportados_endpoint_api_v1_reportes_exportados_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reportes/exportados/{informe_id}/contenido": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar un informe exportado */
+        get: operations["contenido_exportado_endpoint_api_v1_reportes_exportados__informe_id__contenido_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ia/_estado": {
         parameters: {
             query?: never;
@@ -1256,10 +1375,156 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Estado del módulo */
-        get: operations["estado_api_v1_ia__estado_get"];
+        /** Estado del módulo (health check, no confundir con GET /ia/estado) */
+        get: operations["modulo_estado_api_v1_ia__estado_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/estado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Configuración activa del asistente (admin) */
+        get: operations["estado_endpoint_api_v1_ia_estado_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/consultas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Historial de consultas (propio, o todas para admin/auditor) */
+        get: operations["listar_consultas_endpoint_api_v1_ia_consultas_get"];
+        put?: never;
+        /** Pregunta en lenguaje natural (RAG con citas) */
+        post: operations["crear_consulta_endpoint_api_v1_ia_consultas_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/consultas/{consulta_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalle de una consulta */
+        get: operations["obtener_consulta_endpoint_api_v1_ia_consultas__consulta_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/menores/{menor_id}/resumen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resumen de IA del expediente */
+        get: operations["resumen_menor_endpoint_api_v1_ia_menores__menor_id__resumen_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/documentos/{documento_id}/resumen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resumen de IA de un documento o reporte */
+        get: operations["resumen_documento_endpoint_api_v1_ia_documentos__documento_id__resumen_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/redaccion/apoyo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Borrador de informe con apoyo de IA */
+        post: operations["apoyo_redaccion_endpoint_api_v1_ia_redaccion_apoyo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/mantenimiento/reindexar-pendientes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reintenta la indexación de documentos/reportes sin fragmentos (admin) */
+        post: operations["reindexar_pendientes_endpoint_api_v1_ia_mantenimiento_reindexar_pendientes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/documentos/clasificar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sugerencia de categoría antes de crear el documento (no persiste nada)
+         * @description No está en la lista literal de endpoints de ADR-0010 sección 1.9 (que describe
+         *     `clasificar_y_extraer` como un caso de uso interno llamado por `documentos.application`
+         *     después de guardar); se agrega este endpoint propio, de solo sugerencia, para poder
+         *     mostrar `categoria_sugerida`/`confianza` ANTES de guardar (sección 1.2, "se devuelve
+         *     categoria_sugerida y confianza en la respuesta de carga") sin modificar el contrato de
+         *     `POST /documentos` de ADR-0008 sin coordinarlo primero con `backend`. Deviación documentada
+         *     en el informe final de esta tarea.
+         */
+        post: operations["clasificar_documento_endpoint_api_v1_ia_documentos_clasificar_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1309,6 +1574,74 @@ export interface paths {
         };
         /** Estado del módulo */
         get: operations["estado_api_v1_archivo__estado_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/archivo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar expedientes archivados */
+        get: operations["listar_endpoint_api_v1_archivo_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/archivo/menores/{menor_id}/cerrar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archivar y cerrar el expediente de un menor */
+        post: operations["cerrar_endpoint_api_v1_archivo_menores__menor_id__cerrar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/archivo/menores/{menor_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Estado de archivo de un menor */
+        get: operations["estado_endpoint_api_v1_archivo_menores__menor_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/archivo/menores/{menor_id}/paquete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Descargar el paquete cifrado del expediente archivado */
+        get: operations["paquete_endpoint_api_v1_archivo_menores__menor_id__paquete_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1593,6 +1926,11 @@ export interface components {
              */
             created_at: string;
         };
+        /** Body_clasificar_documento_endpoint_api_v1_ia_documentos_clasificar_post */
+        Body_clasificar_documento_endpoint_api_v1_ia_documentos_clasificar_post: {
+            /** Archivo */
+            archivo: string;
+        };
         /** Body_crear_documento_endpoint_api_v1_documentos_post */
         Body_crear_documento_endpoint_api_v1_documentos_post: {
             /** Archivo */
@@ -1618,6 +1956,11 @@ export interface components {
             /** Archivo */
             archivo: string;
         };
+        /** CerrarExpedienteRequest */
+        CerrarExpedienteRequest: {
+            /** Motivo */
+            motivo: string;
+        };
         /** CitaCreate */
         CitaCreate: {
             /**
@@ -1642,47 +1985,6 @@ export interface components {
             /** Estado */
             estado: string;
         };
-        /** CitaOut */
-        CitaOut: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /**
-             * Menor Id
-             * Format: uuid
-             */
-            menor_id: string;
-            /** Tipo */
-            tipo: string;
-            /**
-             * Fecha Hora
-             * Format: date-time
-             */
-            fecha_hora: string;
-            /** Lugar */
-            lugar?: string | null;
-            /** Notas */
-            notas?: string | null;
-            /** Estado */
-            estado: string;
-            /**
-             * Registrado Por
-             * Format: uuid
-             */
-            registrado_por: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
         /** CitaUpdate */
         CitaUpdate: {
             /** Fecha Hora */
@@ -1691,6 +1993,94 @@ export interface components {
             lugar?: string | null;
             /** Notas */
             notas?: string | null;
+        };
+        /** ConsultaCreate */
+        ConsultaCreate: {
+            /** Pregunta */
+            pregunta: string;
+            /** Menor Id */
+            menor_id?: string | null;
+            /** Hogar Id */
+            hogar_id?: string | null;
+        };
+        /**
+         * ConsultaMetadatosOut
+         * @description Lo único que ve `auditor` (ADR-0010, sección 1.4/1.9): nunca `pregunta`/`respuesta`.
+         */
+        ConsultaMetadatosOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Usuario Id
+             * Format: uuid
+             */
+            usuario_id: string;
+            /** Menor Id */
+            menor_id?: string | null;
+            /** Hogar Id */
+            hogar_id?: string | null;
+            /** Fragmentos Usados */
+            fragmentos_usados?: {
+                [key: string]: unknown;
+            }[];
+            /** Modelo */
+            modelo: string;
+            /** Proveedor */
+            proveedor: string;
+            /** Anonimizado */
+            anonimizado: boolean;
+            /** Sin Resultado */
+            sin_resultado: boolean;
+            /** Duracion Ms */
+            duracion_ms?: number | null;
+            /**
+             * Creado En
+             * Format: date-time
+             */
+            creado_en: string;
+        };
+        /** ConsultaOut */
+        ConsultaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Usuario Id
+             * Format: uuid
+             */
+            usuario_id: string;
+            /** Pregunta */
+            pregunta: string;
+            /** Respuesta */
+            respuesta: string;
+            /** Menor Id */
+            menor_id?: string | null;
+            /** Hogar Id */
+            hogar_id?: string | null;
+            /** Fragmentos Usados */
+            fragmentos_usados?: {
+                [key: string]: unknown;
+            }[];
+            /** Modelo */
+            modelo: string;
+            /** Proveedor */
+            proveedor: string;
+            /** Anonimizado */
+            anonimizado: boolean;
+            /** Sin Resultado */
+            sin_resultado: boolean;
+            /** Duracion Ms */
+            duracion_ms?: number | null;
+            /**
+             * Creado En
+             * Format: date-time
+             */
+            creado_en: string;
         };
         /**
          * ContactoEmergencia
@@ -1827,6 +2217,20 @@ export interface components {
              */
             created_at: string;
         };
+        /** DocumentoResumen */
+        DocumentoResumen: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Categoria */
+            categoria: string;
+            /** Titulo */
+            titulo: string;
+            /** Estado Flujo */
+            estado_flujo: string;
+        };
         /** DocumentoVersionOut */
         DocumentoVersionOut: {
             /**
@@ -1873,6 +2277,21 @@ export interface components {
          * @enum {string}
          */
         EstadoHogar: "activo" | "inactivo" | "suspendido";
+        /** EstadoIaOut */
+        EstadoIaOut: {
+            /** Proveedor Llm */
+            proveedor_llm: string;
+            /** Modelo Llm */
+            modelo_llm: string;
+            /** Embeddings Modelo */
+            embeddings_modelo: string;
+            /** Anonimizado Por Defecto */
+            anonimizado_por_defecto: boolean;
+            /** Seudonimizacion Cobertura */
+            seudonimizacion_cobertura: string;
+            /** Indexar Automaticamente */
+            indexar_automaticamente: boolean;
+        };
         /**
          * EstadoMenor
          * @enum {string}
@@ -1897,6 +2316,48 @@ export interface components {
         EvasionReportadaOut: {
             alerta: components["schemas"]["AlertaOut"];
             contactos_emergencia: components["schemas"]["ContactosEmergenciaOut"];
+        };
+        /** ExpedienteArchivoOut */
+        ExpedienteArchivoOut: {
+            /** Id */
+            id?: string | null;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Estado */
+            estado: string;
+            /** Archivado En */
+            archivado_en?: string | null;
+            /** Archivado Por */
+            archivado_por?: string | null;
+            /** Motivo */
+            motivo?: string | null;
+            /** Zona Id */
+            zona_id?: string | null;
+            /** Paquete Hash */
+            paquete_hash?: string | null;
+            /** Destino */
+            destino: string;
+            /** Enviado En */
+            enviado_en?: string | null;
+        };
+        /** ExportarRequest */
+        ExportarRequest: {
+            /** Nivel */
+            nivel: string;
+            /** Zona Id */
+            zona_id?: string | null;
+            /** Menor Id */
+            menor_id?: string | null;
+            /** Madre Id */
+            madre_id?: string | null;
+            /**
+             * Formato
+             * @default json
+             */
+            formato: string;
         };
         /** FamiliarCreate */
         FamiliarCreate: {
@@ -2004,6 +2465,34 @@ export interface components {
             /** Capacidad Maxima */
             capacidad_maxima?: number | null;
             estado?: components["schemas"]["EstadoHogar"] | null;
+        };
+        /** InformeGeneradoOut */
+        InformeGeneradoOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Usuario Id
+             * Format: uuid
+             */
+            usuario_id: string;
+            /** Nivel */
+            nivel: string;
+            /** Filtros */
+            filtros: {
+                [key: string]: unknown;
+            };
+            /** Formato */
+            formato: string;
+            /** Referencia Archivo */
+            referencia_archivo?: string | null;
+            /**
+             * Generado En
+             * Format: date-time
+             */
+            generado_en: string;
         };
         /** InventarioItemCreate */
         InventarioItemCreate: {
@@ -2389,6 +2878,67 @@ export interface components {
             /** Activo */
             activo?: boolean | null;
         };
+        /** RedaccionApoyoCreate */
+        RedaccionApoyoCreate: {
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Tipo Informe */
+            tipo_informe: string;
+            /** Notas Profesional */
+            notas_profesional: string;
+        };
+        /** RedaccionApoyoOut */
+        RedaccionApoyoOut: {
+            /** Borrador */
+            borrador: string;
+            /** Citas */
+            citas: components["schemas"]["app__modules__ia__schemas__CitaOut"][];
+            /** Sin Resultado */
+            sin_resultado: boolean;
+        };
+        /** ReindexarPendientesOut */
+        ReindexarPendientesOut: {
+            /** Documentos Reindexados */
+            documentos_reindexados: number;
+            /** Reportes Reindexados */
+            reportes_reindexados: number;
+            /** Documentos Con Error */
+            documentos_con_error: string[];
+            /** Reportes Con Error */
+            reportes_con_error: string[];
+        };
+        /**
+         * ReporteAgregadoOut
+         * @description `GET /reportes/general` y `GET /reportes/zona/{zona_id}`: mismos campos, `zona_id` es
+         *     `None` solo cuando `general` lo ve `admin`/`auditor` sin acotar (todas las zonas).
+         */
+        ReporteAgregadoOut: {
+            /** Zona Id */
+            zona_id?: string | null;
+            /** Menores Por Estado */
+            menores_por_estado: {
+                [key: string]: number;
+            };
+            /** Hogares Total */
+            hogares_total: number;
+            /** Hogares Capacidad Total */
+            hogares_capacidad_total: number;
+            /** Hogares Con Ocupacion Vigente */
+            hogares_con_ocupacion_vigente: number;
+            /** Documentos Pendientes Revision */
+            documentos_pendientes_revision: number;
+            /** Alertas Activas Por Tipo */
+            alertas_activas_por_tipo: {
+                [key: string]: number;
+            };
+            /** Citas Vencidas */
+            citas_vencidas: number;
+            /** Alimentos Vencidos */
+            alimentos_vencidos: number;
+        };
         /** ReporteCreate */
         ReporteCreate: {
             /**
@@ -2404,6 +2954,61 @@ export interface components {
             };
             /** Referencia Archivo */
             referencia_archivo?: string | null;
+        };
+        /** ReporteMadreOut */
+        ReporteMadreOut: {
+            /**
+             * Madre Id
+             * Format: uuid
+             */
+            madre_id: string;
+            /** Hogares */
+            hogares: string[];
+            /** Menores Asignados */
+            menores_asignados: string[];
+            /** Documentos Creados Por Ella Por Estado */
+            documentos_creados_por_ella_por_estado: {
+                [key: string]: number;
+            };
+            /** Alertas Activas */
+            alertas_activas: number;
+            /** Inventario Items */
+            inventario_items: number;
+            /** Alimentos Vencidos */
+            alimentos_vencidos: number;
+            /**
+             * Solo Agregado
+             * @default false
+             */
+            solo_agregado: boolean;
+        };
+        /** ReporteMenorOut */
+        ReporteMenorOut: {
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Estado Actual */
+            estado_actual: string;
+            /** Asignacion Vigente Hogar Id */
+            asignacion_vigente_hogar_id?: string | null;
+            /** Documentos Por Categoria */
+            documentos_por_categoria: {
+                [key: string]: number;
+            };
+            /** Documentos Visibles */
+            documentos_visibles: components["schemas"]["DocumentoResumen"][];
+            /** Reportes Por Tipo */
+            reportes_por_tipo: {
+                [key: string]: number;
+            };
+            /** Alertas Activas */
+            alertas_activas: number;
+            /** Citas Proximas */
+            citas_proximas: number;
+            /** Secciones Sin Acceso */
+            secciones_sin_acceso?: string[];
         };
         /** ReporteOut */
         ReporteOut: {
@@ -2439,6 +3044,34 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** ResumenDocumentoOut */
+        ResumenDocumentoOut: {
+            /**
+             * Documento Id
+             * Format: uuid
+             */
+            documento_id: string;
+            /** Resumen */
+            resumen: string;
+            /** Citas */
+            citas: components["schemas"]["app__modules__ia__schemas__CitaOut"][];
+            /** Sin Resultado */
+            sin_resultado: boolean;
+        };
+        /** ResumenMenorOut */
+        ResumenMenorOut: {
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Resumen */
+            resumen: string;
+            /** Citas */
+            citas: components["schemas"]["app__modules__ia__schemas__CitaOut"][];
+            /** Sin Resultado */
+            sin_resultado: boolean;
         };
         /**
          * SeccionExpedienteOut
@@ -2544,6 +3177,65 @@ export interface components {
             nombre?: string | null;
             /** Descripcion */
             descripcion?: string | null;
+        };
+        /** CitaOut */
+        app__modules__citas__schemas__CitaOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Menor Id
+             * Format: uuid
+             */
+            menor_id: string;
+            /** Tipo */
+            tipo: string;
+            /**
+             * Fecha Hora
+             * Format: date-time
+             */
+            fecha_hora: string;
+            /** Lugar */
+            lugar?: string | null;
+            /** Notas */
+            notas?: string | null;
+            /** Estado */
+            estado: string;
+            /**
+             * Registrado Por
+             * Format: uuid
+             */
+            registrado_por: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CitaOut */
+        app__modules__ia__schemas__CitaOut: {
+            /** Documento Id */
+            documento_id?: string | null;
+            /** Reporte Id */
+            reporte_id?: string | null;
+            /** Version */
+            version: number;
+            /** Categoria */
+            categoria: string;
+            /** Fecha */
+            fecha: string;
+            /**
+             * Texto
+             * @description Formato de cita ya armado, sin nombres reales (sección 1.5 paso 6)
+             */
+            texto: string;
         };
     };
     responses: never;
@@ -4883,7 +5575,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CitaOut"][];
+                    "application/json": components["schemas"]["app__modules__citas__schemas__CitaOut"][];
                 };
             };
             /** @description Validation Error */
@@ -4916,7 +5608,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CitaOut"];
+                    "application/json": components["schemas"]["app__modules__citas__schemas__CitaOut"];
                 };
             };
             /** @description Validation Error */
@@ -4945,7 +5637,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CitaOut"][];
+                    "application/json": components["schemas"]["app__modules__citas__schemas__CitaOut"][];
                 };
             };
         };
@@ -4967,7 +5659,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CitaOut"];
+                    "application/json": components["schemas"]["app__modules__citas__schemas__CitaOut"];
                 };
             };
             /** @description Validation Error */
@@ -5002,7 +5694,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CitaOut"];
+                    "application/json": components["schemas"]["app__modules__citas__schemas__CitaOut"];
                 };
             };
             /** @description Validation Error */
@@ -5037,7 +5729,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CitaOut"];
+                    "application/json": components["schemas"]["app__modules__citas__schemas__CitaOut"];
                 };
             };
             /** @description Validation Error */
@@ -5316,7 +6008,204 @@ export interface operations {
             };
         };
     };
-    estado_api_v1_ia__estado_get: {
+    general_endpoint_api_v1_reportes_general_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReporteAgregadoOut"];
+                };
+            };
+        };
+    };
+    zona_endpoint_api_v1_reportes_zona__zona_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                zona_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReporteAgregadoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    menor_endpoint_api_v1_reportes_menor__menor_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReporteMenorOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    madre_endpoint_api_v1_reportes_madre__madre_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                madre_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReporteMadreOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exportar_endpoint_api_v1_reportes_exportar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExportarRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InformeGeneradoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_exportados_endpoint_api_v1_reportes_exportados_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InformeGeneradoOut"][];
+                };
+            };
+        };
+    };
+    contenido_exportado_endpoint_api_v1_reportes_exportados__informe_id__contenido_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                informe_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    modulo_estado_api_v1_ia__estado_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -5334,6 +6223,260 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    estado_endpoint_api_v1_ia_estado_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EstadoIaOut"];
+                };
+            };
+        };
+    };
+    listar_consultas_endpoint_api_v1_ia_consultas_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsultaOut"][] | components["schemas"]["ConsultaMetadatosOut"][];
+                };
+            };
+        };
+    };
+    crear_consulta_endpoint_api_v1_ia_consultas_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsultaCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsultaOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_consulta_endpoint_api_v1_ia_consultas__consulta_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                consulta_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsultaOut"] | components["schemas"]["ConsultaMetadatosOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resumen_menor_endpoint_api_v1_ia_menores__menor_id__resumen_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumenMenorOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resumen_documento_endpoint_api_v1_ia_documentos__documento_id__resumen_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                documento_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResumenDocumentoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apoyo_redaccion_endpoint_api_v1_ia_redaccion_apoyo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedaccionApoyoCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedaccionApoyoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reindexar_pendientes_endpoint_api_v1_ia_mantenimiento_reindexar_pendientes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReindexarPendientesOut"];
+                };
+            };
+        };
+    };
+    clasificar_documento_endpoint_api_v1_ia_documentos_clasificar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_clasificar_documento_endpoint_api_v1_ia_documentos_clasificar_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -5414,6 +6557,136 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    listar_endpoint_api_v1_archivo_get: {
+        parameters: {
+            query?: {
+                zona_id?: string | null;
+                desde?: string | null;
+                hasta?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpedienteArchivoOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cerrar_endpoint_api_v1_archivo_menores__menor_id__cerrar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CerrarExpedienteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpedienteArchivoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    estado_endpoint_api_v1_archivo_menores__menor_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExpedienteArchivoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    paquete_endpoint_api_v1_archivo_menores__menor_id__paquete_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

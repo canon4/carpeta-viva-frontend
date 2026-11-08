@@ -7,7 +7,10 @@ import { firstValueFrom } from 'rxjs';
 import { AppConfigService } from '../../core/config/app-config';
 import type { components } from '../../core/api/schema';
 
-type Cita = components['schemas']['CitaOut'];
+// El generador de tipos distingue este `CitaOut` (citas y recordatorios) del homónimo agregado
+// en el módulo `ia` (cita a una fuente documental, Fase 5) porque ambos backends usan el mismo
+// nombre de clase en módulos distintos.
+type Cita = components['schemas']['app__modules__citas__schemas__CitaOut'];
 
 const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 

@@ -3,10 +3,11 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth';
 import { MODULOS } from '../../core/navegacion';
+import { IaFlotante } from '../../shared/ia-flotante/ia-flotante';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, IaFlotante],
   template: `
     <header class="barra">
       <button type="button" class="menu" (click)="menuAbierto.set(!menuAbierto())" [attr.aria-expanded]="menuAbierto()">
@@ -25,6 +26,7 @@ import { MODULOS } from '../../core/navegacion';
       </nav>
       <main class="contenido"><router-outlet /></main>
     </div>
+    <app-ia-flotante />
   `,
 })
 export class Shell {

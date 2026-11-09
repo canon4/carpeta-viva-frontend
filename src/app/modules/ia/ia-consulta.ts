@@ -12,6 +12,9 @@ type ConsultaCreate = components['schemas']['ConsultaCreate'];
 type ConsultaOut = components['schemas']['ConsultaOut'];
 type ConsultaMetadatosOut = components['schemas']['ConsultaMetadatosOut'];
 type ConsultaFila = ConsultaOut | ConsultaMetadatosOut;
+type Menor = components['schemas']['MenorOut'];
+type Hogar = components['schemas']['HogarOut'];
+type Zona = components['schemas']['ZonaOut'];
 
 const MENSAJE_GENERICO = 'No se pudo completar la consulta. Intente de nuevo.';
 
@@ -50,10 +53,22 @@ const MENSAJE_GENERICO = 'No se pudo completar la consulta. Intente de nuevo.';
         [disabled]="preguntando()"
         placeholder="Ejemplo: ¿Cuándo fue la última visita médica de este menor?"
       ></textarea>
-      <label for="menorIdCtx">Id del menor (opcional, limita la búsqueda a su expediente)</label>
-      <input id="menorIdCtx" name="menorIdCtx" [(ngModel)]="menorId" [disabled]="preguntando()" />
-      <label for="hogarIdCtx">Id del hogar (opcional)</label>
-      <input id="hogarIdCtx" name="hogarIdCtx" [(ngModel)]="hogarId" [disabled]="preguntando()" />
+      <label for="menorIdCtx">Limitar a un menor (opcional)</label>
+      <select id="menorIdCtx" name="menorIdCtx" [(ngModel)]="menorId" [disabled]="preguntando() || cargandoFiltros()">
+        <option value="">Todos los menores a los que tengo acceso</option>
+        @for (m of menores(); track m.id) {
+          <option [value]="m.id">{{ m.nombres }} {{ m.apellidos }}{{ m.numero_documento ? ' — ' + m.numero_documento : '' }}</option>
+        }
+      </select>
+      @if (puedeFiltrarPorHogar()) {
+        <label for="hogarIdCtx">Limitar a un hogar (opcional)</label>
+        <select id="hogarIdCtx" name="hogarIdCtx" [(ngModel)]="hogarId" [disabled]="preguntando() || cargandoFiltros()">
+          <option value="">Todos los hogares</option>
+          @for (h of hogares(); track h.id) {
+            <option [value]="h.id">{{ etiquetaHogar(h) }}</option>
+          }
+        </select>
+      }
       <button type="submit" [disabled]="f.invalid || preguntando()">
         {{ preguntando() ? 'Buscando...' : 'Preguntar' }}
       </button>
@@ -127,10 +142,19 @@ export class IaConsulta {
     const rol = this.auth.rol();
     return rol === 'profesional' || rol === 'defensor';
   });
+  protected readonly puedeFiltrarPorHogar = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'coordinador' || rol === 'admin';
+  });
 
   protected pregunta = '';
   protected menorId = '';
   protected hogarId = '';
+
+  protected readonly cargandoFiltros = signal(false);
+  protected readonly menores = signal<Menor[]>([]);
+  protected readonly hogares = signal<Hogar[]>([]);
+  private readonly zonasPorId = new Map<string, string>();
 
   protected readonly preguntando = signal(false);
   protected readonly error = signal('');
@@ -143,6 +167,38 @@ export class IaConsulta {
   constructor() {
     this.menorId = this.route.snapshot.queryParamMap.get('menor_id') ?? '';
     this.hogarId = this.route.snapshot.queryParamMap.get('hogar_id') ?? '';
+    void this.cargarFiltros();
+  }
+
+  private async cargarFiltros(): Promise<void> {
+    this.cargandoFiltros.set(true);
+    try {
+      const peticiones: Promise<void>[] = [
+        firstValueFrom(this.http.get<Menor[]>(`${this.config.apiUrl}/menores`)).then((m) => this.menores.set(m)),
+      ];
+      if (this.puedeFiltrarPorHogar()) {
+        peticiones.push(
+          firstValueFrom(this.http.get<Zona[]>(`${this.config.apiUrl}/zonas-hogares/zonas`)).then((zonas) => {
+            for (const z of zonas) this.zonasPorId.set(z.id, z.nombre);
+          }),
+        );
+        peticiones.push(
+          firstValueFrom(this.http.get<Hogar[]>(`${this.config.apiUrl}/zonas-hogares/hogares`)).then((h) =>
+            this.hogares.set(h),
+          ),
+        );
+      }
+      await Promise.all(peticiones);
+    } catch {
+      // Los menús quedan vacíos; se puede seguir preguntando sin filtrar por menor u hogar.
+    } finally {
+      this.cargandoFiltros.set(false);
+    }
+  }
+
+  protected etiquetaHogar(h: Hogar): string {
+    const zona = this.zonasPorId.get(h.zona_id);
+    return zona ? `Hogar de la zona ${zona}` : `Hogar ${h.id.slice(0, 8)}`;
   }
 
   protected async preguntar(): Promise<void> {

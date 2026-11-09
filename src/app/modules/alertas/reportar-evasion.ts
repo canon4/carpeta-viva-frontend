@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config';
+import { SelectorMenor } from '../../shared/selector-menor/selector-menor';
 import type { components } from '../../core/api/schema';
 
 type EvasionReportada = components['schemas']['EvasionReportadaOut'];
@@ -20,7 +21,7 @@ const MENSAJE_GENERICO = 'No se pudo registrar el reporte. Intente de nuevo o ll
  */
 @Component({
   selector: 'app-reportar-evasion',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, SelectorMenor],
   template: `
     <h1>Reportar evasión</h1>
 
@@ -31,8 +32,7 @@ const MENSAJE_GENERICO = 'No se pudo registrar el reporte. Intente de nuevo o ll
       </p>
 
       <form class="formulario tarjeta" (ngSubmit)="reportar()" #f="ngForm">
-        <label for="menorId">Id del menor</label>
-        <input id="menorId" name="menorId" required [(ngModel)]="menorId" [disabled]="enviando()" />
+        <app-selector-menor [(valor)]="menorId" [requerido]="true" />
 
         <label for="descripcion">Qué pasó (breve)</label>
         <textarea

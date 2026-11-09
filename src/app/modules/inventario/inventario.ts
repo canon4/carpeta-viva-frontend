@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config';
+import { SelectorHogar } from '../../shared/selector-hogar/selector-hogar';
 import type { components } from '../../core/api/schema';
 
 type Item = components['schemas']['InventarioItemOut'];
@@ -20,13 +21,12 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
  */
 @Component({
   selector: 'app-inventario',
-  imports: [FormsModule],
+  imports: [FormsModule, SelectorHogar],
   template: `
     <h1>Inventario del Hogar</h1>
 
     <form class="formulario" (ngSubmit)="cargarTodo()">
-      <label for="hogarId">Id del hogar</label>
-      <input id="hogarId" name="hogarId" required [(ngModel)]="hogarId" />
+      <app-selector-hogar [(valor)]="hogarId" [requerido]="true" />
       <button type="submit" [disabled]="!hogarId.trim() || cargando()">Cargar</button>
     </form>
 

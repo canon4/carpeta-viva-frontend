@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
+import { SelectorMenor } from '../../shared/selector-menor/selector-menor';
 import type { components } from '../../core/api/schema';
 
 type Alerta = components['schemas']['AlertaOut'];
@@ -29,7 +30,7 @@ function etiquetaTipo(tipo: string): string {
  */
 @Component({
   selector: 'app-alertas-lista',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, SelectorMenor],
   template: `
     <h1>Alertas y Evasiones</h1>
 
@@ -55,8 +56,7 @@ function etiquetaTipo(tipo: string): string {
     }
 
     <form class="formulario" (ngSubmit)="filtrar()">
-      <label for="fMenor">Id del menor (opcional)</label>
-      <input id="fMenor" name="fMenor" [(ngModel)]="filtroMenorId" />
+      <app-selector-menor [(valor)]="filtroMenorId" etiqueta="Menor (opcional)" opcionVacia="Todos los menores" />
       <label for="fTipo">Tipo (opcional)</label>
       <select id="fTipo" name="fTipo" [(ngModel)]="filtroTipo">
         <option value="">Todos</option>

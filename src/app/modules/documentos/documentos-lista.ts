@@ -6,6 +6,8 @@ import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
+import { SelectorMenor } from '../../shared/selector-menor/selector-menor';
+import { SelectorHogar } from '../../shared/selector-hogar/selector-hogar';
 import type { components } from '../../core/api/schema';
 import { CATEGORIAS_HOGAR, CATEGORIAS_MENOR, ESTADOS_FLUJO, etiquetaCategoria, etiquetaEstadoFlujo, formatoTamanio } from './categorias';
 
@@ -20,7 +22,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
  */
 @Component({
   selector: 'app-documentos-lista',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, SelectorMenor, SelectorHogar],
   template: `
     <h1>Gestión Documental</h1>
 
@@ -31,10 +33,8 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
       </p>
     } @else {
       <form class="formulario" (ngSubmit)="filtrar()">
-        <label for="fMenor">Id del menor (opcional)</label>
-        <input id="fMenor" name="fMenor" [(ngModel)]="filtroMenorId" />
-        <label for="fHogar">Id del hogar (opcional)</label>
-        <input id="fHogar" name="fHogar" [(ngModel)]="filtroHogarId" />
+        <app-selector-menor [(valor)]="filtroMenorId" etiqueta="Menor (opcional)" opcionVacia="Todos los menores" />
+        <app-selector-hogar [(valor)]="filtroHogarId" etiqueta="Hogar (opcional)" opcionVacia="Todos los hogares" />
         <label for="fCategoria">Categoría (opcional)</label>
         <select id="fCategoria" name="fCategoria" [(ngModel)]="filtroCategoria">
           <option value="">Todas</option>
@@ -86,11 +86,9 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
         </select>
 
         @if (nuevo.destino === 'menor') {
-          <label for="nMenorId">Id del menor</label>
-          <input id="nMenorId" name="nMenorId" required [(ngModel)]="nuevo.menor_id" />
+          <app-selector-menor [(valor)]="nuevo.menor_id" [requerido]="true" />
         } @else {
-          <label for="nHogarId">Id del hogar</label>
-          <input id="nHogarId" name="nHogarId" required [(ngModel)]="nuevo.hogar_id" />
+          <app-selector-hogar [(valor)]="nuevo.hogar_id" [requerido]="true" />
         }
 
         <label for="nCategoria">Categoría</label>

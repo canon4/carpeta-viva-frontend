@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config';
+import { SelectorHogar } from '../../shared/selector-hogar/selector-hogar';
 import type { components } from '../../core/api/schema';
 
 type Alimento = components['schemas']['AlimentoItemOut'];
@@ -14,13 +15,12 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 /** Control de Alimentos del hogar: ingreso de mercado, perecederos y vencimientos. */
 @Component({
   selector: 'app-alimentos',
-  imports: [FormsModule],
+  imports: [FormsModule, SelectorHogar],
   template: `
     <h1>Control de Alimentos</h1>
 
     <form class="formulario" (ngSubmit)="cargar()">
-      <label for="hogarId">Id del hogar</label>
-      <input id="hogarId" name="hogarId" required [(ngModel)]="hogarId" />
+      <app-selector-hogar [(valor)]="hogarId" [requerido]="true" />
       <label for="fPerecedero">Perecedero</label>
       <select id="fPerecedero" name="fPerecedero" [(ngModel)]="filtroPerecedero">
         <option value="">Todos</option>

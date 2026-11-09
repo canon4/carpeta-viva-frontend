@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config';
+import { SelectorMenor } from '../../shared/selector-menor/selector-menor';
 import type { components } from '../../core/api/schema';
 
 // El generador de tipos distingue este `CitaOut` (citas y recordatorios) del homónimo agregado
@@ -35,13 +36,12 @@ const ETIQUETAS_ESTADO: Record<string, string> = {
  */
 @Component({
   selector: 'app-citas-lista',
-  imports: [FormsModule],
+  imports: [FormsModule, SelectorMenor],
   template: `
     <h1>Citas y Recordatorios</h1>
 
     <form class="formulario" (ngSubmit)="filtrar()">
-      <label for="fMenor">Id del menor</label>
-      <input id="fMenor" name="fMenor" [(ngModel)]="filtroMenorId" />
+      <app-selector-menor [(valor)]="filtroMenorId" etiqueta="Menor (opcional)" opcionVacia="Todos los menores" />
       <label for="fTipo">Tipo (opcional)</label>
       <select id="fTipo" name="fTipo" [(ngModel)]="filtroTipo">
         <option value="">Todos</option>
@@ -96,8 +96,7 @@ const ETIQUETAS_ESTADO: Record<string, string> = {
 
     <form class="formulario tarjeta" (ngSubmit)="crear()" #f="ngForm">
       <h2>Registrar cita</h2>
-      <label for="nMenor">Id del menor</label>
-      <input id="nMenor" name="nMenor" required [(ngModel)]="nueva.menor_id" />
+      <app-selector-menor [(valor)]="nueva.menor_id" [requerido]="true" />
       <label for="nTipo">Tipo</label>
       <select id="nTipo" name="nTipo" required [(ngModel)]="nueva.tipo">
         <option value="medica">Médica</option>

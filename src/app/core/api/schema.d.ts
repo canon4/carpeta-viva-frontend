@@ -1523,6 +1523,14 @@ export interface paths {
          *     categoria_sugerida y confianza en la respuesta de carga") sin modificar el contrato de
          *     `POST /documentos` de ADR-0008 sin coordinarlo primero con `backend`. Deviación documentada
          *     en el informe final de esta tarea.
+         *
+         *     Hueco de disponibilidad corregido en la revisión de cierre de seguridad: a diferencia de
+         *     `POST /documentos`/`POST /documentos/{id}/version` (que validan tamaño con
+         *     `documentos.application._validar_tamanio` antes de procesar), este endpoint no tenía límite
+         *     de tamaño: cualquier usuario autenticado podía mandar repetidamente una imagen enorme (o una
+         *     "bomba de descompresión" para Pillow/Tesseract) y agotar CPU/memoria del backend sin pasar
+         *     por ningún límite, ya que no persiste nada y por eso no pasaba por esa validación. Se aplica
+         *     el mismo límite de tamaño configurado (`ARCHIVOS_TAMANIO_MAXIMO_BYTES`).
          */
         post: operations["clasificar_documento_endpoint_api_v1_ia_documentos_clasificar_post"];
         delete?: never;
@@ -2606,6 +2614,8 @@ export interface components {
             estado_certificacion: string;
             /** Firma Ref */
             firma_ref?: string | null;
+            /** Hogar Id */
+            hogar_id?: string | null;
         };
         /** MadreUpdate */
         MadreUpdate: {

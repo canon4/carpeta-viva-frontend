@@ -7,6 +7,7 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
 import type { components } from '../../core/api/schema';
+import { VisorDocumento } from '../../shared/visor-documento/visor-documento';
 import { etiquetaCategoria, etiquetaEstadoFlujo, formatoTamanio } from './categorias';
 import { descargarBlob } from './descargas';
 
@@ -22,7 +23,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
  */
 @Component({
   selector: 'app-documento-detalle',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, VisorDocumento],
   template: `
     @if (cargando()) {
       <p class="nota">Cargando documento...</p>
@@ -34,6 +35,17 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
     @if (documento()) {
       <h1>{{ documento()!.titulo }}</h1>
       <p><a routerLink="/documentos">Volver a la lista de documentos</a></p>
+
+      @if (!esAuditor()) {
+        <section class="tarjeta">
+          <h2>Vista previa</h2>
+          <app-visor-documento
+            [documentoId]="documento()!.id"
+            [mimeType]="documento()!.mime_type"
+            [nombreArchivo]="documento()!.nombre_original"
+          />
+        </section>
+      }
 
       <section class="tarjeta">
         <h2>Metadatos</h2>
@@ -55,6 +67,12 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
           <button type="button" (click)="descargar()" [disabled]="descargando()">
             {{ descargando() ? 'Descargando...' : 'Descargar archivo' }}
           </button>
+          @if (documento()!.estado_flujo === 'borrador' || documento()!.estado_flujo === 'devuelto') {
+            <p class="nota">
+              Para corregirlo: descárguelo, edítelo fuera del sistema y suba la nueva versión abajo.
+              No se puede editar directamente aquí.
+            </p>
+          }
         } @else {
           <p class="nota">El rol auditor solo ve metadatos; la descarga del archivo no está disponible.</p>
         }
@@ -111,6 +129,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
                 <th>Archivo</th>
                 <th>Estado en ese momento</th>
                 <th>Fecha</th>
+                <th>Calidad</th>
                 @if (!esAuditor()) {
                   <th>Descarga</th>
                 }
@@ -123,6 +142,10 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
                   <td>{{ v.nombre_original || 'Sin nombre' }}</td>
                   <td>{{ etiquetaEstadoFlujo(v.estado_flujo) }}</td>
                   <td>{{ v.created_at }}</td>
+                  <td>
+                    {{ v.comprimida ? 'Comprimida (copia liviana de historial)' : 'Original' }}
+                    — {{ formatoTamanio(v.tamanio_bytes || 0) }}
+                  </td>
                   @if (!esAuditor()) {
                     <td>
                       <button type="button" (click)="descargarVersion(v)" [disabled]="descargando()">Descargar</button>

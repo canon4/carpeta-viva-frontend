@@ -41,6 +41,15 @@ export function etiquetaEstadoFlujo(valor: string): string {
   return ESTADOS_FLUJO.find((e) => e.valor === valor)?.etiqueta ?? valor;
 }
 
+/** Tipos que el visor puede mostrar en pantalla (ADR-0011); debe coincidir con `MIME_VISUALIZABLES`
+ * de `app/modules/documentos/domain.py` en el backend. Otros formatos (Word/Excel, etc.) solo se
+ * descargan, como antes. */
+const MIME_VISUALIZABLES = new Set(['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+
+export function esVisualizable(mimeType: string): boolean {
+  return MIME_VISUALIZABLES.has(mimeType);
+}
+
 export function formatoTamanio(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;

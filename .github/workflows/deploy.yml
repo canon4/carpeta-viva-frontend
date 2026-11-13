@@ -1,0 +1,21 @@
+name: Desplegar en Dokploy
+
+# Dispara el redespliegue de la app "frontend" en Dokploy (proyecto "carpeta-viva", ver
+# ../../docs/adr/0012-despliegue-dokploy.md en Carpeta_Viva) cuando algo llega a main.
+# Requiere el secreto de repositorio DOKPLOY_DEPLOY_WEBHOOK: la URL que Dokploy muestra en
+# la pestaña "Deployments" de esta app ("Deploy Webhook"). Configúralo en
+# Settings > Secrets and variables > Actions de este repositorio.
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Llamar al webhook de despliegue de Dokploy
+        run: |
+          curl --fail --silent --show-error --request POST "${DOKPLOY_DEPLOY_WEBHOOK}"
+        env:
+          DOKPLOY_DEPLOY_WEBHOOK: ${{ secrets.DOKPLOY_DEPLOY_WEBHOOK }}

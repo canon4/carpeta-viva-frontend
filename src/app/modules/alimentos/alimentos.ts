@@ -1,9 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
 import { SelectorHogar } from '../../shared/selector-hogar/selector-hogar';
 import type { components } from '../../core/api/schema';
@@ -67,7 +68,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
             @if (a.checklist_item_id) {
               <p class="nota">Viene de un producto habitual del checklist.</p>
             }
-            @if (!a.consumido) {
+            @if (!a.consumido && esMadreOAdmin()) {
               <button type="button" (click)="marcarConsumido(a)" [disabled]="guardandoId() === a.id">
                 {{ guardandoId() === a.id ? 'Guardando...' : 'Marcar como consumido' }}
               </button>
@@ -104,47 +105,49 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
                 }
               </p>
 
-              @if (!mostrarComprar[p.id]) {
-                <button type="button" (click)="abrirComprar(p)">Comprar de nuevo</button>
-              } @else {
-                <form class="formulario" (ngSubmit)="comprarDeChecklist(p)" #fcp="ngForm">
-                  <label [for]="'fechaIngresoChk-' + p.id">Fecha de ingreso</label>
-                  <input
-                    [id]="'fechaIngresoChk-' + p.id"
-                    [name]="'fechaIngresoChk-' + p.id"
-                    type="date"
-                    required
-                    [(ngModel)]="compraChecklist[p.id].fecha_ingreso"
-                  />
-                  @if (p.perecedero) {
-                    <label [for]="'fechaVenceChk-' + p.id">Fecha de vencimiento</label>
+              @if (esMadreOAdmin()) {
+                @if (!mostrarComprar[p.id]) {
+                  <button type="button" (click)="abrirComprar(p)">Comprar de nuevo</button>
+                } @else {
+                  <form class="formulario" (ngSubmit)="comprarDeChecklist(p)" #fcp="ngForm">
+                    <label [for]="'fechaIngresoChk-' + p.id">Fecha de ingreso</label>
                     <input
-                      [id]="'fechaVenceChk-' + p.id"
-                      [name]="'fechaVenceChk-' + p.id"
+                      [id]="'fechaIngresoChk-' + p.id"
+                      [name]="'fechaIngresoChk-' + p.id"
                       type="date"
-                      [(ngModel)]="compraChecklist[p.id].fecha_vencimiento"
+                      required
+                      [(ngModel)]="compraChecklist[p.id].fecha_ingreso"
                     />
-                  }
-                  <label [for]="'cantidadChk-' + p.id">Cantidad</label>
-                  <input
-                    [id]="'cantidadChk-' + p.id"
-                    [name]="'cantidadChk-' + p.id"
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    required
-                    [(ngModel)]="compraChecklist[p.id].cantidad"
-                  />
-                  <button type="submit" [disabled]="fcp.invalid || comprandoId() === p.id">
-                    {{ comprandoId() === p.id ? 'Registrando...' : 'Confirmar compra' }}
-                  </button>
-                  <button type="button" (click)="mostrarComprar[p.id] = false">Cancelar</button>
-                </form>
-              }
+                    @if (p.perecedero) {
+                      <label [for]="'fechaVenceChk-' + p.id">Fecha de vencimiento</label>
+                      <input
+                        [id]="'fechaVenceChk-' + p.id"
+                        [name]="'fechaVenceChk-' + p.id"
+                        type="date"
+                        [(ngModel)]="compraChecklist[p.id].fecha_vencimiento"
+                      />
+                    }
+                    <label [for]="'cantidadChk-' + p.id">Cantidad</label>
+                    <input
+                      [id]="'cantidadChk-' + p.id"
+                      [name]="'cantidadChk-' + p.id"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      required
+                      [(ngModel)]="compraChecklist[p.id].cantidad"
+                    />
+                    <button type="submit" [disabled]="fcp.invalid || comprandoId() === p.id">
+                      {{ comprandoId() === p.id ? 'Registrando...' : 'Confirmar compra' }}
+                    </button>
+                    <button type="button" (click)="mostrarComprar[p.id] = false">Cancelar</button>
+                  </form>
+                }
 
-              <button type="button" (click)="desactivarChecklist(p)" [disabled]="guardandoChecklistId() === p.id">
-                Ya no compro este producto
-              </button>
+                <button type="button" (click)="desactivarChecklist(p)" [disabled]="guardandoChecklistId() === p.id">
+                  Ya no compro este producto
+                </button>
+              }
             </li>
           }
           @if (!cargandoChecklist() && checklist().length === 0) {
@@ -152,44 +155,48 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
           }
         </ul>
 
-        <form class="formulario" (ngSubmit)="crearChecklist()" #fc="ngForm">
-          <h3>Registrar producto habitual</h3>
-          <label for="nDescChk">Descripción</label>
-          <input id="nDescChk" name="nDescChk" required [(ngModel)]="nuevoChecklist.descripcion" />
-          <label for="nUnidadChk">Unidad por defecto (opcional)</label>
-          <input id="nUnidadChk" name="nUnidadChk" [(ngModel)]="nuevoChecklist.unidad_por_defecto" placeholder="kg, unidades, litros..." />
-          <label for="nPerecederoChk">
-            <input id="nPerecederoChk" name="nPerecederoChk" type="checkbox" [(ngModel)]="nuevoChecklist.perecedero" />
-            Es perecedero
-          </label>
-          <button type="submit" [disabled]="fc.invalid || creandoChecklist()">
-            {{ creandoChecklist() ? 'Guardando...' : 'Registrar producto' }}
-          </button>
-        </form>
+        @if (esMadreOAdmin()) {
+          <form class="formulario" (ngSubmit)="crearChecklist()" #fc="ngForm">
+            <h3>Registrar producto habitual</h3>
+            <label for="nDescChk">Descripción</label>
+            <input id="nDescChk" name="nDescChk" required [(ngModel)]="nuevoChecklist.descripcion" />
+            <label for="nUnidadChk">Unidad por defecto (opcional)</label>
+            <input id="nUnidadChk" name="nUnidadChk" [(ngModel)]="nuevoChecklist.unidad_por_defecto" placeholder="kg, unidades, litros..." />
+            <label for="nPerecederoChk">
+              <input id="nPerecederoChk" name="nPerecederoChk" type="checkbox" [(ngModel)]="nuevoChecklist.perecedero" />
+              Es perecedero
+            </label>
+            <button type="submit" [disabled]="fc.invalid || creandoChecklist()">
+              {{ creandoChecklist() ? 'Guardando...' : 'Registrar producto' }}
+            </button>
+          </form>
+        }
       </section>
 
-      <form class="formulario tarjeta" (ngSubmit)="crear()" #f="ngForm">
-        <h2>Registrar ingreso</h2>
-        <label for="nDesc">Descripción</label>
-        <input id="nDesc" name="nDesc" required [(ngModel)]="nuevo.descripcion" />
-        <label for="nFechaIngreso">Fecha de ingreso</label>
-        <input id="nFechaIngreso" name="nFechaIngreso" type="date" required [(ngModel)]="nuevo.fecha_ingreso" />
-        <label for="nCantidad">Cantidad</label>
-        <input id="nCantidad" name="nCantidad" type="number" min="0" step="0.1" required [(ngModel)]="nuevo.cantidad" />
-        <label for="nUnidad">Unidad (opcional)</label>
-        <input id="nUnidad" name="nUnidad" [(ngModel)]="nuevo.unidad" placeholder="kg, unidades, litros..." />
-        <label for="nPerecedero">
-          <input id="nPerecedero" name="nPerecedero" type="checkbox" [(ngModel)]="nuevo.perecedero" />
-          Es perecedero
-        </label>
-        @if (nuevo.perecedero) {
-          <label for="nVencimiento">Fecha de vencimiento</label>
-          <input id="nVencimiento" name="nVencimiento" type="date" [(ngModel)]="nuevo.fecha_vencimiento" />
-        }
-        <button type="submit" [disabled]="f.invalid || guardando()">
-          {{ guardando() ? 'Guardando...' : 'Registrar' }}
-        </button>
-      </form>
+      @if (esMadreOAdmin()) {
+        <form class="formulario tarjeta" (ngSubmit)="crear()" #f="ngForm">
+          <h2>Registrar ingreso</h2>
+          <label for="nDesc">Descripción</label>
+          <input id="nDesc" name="nDesc" required [(ngModel)]="nuevo.descripcion" />
+          <label for="nFechaIngreso">Fecha de ingreso</label>
+          <input id="nFechaIngreso" name="nFechaIngreso" type="date" required [(ngModel)]="nuevo.fecha_ingreso" />
+          <label for="nCantidad">Cantidad</label>
+          <input id="nCantidad" name="nCantidad" type="number" min="0" step="0.1" required [(ngModel)]="nuevo.cantidad" />
+          <label for="nUnidad">Unidad (opcional)</label>
+          <input id="nUnidad" name="nUnidad" [(ngModel)]="nuevo.unidad" placeholder="kg, unidades, litros..." />
+          <label for="nPerecedero">
+            <input id="nPerecedero" name="nPerecedero" type="checkbox" [(ngModel)]="nuevo.perecedero" />
+            Es perecedero
+          </label>
+          @if (nuevo.perecedero) {
+            <label for="nVencimiento">Fecha de vencimiento</label>
+            <input id="nVencimiento" name="nVencimiento" type="date" [(ngModel)]="nuevo.fecha_vencimiento" />
+          }
+          <button type="submit" [disabled]="f.invalid || guardando()">
+            {{ guardando() ? 'Guardando...' : 'Registrar' }}
+          </button>
+        </form>
+      }
     }
   `,
   styles: [
@@ -205,6 +212,9 @@ export class Alimentos {
   private readonly http = inject(HttpClient);
   private readonly config = inject(AppConfigService);
   private readonly route = inject(ActivatedRoute);
+  private readonly auth = inject(AuthService);
+
+  protected readonly esMadreOAdmin = computed(() => this.auth.rol() === 'madre' || this.auth.rol() === 'admin');
 
   protected hogarId = '';
   protected filtroPerecedero = '';

@@ -1,9 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
 import { SelectorMenor } from '../../shared/selector-menor/selector-menor';
 import type { components } from '../../core/api/schema';
@@ -79,7 +80,7 @@ const ETIQUETAS_ESTADO: Record<string, string> = {
             {{ c.notas === null ? 'Sin acceso a las notas de esta cita.' : (c.notas || 'Sin notas registradas.') }}
           </p>
 
-          @if (c.estado === 'pendiente') {
+          @if (c.estado === 'pendiente' && puedeGestionarCita(c)) {
             <button type="button" (click)="cambiarEstado(c, 'cumplida')" [disabled]="guardandoId() === c.id">
               Marcar cumplida
             </button>
@@ -94,39 +95,66 @@ const ETIQUETAS_ESTADO: Record<string, string> = {
       }
     </ul>
 
-    <form class="formulario tarjeta" (ngSubmit)="crear()" #f="ngForm">
-      <h2>Registrar cita</h2>
-      <app-selector-menor [(valor)]="nueva.menor_id" [requerido]="true" />
-      <label for="nTipo">Tipo</label>
-      <select id="nTipo" name="nTipo" required [(ngModel)]="nueva.tipo">
-        <option value="medica">Médica</option>
-        <option value="psicosocial">Psicosocial</option>
-        <option value="reunion_familia">Reunión con familia biológica</option>
-        <option value="otro">Otro</option>
-      </select>
-      <label for="nFechaHora">Fecha y hora</label>
-      <input id="nFechaHora" name="nFechaHora" type="datetime-local" required [(ngModel)]="nueva.fecha_hora" />
-      <label for="nLugar">Lugar (opcional)</label>
-      <input id="nLugar" name="nLugar" [(ngModel)]="nueva.lugar" />
-      <label for="nNotas">Notas de logística (opcional, p. ej. "traer carné de vacunas")</label>
-      <input id="nNotas" name="nNotas" [(ngModel)]="nueva.notas" />
-      <p class="nota">
-        Las notas son para logística, no para contenido clínico o psicosocial: ese contenido se
-        registra en Gestión Documental.
-      </p>
-      <button type="submit" [disabled]="f.invalid || guardando()">
-        {{ guardando() ? 'Guardando...' : 'Registrar cita' }}
-      </button>
-    </form>
+    @if (esMadreOAdmin()) {
+      <form class="formulario tarjeta" (ngSubmit)="crearMadre()" #fm="ngForm">
+        <h2>Registrar cita</h2>
+        <app-selector-menor [(valor)]="nuevaMadre.menor_id" [requerido]="true" />
+        <label for="nTipoMadre">Tipo</label>
+        <select id="nTipoMadre" name="nTipoMadre" required [(ngModel)]="nuevaMadre.tipo">
+          <option value="medica">Médica</option>
+          <option value="psicosocial">Psicosocial</option>
+          <option value="otro">Otro</option>
+        </select>
+        <label for="nFechaHoraMadre">Fecha y hora</label>
+        <input id="nFechaHoraMadre" name="nFechaHoraMadre" type="datetime-local" required [(ngModel)]="nuevaMadre.fecha_hora" />
+        <label for="nLugarMadre">Lugar (opcional)</label>
+        <input id="nLugarMadre" name="nLugarMadre" [(ngModel)]="nuevaMadre.lugar" />
+        <label for="nNotasMadre">Notas de logística (opcional, p. ej. "traer carné de vacunas")</label>
+        <input id="nNotasMadre" name="nNotasMadre" [(ngModel)]="nuevaMadre.notas" />
+        <p class="nota">
+          Las notas son para logística, no para contenido clínico o psicosocial: ese contenido se
+          registra en Gestión Documental.
+        </p>
+        <button type="submit" [disabled]="fm.invalid || guardando()">
+          {{ guardando() ? 'Guardando...' : 'Registrar cita' }}
+        </button>
+      </form>
+    }
+
+    @if (esDefensorOAdmin()) {
+      <form class="formulario tarjeta" (ngSubmit)="crearDefensor()" #fd="ngForm">
+        <h2>Registrar cita con familia biológica</h2>
+        <app-selector-menor [(valor)]="nuevaDefensor.menor_id" [requerido]="true" />
+        <p class="nota">Tipo: Reunión con familia biológica</p>
+        <label for="nFechaHoraDefensor">Fecha y hora</label>
+        <input id="nFechaHoraDefensor" name="nFechaHoraDefensor" type="datetime-local" required [(ngModel)]="nuevaDefensor.fecha_hora" />
+        <label for="nLugarDefensor">Lugar (opcional)</label>
+        <input id="nLugarDefensor" name="nLugarDefensor" [(ngModel)]="nuevaDefensor.lugar" />
+        <label for="nNotasDefensor">Notas de logística (opcional)</label>
+        <input id="nNotasDefensor" name="nNotasDefensor" [(ngModel)]="nuevaDefensor.notas" />
+        <button type="submit" [disabled]="fd.invalid || guardando()">
+          {{ guardando() ? 'Guardando...' : 'Registrar cita' }}
+        </button>
+      </form>
+    }
   `,
 })
 export class CitasLista {
   private readonly http = inject(HttpClient);
   private readonly config = inject(AppConfigService);
   private readonly route = inject(ActivatedRoute);
+  private readonly auth = inject(AuthService);
+
+  protected readonly esMadreOAdmin = computed(() => this.auth.rol() === 'madre' || this.auth.rol() === 'admin');
+  protected readonly esDefensorOAdmin = computed(() => this.auth.rol() === 'defensor' || this.auth.rol() === 'admin');
 
   protected readonly etiquetaTipo = (t: string) => ETIQUETAS_TIPO[t] ?? t;
   protected readonly etiquetaEstado = (e: string) => ETIQUETAS_ESTADO[e] ?? e;
+
+  /** Dueño de la cita según su tipo (ADR-0015 sección 2): madre para medica/psicosocial/otro, defensor para reunion_familia. */
+  protected puedeGestionarCita(c: Cita): boolean {
+    return c.tipo === 'reunion_familia' ? this.esDefensorOAdmin() : this.esMadreOAdmin();
+  }
 
   protected readonly citas = signal<Cita[]>([]);
   protected readonly cargando = signal(false);
@@ -138,7 +166,7 @@ export class CitasLista {
   protected filtroTipo = '';
   protected filtroEstado = '';
 
-  protected nueva: { menor_id: string; tipo: string; fecha_hora: string; lugar: string; notas: string } = {
+  protected nuevaMadre: { menor_id: string; tipo: string; fecha_hora: string; lugar: string; notas: string } = {
     menor_id: '',
     tipo: 'medica',
     fecha_hora: '',
@@ -146,9 +174,19 @@ export class CitasLista {
     notas: '',
   };
 
+  protected nuevaDefensor: { menor_id: string; fecha_hora: string; lugar: string; notas: string } = {
+    menor_id: '',
+    fecha_hora: '',
+    lugar: '',
+    notas: '',
+  };
+
   constructor() {
     this.filtroMenorId = this.route.snapshot.queryParamMap.get('menor_id') ?? '';
-    if (this.filtroMenorId) this.nueva.menor_id = this.filtroMenorId;
+    if (this.filtroMenorId) {
+      this.nuevaMadre.menor_id = this.filtroMenorId;
+      this.nuevaDefensor.menor_id = this.filtroMenorId;
+    }
     void this.cargar();
   }
 
@@ -180,24 +218,57 @@ export class CitasLista {
     }
   }
 
-  protected async crear(): Promise<void> {
+  protected async crearMadre(): Promise<void> {
+    const exito = await this.crear({
+      menor_id: this.nuevaMadre.menor_id,
+      tipo: this.nuevaMadre.tipo,
+      fecha_hora: this.nuevaMadre.fecha_hora,
+      lugar: this.nuevaMadre.lugar,
+      notas: this.nuevaMadre.notas,
+    });
+    if (exito) {
+      this.nuevaMadre = { menor_id: this.nuevaMadre.menor_id, tipo: 'medica', fecha_hora: '', lugar: '', notas: '' };
+    }
+  }
+
+  protected async crearDefensor(): Promise<void> {
+    const exito = await this.crear({
+      menor_id: this.nuevaDefensor.menor_id,
+      tipo: 'reunion_familia',
+      fecha_hora: this.nuevaDefensor.fecha_hora,
+      lugar: this.nuevaDefensor.lugar,
+      notas: this.nuevaDefensor.notas,
+    });
+    if (exito) {
+      this.nuevaDefensor = { menor_id: this.nuevaDefensor.menor_id, fecha_hora: '', lugar: '', notas: '' };
+    }
+  }
+
+  private async crear(datos: {
+    menor_id: string;
+    tipo: string;
+    fecha_hora: string;
+    lugar: string;
+    notas: string;
+  }): Promise<boolean> {
     this.guardando.set(true);
     this.error.set('');
     try {
-      const fechaIso = this.nueva.fecha_hora ? new Date(this.nueva.fecha_hora).toISOString() : '';
+      const fechaIso = datos.fecha_hora ? new Date(datos.fecha_hora).toISOString() : '';
       const creada = await firstValueFrom(
         this.http.post<Cita>(`${this.config.apiUrl}/citas`, {
-          menor_id: this.nueva.menor_id,
-          tipo: this.nueva.tipo,
+          menor_id: datos.menor_id,
+          tipo: datos.tipo,
           fecha_hora: fechaIso,
-          lugar: this.nueva.lugar || null,
-          notas: this.nueva.notas || null,
+          lugar: datos.lugar || null,
+          notas: datos.notas || null,
         }),
       );
       this.citas.set([creada, ...this.citas()]);
-      this.nueva = { menor_id: this.nueva.menor_id, tipo: 'medica', fecha_hora: '', lugar: '', notas: '' };
+      return true;
     } catch (e) {
       this.error.set(this.mensajeError(e));
+      return false;
     } finally {
       this.guardando.set(false);
     }

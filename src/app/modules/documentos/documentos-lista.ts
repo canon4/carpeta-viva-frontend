@@ -6,10 +6,21 @@ import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
+import { CatalogosService } from '../../core/catalogos/catalogos';
 import { SelectorMenor } from '../../shared/selector-menor/selector-menor';
 import { SelectorHogar } from '../../shared/selector-hogar/selector-hogar';
 import type { components } from '../../core/api/schema';
-import { CATEGORIAS_HOGAR, CATEGORIAS_MENOR, ESTADOS_FLUJO, etiquetaCategoria, etiquetaEstadoFlujo, formatoTamanio } from './categorias';
+import {
+  CATEGORIAS_HOGAR,
+  CATEGORIAS_MENOR,
+  ESTADOS_FLUJO,
+  GRUPO_CATEGORIA_HOGAR,
+  GRUPO_CATEGORIA_MENOR,
+  etiquetaCategoria,
+  etiquetaEstadoFlujo,
+  formatoTamanio,
+  type CategoriaOpcion,
+} from './categorias';
 
 type Documento = components['schemas']['DocumentoOut'];
 
@@ -38,7 +49,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
         <label for="fCategoria">Categoría (opcional)</label>
         <select id="fCategoria" name="fCategoria" [(ngModel)]="filtroCategoria">
           <option value="">Todas</option>
-          @for (c of todasCategorias; track c.valor) {
+          @for (c of todasCategorias(); track c.valor) {
             <option [value]="c.valor">{{ c.etiqueta }}</option>
           }
         </select>
@@ -65,7 +76,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
         <li class="tarjeta">
           <a [routerLink]="['/documentos', d.id]">
             <p><strong>{{ d.titulo }}</strong></p>
-            <p>Categoría: {{ etiquetaCategoria(d.categoria) }}</p>
+            <p>Categoría: {{ etiquetaCategoria(d.categoria, todasCategorias()) }}</p>
             <p>Estado: {{ etiquetaEstadoFlujo(d.estado_flujo) }} — Versión {{ d.version }}</p>
             <p>Archivo: {{ d.nombre_original }} ({{ formatoTamanio(d.tamanio_bytes) }})</p>
           </a>
@@ -94,7 +105,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
         <label for="nCategoria">Categoría</label>
         <select id="nCategoria" name="nCategoria" required [(ngModel)]="nuevo.categoria">
           <option value="" disabled>Seleccione una categoría</option>
-          @for (c of (nuevo.destino === 'menor' ? categoriasMenor : categoriasHogar); track c.valor) {
+          @for (c of (nuevo.destino === 'menor' ? categoriasMenor() : categoriasHogar()); track c.valor) {
             <option [value]="c.valor">{{ c.etiqueta }}</option>
           }
         </select>
@@ -128,13 +139,19 @@ export class DocumentosLista {
   private readonly config = inject(AppConfigService);
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
+  private readonly catalogos = inject(CatalogosService);
 
   protected readonly etiquetaCategoria = etiquetaCategoria;
   protected readonly etiquetaEstadoFlujo = etiquetaEstadoFlujo;
   protected readonly formatoTamanio = formatoTamanio;
-  protected readonly categoriasMenor = CATEGORIAS_MENOR;
-  protected readonly categoriasHogar = CATEGORIAS_HOGAR;
-  protected readonly todasCategorias = [...CATEGORIAS_MENOR, ...CATEGORIAS_HOGAR.filter((h) => h.valor !== 'otros')];
+  // Valor por defecto embebido (ADR-0013 sección 7, punto 1); se reemplaza al cargar el catálogo
+  // administrable. Si la llamada falla, queda este respaldo.
+  protected readonly categoriasMenor = signal<CategoriaOpcion[]>(CATEGORIAS_MENOR);
+  protected readonly categoriasHogar = signal<CategoriaOpcion[]>(CATEGORIAS_HOGAR);
+  protected readonly todasCategorias = computed(() => [
+    ...this.categoriasMenor(),
+    ...this.categoriasHogar().filter((h) => h.valor !== 'otros'),
+  ]);
   protected readonly estados = ESTADOS_FLUJO;
 
   protected readonly documentos = signal<Documento[]>([]);
@@ -178,6 +195,21 @@ export class DocumentosLista {
       this.nuevo.destino = 'hogar';
     }
     void this.cargar();
+    void this.cargarCatalogos();
+  }
+
+  private async cargarCatalogos(): Promise<void> {
+    // Si la API falla, se deja el valor por defecto embebido ya puesto en la señal.
+    try {
+      this.categoriasMenor.set(await this.catalogos.obtener(GRUPO_CATEGORIA_MENOR));
+    } catch {
+      /* se mantiene CATEGORIAS_MENOR como respaldo */
+    }
+    try {
+      this.categoriasHogar.set(await this.catalogos.obtener(GRUPO_CATEGORIA_HOGAR));
+    } catch {
+      /* se mantiene CATEGORIAS_HOGAR como respaldo */
+    }
   }
 
   protected filtrar(): void {

@@ -1249,6 +1249,144 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/configuracion/_estado": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Estado del módulo */
+        get: operations["estado_api_v1_configuracion__estado_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/configuracion/catalogos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar grupos de catálogo (admin) */
+        get: operations["listar_grupos_catalogo_endpoint_api_v1_configuracion_catalogos_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/configuracion/catalogos/{grupo}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar opciones activas de un catálogo (cualquier autenticado) */
+        get: operations["listar_catalogo_publico_endpoint_api_v1_configuracion_catalogos__grupo__get"];
+        put?: never;
+        /** Crear opción de catálogo (admin) */
+        post: operations["crear_opcion_catalogo_endpoint_api_v1_configuracion_catalogos__grupo__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/configuracion/catalogos/{grupo}/admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar opciones de un catálogo, incluidas inactivas (admin) */
+        get: operations["listar_catalogo_admin_endpoint_api_v1_configuracion_catalogos__grupo__admin_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/configuracion/catalogos/{grupo}/{valor}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Editar o desactivar opción de catálogo (admin) */
+        put: operations["actualizar_opcion_catalogo_endpoint_api_v1_configuracion_catalogos__grupo___valor__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/configuracion/parametros": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar parámetros (admin) */
+        get: operations["listar_parametros_endpoint_api_v1_configuracion_parametros_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/configuracion/parametros/{clave}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalle de un parámetro (admin) */
+        get: operations["obtener_parametro_endpoint_api_v1_configuracion_parametros__clave__get"];
+        /** Actualizar un parámetro (admin) */
+        put: operations["actualizar_parametro_endpoint_api_v1_configuracion_parametros__clave__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/configuracion/publica": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Parámetros públicos (cualquier autenticado) */
+        get: operations["listar_parametros_publicos_endpoint_api_v1_configuracion_publica_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reportes/_estado": {
         parameters: {
             query?: never;
@@ -1981,6 +2119,70 @@ export interface components {
             /** Archivo */
             archivo: string;
         };
+        /** CatalogoOpcionAdminOut */
+        CatalogoOpcionAdminOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Grupo */
+            grupo: string;
+            /** Valor */
+            valor: string;
+            /** Etiqueta */
+            etiqueta: string;
+            /** Orden */
+            orden: number;
+            /** Activo */
+            activo: boolean;
+            /** Seccion Acceso */
+            seccion_acceso?: string | null;
+            /**
+             * Creado En
+             * Format: date-time
+             */
+            creado_en: string;
+            /** Actualizado En */
+            actualizado_en?: string | null;
+            /** Actualizado Por */
+            actualizado_por?: string | null;
+        };
+        /** CatalogoOpcionCreate */
+        CatalogoOpcionCreate: {
+            /** Valor */
+            valor: string;
+            /** Etiqueta */
+            etiqueta: string;
+            /**
+             * Orden
+             * @default 0
+             */
+            orden: number;
+            /** Seccion Acceso */
+            seccion_acceso?: string | null;
+        };
+        /**
+         * CatalogoOpcionOut
+         * @description Lectura pública (cualquier autenticado): solo lo que necesita un formulario.
+         */
+        CatalogoOpcionOut: {
+            /** Valor */
+            valor: string;
+            /** Etiqueta */
+            etiqueta: string;
+            /** Orden */
+            orden: number;
+        };
+        /** CatalogoOpcionUpdate */
+        CatalogoOpcionUpdate: {
+            /** Etiqueta */
+            etiqueta?: string | null;
+            /** Orden */
+            orden?: number | null;
+            /** Activo */
+            activo?: boolean | null;
+        };
         /** CerrarExpedienteRequest */
         CerrarExpedienteRequest: {
             /** Motivo */
@@ -2437,6 +2639,19 @@ export interface components {
             /** Firma Ref */
             firma_ref: string;
         };
+        /** GrupoCatalogoOut */
+        GrupoCatalogoOut: {
+            /** Grupo */
+            grupo: string;
+            /** Etiqueta */
+            etiqueta: string;
+            /** Descripcion */
+            descripcion: string;
+            /** Con Seccion Acceso */
+            con_seccion_acceso: boolean;
+            /** Total Opciones Activas */
+            total_opciones_activas: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -2748,6 +2963,39 @@ export interface components {
             estado_actual?: components["schemas"]["EstadoMenor"] | null;
             /** Motivo */
             motivo?: string | null;
+        };
+        /** ParametroOut */
+        ParametroOut: {
+            /** Clave */
+            clave: string;
+            /** Etiqueta */
+            etiqueta: string;
+            /** Descripcion */
+            descripcion: string;
+            /** Tipo */
+            tipo: string;
+            /** Grupo */
+            grupo?: string | null;
+            /** Publico */
+            publico: boolean;
+            /** Valor Actual */
+            valor_actual: string;
+            /** Valor Por Defecto */
+            valor_por_defecto: string;
+            /** Editado Por Admin */
+            editado_por_admin: boolean;
+        };
+        /** ParametroPublicoOut */
+        ParametroPublicoOut: {
+            /** Clave */
+            clave: string;
+            /** Valor */
+            valor: string;
+        };
+        /** ParametroUpdate */
+        ParametroUpdate: {
+            /** Valor */
+            valor: string;
         };
         /**
          * Parentesco
@@ -6045,6 +6293,287 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    estado_api_v1_configuracion__estado_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    listar_grupos_catalogo_endpoint_api_v1_configuracion_catalogos_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GrupoCatalogoOut"][];
+                };
+            };
+        };
+    };
+    listar_catalogo_publico_endpoint_api_v1_configuracion_catalogos__grupo__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grupo: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogoOpcionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_opcion_catalogo_endpoint_api_v1_configuracion_catalogos__grupo__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grupo: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CatalogoOpcionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogoOpcionAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_catalogo_admin_endpoint_api_v1_configuracion_catalogos__grupo__admin_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grupo: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogoOpcionAdminOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_opcion_catalogo_endpoint_api_v1_configuracion_catalogos__grupo___valor__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                grupo: string;
+                valor: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CatalogoOpcionUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CatalogoOpcionAdminOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_parametros_endpoint_api_v1_configuracion_parametros_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParametroOut"][];
+                };
+            };
+        };
+    };
+    obtener_parametro_endpoint_api_v1_configuracion_parametros__clave__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                clave: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParametroOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_parametro_endpoint_api_v1_configuracion_parametros__clave__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                clave: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ParametroUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParametroOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_parametros_publicos_endpoint_api_v1_configuracion_publica_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParametroPublicoOut"][];
                 };
             };
         };

@@ -28,4 +28,6 @@ export const MODULOS: ModuloNav[] = [
   // agrega auditor (listado de expedientes archivados sin contenido, ADR-0010 "Consecuencias").
   { ruta: 'archivo', titulo: 'Archivo y Cierre', descripcion: 'Archivo del expediente al cierre del proceso.', fase: 5, roles: ['coordinador', 'admin', 'auditor'] },
   { ruta: 'auditoria', titulo: 'Auditoría', descripcion: 'Registro de accesos y cambios.', fase: 1, roles: ['auditor', 'admin'] },
+  // Transversal T4 (ADR-0013): catálogos y parámetros editables sin redesplegar. Solo admin.
+  { ruta: 'configuracion', titulo: 'Configuración', descripcion: 'Catálogos de opciones y parámetros de negocio administrables.', fase: 3, roles: ['admin'] },
 ];

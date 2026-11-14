@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { authGuard } from './core/auth/guards';
+import { authGuard, rolGuard } from './core/auth/guards';
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./features/login/login').then((m) => m.Login) },
@@ -25,6 +25,11 @@ export const routes: Routes = [
       { path: 'ia', loadChildren: () => import('./modules/ia/ia.routes') },
       { path: 'archivo', loadChildren: () => import('./modules/archivo/archivo.routes') },
       { path: 'auditoria', loadChildren: () => import('./modules/auditoria/auditoria.routes') },
+      {
+        path: 'configuracion',
+        canActivate: [rolGuard('admin')],
+        loadChildren: () => import('./modules/configuracion/configuracion.routes'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

@@ -6,9 +6,19 @@ import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
+import { CatalogosService } from '../../core/catalogos/catalogos';
 import type { components } from '../../core/api/schema';
 import { VisorDocumento } from '../../shared/visor-documento/visor-documento';
-import { etiquetaCategoria, etiquetaEstadoFlujo, formatoTamanio } from './categorias';
+import {
+  CATEGORIAS_HOGAR,
+  CATEGORIAS_MENOR,
+  GRUPO_CATEGORIA_HOGAR,
+  GRUPO_CATEGORIA_MENOR,
+  etiquetaCategoria,
+  etiquetaEstadoFlujo,
+  formatoTamanio,
+  type CategoriaOpcion,
+} from './categorias';
 import { descargarBlob } from './descargas';
 
 type Documento = components['schemas']['DocumentoOut'];
@@ -49,7 +59,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 
       <section class="tarjeta">
         <h2>Metadatos</h2>
-        <p>Categoría: {{ etiquetaCategoria(documento()!.categoria) }}</p>
+        <p>Categoría: {{ etiquetaCategoria(documento()!.categoria, catalogoCategorias()) }}</p>
         <p>Nombre del archivo: {{ documento()!.nombre_original }}</p>
         <p>Tipo: {{ documento()!.mime_type }}</p>
         <p>Tamaño: {{ formatoTamanio(documento()!.tamanio_bytes) }}</p>
@@ -167,11 +177,15 @@ export class DocumentoDetalle {
   private readonly http = inject(HttpClient);
   private readonly config = inject(AppConfigService);
   private readonly auth = inject(AuthService);
+  private readonly catalogos = inject(CatalogosService);
   protected readonly documentoId = inject(ActivatedRoute).snapshot.paramMap.get('id') ?? '';
 
   protected readonly etiquetaCategoria = etiquetaCategoria;
   protected readonly etiquetaEstadoFlujo = etiquetaEstadoFlujo;
   protected readonly formatoTamanio = formatoTamanio;
+  // Combina categoría de menor y de hogar (no se sabe cuál aplica sin consultar el documento);
+  // valor por defecto embebido como respaldo (ADR-0013 sección 7, punto 1).
+  protected readonly catalogoCategorias = signal<CategoriaOpcion[]>([...CATEGORIAS_MENOR, ...CATEGORIAS_HOGAR]);
 
   protected readonly documento = signal<Documento | null>(null);
   protected readonly cargando = signal(false);
@@ -192,6 +206,19 @@ export class DocumentoDetalle {
 
   constructor() {
     void this.cargar();
+    void this.cargarCatalogos();
+  }
+
+  private async cargarCatalogos(): Promise<void> {
+    try {
+      const [menor, hogar] = await Promise.all([
+        this.catalogos.obtener(GRUPO_CATEGORIA_MENOR),
+        this.catalogos.obtener(GRUPO_CATEGORIA_HOGAR),
+      ]);
+      this.catalogoCategorias.set([...menor, ...hogar]);
+    } catch {
+      /* se mantiene el valor por defecto embebido como respaldo */
+    }
   }
 
   private async cargar(): Promise<void> {

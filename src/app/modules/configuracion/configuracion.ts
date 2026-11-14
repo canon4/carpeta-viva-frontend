@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 
@@ -264,12 +264,17 @@ export class Configuracion {
   protected readonly creando = signal(false);
   protected readonly errorCrear = signal('');
 
-  protected readonly puedeCrear = computed(() => {
+  // No es un computed(): depende de `nuevaSeccion`, una propiedad de clase normal que cambia
+  // por el [(ngModel)] del <select>, no por una signal. Un computed() solo volvería a evaluar
+  // cuando cambia una signal que lee (aquí, grupoSeleccionado), así que quedaría deshabilitado
+  // para siempre tras elegir la sección. Angular vuelve a llamar este método en cada ciclo de
+  // detección de cambios, igual que llamaría a un computed().
+  protected puedeCrear(): boolean {
     const g = this.grupoSeleccionado();
     if (!g) return false;
     if (g.con_seccion_acceso && this.nuevaSeccion === SIN_ELEGIR) return false;
     return true;
-  });
+  }
 
   protected readonly parametros = signal<Parametro[]>([]);
   protected readonly cargandoParametros = signal(false);

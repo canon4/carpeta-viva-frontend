@@ -870,6 +870,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/inventario/items/{item_id}/recepcion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Confirmar recepción de un ítem */
+        put: operations["confirmar_recepcion_endpoint_api_v1_inventario_items__item_id__recepcion_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventario/items/{item_id}/fotos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar fotos de un ítem */
+        get: operations["listar_fotos_endpoint_api_v1_inventario_items__item_id__fotos_get"];
+        put?: never;
+        /** Subir foto de evidencia de recepción */
+        post: operations["subir_foto_endpoint_api_v1_inventario_items__item_id__fotos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventario/items/{item_id}/fotos/{foto_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver foto de evidencia */
+        get: operations["obtener_foto_endpoint_api_v1_inventario_items__item_id__fotos__foto_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventario/items/{item_id}/fotos/{foto_id}/ocultar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Ocultar foto de evidencia (solo admin, remediación) */
+        put: operations["ocultar_foto_endpoint_api_v1_inventario_items__item_id__fotos__foto_id__ocultar_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/inventario/convivientes": {
         parameters: {
             query?: never;
@@ -969,6 +1038,58 @@ export interface paths {
         put?: never;
         /** Registrar ingreso de alimento */
         post: operations["crear_alimento_endpoint_api_v1_alimentos_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alimentos/checklist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listar checklist de un hogar */
+        get: operations["listar_checklist_endpoint_api_v1_alimentos_checklist_get"];
+        put?: never;
+        /** Crear producto reutilizable */
+        post: operations["crear_checklist_endpoint_api_v1_alimentos_checklist_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alimentos/checklist/{checklist_item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar producto del checklist */
+        put: operations["actualizar_checklist_endpoint_api_v1_alimentos_checklist__checklist_item_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alimentos/checklist/{checklist_item_id}/comprar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Comprar de nuevo un producto del checklist */
+        post: operations["comprar_de_checklist_endpoint_api_v1_alimentos_checklist__checklist_item_id__comprar_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1866,6 +1987,77 @@ export interface components {
             /** Destinatarios */
             destinatarios?: components["schemas"]["AlertaDestinatarioOut"][];
         };
+        /** AlimentoChecklistComprar */
+        AlimentoChecklistComprar: {
+            /**
+             * Fecha Ingreso
+             * Format: date
+             */
+            fecha_ingreso: string;
+            /** Fecha Vencimiento */
+            fecha_vencimiento?: string | null;
+            /** Cantidad */
+            cantidad: number;
+            /** Unidad */
+            unidad?: string | null;
+        };
+        /** AlimentoChecklistItemCreate */
+        AlimentoChecklistItemCreate: {
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Descripcion */
+            descripcion: string;
+            /**
+             * Perecedero
+             * @default true
+             */
+            perecedero: boolean;
+            /** Unidad Por Defecto */
+            unidad_por_defecto?: string | null;
+        };
+        /** AlimentoChecklistItemOut */
+        AlimentoChecklistItemOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Descripcion */
+            descripcion: string;
+            /** Perecedero */
+            perecedero: boolean;
+            /** Unidad Por Defecto */
+            unidad_por_defecto?: string | null;
+            /** Activo */
+            activo: boolean;
+            /**
+             * Creado Por
+             * Format: uuid
+             */
+            creado_por: string;
+            /**
+             * Creado En
+             * Format: date-time
+             */
+            creado_en: string;
+        };
+        /** AlimentoChecklistItemUpdate */
+        AlimentoChecklistItemUpdate: {
+            /** Descripcion */
+            descripcion?: string | null;
+            /** Unidad Por Defecto */
+            unidad_por_defecto?: string | null;
+            /** Activo */
+            activo?: boolean | null;
+        };
         /** AlimentoItemCreate */
         AlimentoItemCreate: {
             /**
@@ -1923,6 +2115,8 @@ export interface components {
              * Format: uuid
              */
             registrado_por: string;
+            /** Checklist Item Id */
+            checklist_item_id?: string | null;
             /**
              * Created At
              * Format: date-time
@@ -2118,6 +2312,13 @@ export interface components {
         Body_crear_version_endpoint_api_v1_documentos__documento_id__version_post: {
             /** Archivo */
             archivo: string;
+        };
+        /** Body_subir_foto_endpoint_api_v1_inventario_items__item_id__fotos_post */
+        Body_subir_foto_endpoint_api_v1_inventario_items__item_id__fotos_post: {
+            /** Archivo */
+            archivo: string;
+            /** Declaracion Sin Menores */
+            declaracion_sin_menores: boolean;
         };
         /** CatalogoOpcionAdminOut */
         CatalogoOpcionAdminOut: {
@@ -2761,6 +2962,37 @@ export interface components {
              */
             estado: string;
         };
+        /** InventarioItemFotoOut */
+        InventarioItemFotoOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Item Id
+             * Format: uuid
+             */
+            item_id: string;
+            /** Mime Type */
+            mime_type: string;
+            /** Tamanio Bytes */
+            tamanio_bytes: number;
+            /**
+             * Subido Por
+             * Format: uuid
+             */
+            subido_por: string;
+            /**
+             * Creado En
+             * Format: date-time
+             */
+            creado_en: string;
+            /** Declaracion Sin Menores */
+            declaracion_sin_menores: boolean;
+            /** Oculta */
+            oculta: boolean;
+        };
         /** InventarioItemOut */
         InventarioItemOut: {
             /**
@@ -2781,6 +3013,8 @@ export interface components {
             cantidad: number;
             /** Estado */
             estado: string;
+            /** Recibido */
+            recibido: boolean;
             /**
              * Registrado Por
              * Format: uuid
@@ -2799,12 +3033,19 @@ export interface components {
         };
         /** InventarioItemUpdate */
         InventarioItemUpdate: {
+            /** Tipo */
+            tipo?: string | null;
             /** Descripcion */
             descripcion?: string | null;
             /** Cantidad */
             cantidad?: number | null;
             /** Estado */
             estado?: string | null;
+        };
+        /** InventarioRecepcionConfirmar */
+        InventarioRecepcionConfirmar: {
+            /** Estado */
+            estado: string;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -5492,6 +5733,171 @@ export interface operations {
             };
         };
     };
+    confirmar_recepcion_endpoint_api_v1_inventario_items__item_id__recepcion_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InventarioRecepcionConfirmar"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventarioItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_fotos_endpoint_api_v1_inventario_items__item_id__fotos_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventarioItemFotoOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    subir_foto_endpoint_api_v1_inventario_items__item_id__fotos_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_subir_foto_endpoint_api_v1_inventario_items__item_id__fotos_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventarioItemFotoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_foto_endpoint_api_v1_inventario_items__item_id__fotos__foto_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                foto_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ocultar_foto_endpoint_api_v1_inventario_items__item_id__fotos__foto_id__ocultar_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                foto_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventarioItemFotoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     listar_convivientes_endpoint_api_v1_inventario_convivientes_get: {
         parameters: {
             query: {
@@ -5756,6 +6162,141 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["AlimentoItemCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlimentoItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_checklist_endpoint_api_v1_alimentos_checklist_get: {
+        parameters: {
+            query: {
+                hogar_id: string;
+                incluir_inactivos?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlimentoChecklistItemOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    crear_checklist_endpoint_api_v1_alimentos_checklist_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlimentoChecklistItemCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlimentoChecklistItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_checklist_endpoint_api_v1_alimentos_checklist__checklist_item_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                checklist_item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlimentoChecklistItemUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlimentoChecklistItemOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    comprar_de_checklist_endpoint_api_v1_alimentos_checklist__checklist_item_id__comprar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                checklist_item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlimentoChecklistComprar"];
             };
         };
         responses: {

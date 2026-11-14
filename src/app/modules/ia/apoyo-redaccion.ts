@@ -10,6 +10,7 @@ import { TIPOS_INFORME } from './opciones';
 
 type RedaccionApoyoCreate = components['schemas']['RedaccionApoyoCreate'];
 type RedaccionApoyoOut = components['schemas']['RedaccionApoyoOut'];
+type Menor = components['schemas']['MenorOut'];
 
 const MENSAJE_GENERICO = 'No se pudo generar el borrador. Intente de nuevo.';
 
@@ -31,8 +32,13 @@ const MENSAJE_GENERICO = 'No se pudo generar el borrador. Intente de nuevo.';
     </p>
 
     <form class="formulario tarjeta" (ngSubmit)="generar()" #f="ngForm">
-      <label for="menorId">Id del menor</label>
-      <input id="menorId" name="menorId" required [(ngModel)]="menorId" [disabled]="generando()" />
+      <label for="menorId">Menor</label>
+      <select id="menorId" name="menorId" required [(ngModel)]="menorId" [disabled]="generando() || cargandoMenores()">
+        <option value="" disabled>Seleccione un menor</option>
+        @for (m of menores(); track m.id) {
+          <option [value]="m.id">{{ m.nombres }} {{ m.apellidos }}{{ m.numero_documento ? ' — ' + m.numero_documento : '' }}</option>
+        }
+      </select>
 
       <label for="tipoInforme">Tipo de informe</label>
       <select id="tipoInforme" name="tipoInforme" required [(ngModel)]="tipoInforme" [disabled]="generando()">
@@ -100,6 +106,9 @@ export class ApoyoRedaccion {
   protected tipoInforme = TIPOS_INFORME[0].valor;
   protected notasProfesional = '';
 
+  protected readonly menores = signal<Menor[]>([]);
+  protected readonly cargandoMenores = signal(false);
+
   protected readonly generando = signal(false);
   protected readonly error = signal('');
   protected readonly resultado = signal<RedaccionApoyoOut | null>(null);
@@ -107,6 +116,18 @@ export class ApoyoRedaccion {
 
   constructor() {
     this.menorId = this.route.snapshot.queryParamMap.get('menor_id') ?? '';
+    void this.cargarMenores();
+  }
+
+  private async cargarMenores(): Promise<void> {
+    this.cargandoMenores.set(true);
+    try {
+      this.menores.set(await firstValueFrom(this.http.get<Menor[]>(`${this.config.apiUrl}/menores`)));
+    } catch {
+      // El desplegable queda vacío; el profesional puede volver a intentar más tarde.
+    } finally {
+      this.cargandoMenores.set(false);
+    }
   }
 
   protected async generar(): Promise<void> {

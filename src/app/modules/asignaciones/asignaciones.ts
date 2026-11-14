@@ -1,15 +1,19 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
 import type { components } from '../../core/api/schema';
 
 type Asignacion = components['schemas']['AsignacionOut'];
 type AsignacionHistoria = components['schemas']['AsignacionHistoryOut'];
 type TipoMovimiento = components['schemas']['TipoMovimiento'];
+type Menor = components['schemas']['MenorOut'];
+type Hogar = components['schemas']['HogarOut'];
+type Zona = components['schemas']['ZonaOut'];
 
 const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 
@@ -26,12 +30,33 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
     <p><a routerLink="/menores">Ir a Menores y Expedientes</a></p>
 
     <form class="formulario" (ngSubmit)="filtrar()">
-      <label for="fMenor">Id del menor (opcional)</label>
-      <input id="fMenor" name="fMenor" [(ngModel)]="filtroMenorId" />
-      <label for="fHogar">Id del hogar (opcional)</label>
-      <input id="fHogar" name="fHogar" [(ngModel)]="filtroHogarId" />
-      <label for="fZona">Id de la zona (opcional)</label>
-      <input id="fZona" name="fZona" [(ngModel)]="filtroZonaId" />
+      <label for="fMenor">Menor (opcional)</label>
+      <select id="fMenor" name="fMenor" [(ngModel)]="filtroMenorId" [disabled]="cargandoFiltros()">
+        <option value="">Todos los menores</option>
+        @for (m of menores(); track m.id) {
+          <option [value]="m.id">{{ etiquetaMenor(m) }}</option>
+        }
+      </select>
+
+      @if (puedeVerHogaresYZonas()) {
+        <label for="fHogar">Hogar (opcional)</label>
+        <select id="fHogar" name="fHogar" [(ngModel)]="filtroHogarId" [disabled]="cargandoFiltros()">
+          <option value="">Todos los hogares</option>
+          @for (h of hogares(); track h.id) {
+            <option [value]="h.id">{{ etiquetaHogar(h) }}</option>
+          }
+        </select>
+        <label for="fZona">Zona (opcional)</label>
+        <select id="fZona" name="fZona" [(ngModel)]="filtroZonaId" [disabled]="cargandoFiltros()">
+          <option value="">Todas las zonas</option>
+          @for (z of zonas(); track z.id) {
+            <option [value]="z.id">{{ z.nombre }}</option>
+          }
+        </select>
+      } @else {
+        <label for="fHogar">Id del hogar (opcional)</label>
+        <input id="fHogar" name="fHogar" [(ngModel)]="filtroHogarId" />
+      }
       <button type="submit" [disabled]="cargando()">Filtrar</button>
     </form>
 
@@ -45,8 +70,8 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
     <ul class="lista-simple">
       @for (a of asignaciones(); track a.id) {
         <li class="tarjeta">
-          <p>Menor: {{ a.menor_id }}</p>
-          <p>Hogar: {{ a.hogar_id }}</p>
+          <p>Menor: {{ nombreMenor(a.menor_id) }}</p>
+          <p>Hogar: {{ puedeVerHogaresYZonas() ? etiquetaHogarPorId(a.hogar_id) : a.hogar_id }}</p>
           <p>Tipo de movimiento: {{ a.tipo_movimiento }}</p>
           <p>Desde: {{ a.fecha_inicio }} — Hasta: {{ a.fecha_fin || 'Vigente' }}</p>
           <p>Estado: {{ a.estado }}</p>
@@ -111,10 +136,26 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 
     <form class="formulario tarjeta" (ngSubmit)="crear()" #f="ngForm">
       <h2>Registrar ingreso o traslado</h2>
-      <label for="nMenor">Id del menor</label>
-      <input id="nMenor" name="nMenor" required [(ngModel)]="nueva.menor_id" />
-      <label for="nHogar">Id del hogar</label>
-      <input id="nHogar" name="nHogar" required [(ngModel)]="nueva.hogar_id" />
+      <label for="nMenor">Menor</label>
+      <select id="nMenor" name="nMenor" required [(ngModel)]="nueva.menor_id" [disabled]="cargandoFiltros()">
+        <option value="" disabled>Seleccione un menor</option>
+        @for (m of menores(); track m.id) {
+          <option [value]="m.id">{{ etiquetaMenor(m) }}</option>
+        }
+      </select>
+
+      @if (puedeVerHogaresYZonas()) {
+        <label for="nHogar">Hogar</label>
+        <select id="nHogar" name="nHogar" required [(ngModel)]="nueva.hogar_id" [disabled]="cargandoFiltros()">
+          <option value="" disabled>Seleccione un hogar</option>
+          @for (h of hogares(); track h.id) {
+            <option [value]="h.id">{{ etiquetaHogar(h) }}</option>
+          }
+        </select>
+      } @else {
+        <label for="nHogar">Id del hogar</label>
+        <input id="nHogar" name="nHogar" required [(ngModel)]="nueva.hogar_id" />
+      }
       <label for="nFechaInicio">Fecha de inicio</label>
       <input id="nFechaInicio" name="nFechaInicio" type="date" required [(ngModel)]="nueva.fecha_inicio" />
       <label for="nTipo">Tipo de movimiento</label>
@@ -136,11 +177,25 @@ export class Asignaciones {
   private readonly http = inject(HttpClient);
   private readonly config = inject(AppConfigService);
   private readonly route = inject(ActivatedRoute);
+  private readonly auth = inject(AuthService);
 
   protected readonly asignaciones = signal<Asignacion[]>([]);
   protected readonly cargando = signal(false);
   protected readonly error = signal('');
   protected readonly guardando = signal(false);
+
+  // Listar hogares/zonas (`GET /zonas-hogares/...`) solo lo permite el backend a coordinador y
+  // admin; para profesional/defensor el campo de hogar sigue siendo texto libre, como antes.
+  protected readonly puedeVerHogaresYZonas = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'coordinador' || rol === 'admin';
+  });
+
+  protected readonly cargandoFiltros = signal(false);
+  protected readonly menores = signal<Menor[]>([]);
+  protected readonly hogares = signal<Hogar[]>([]);
+  protected readonly zonas = signal<Zona[]>([]);
+  private readonly zonasPorId = new Map<string, string>();
 
   protected filtroMenorId = '';
   protected filtroHogarId = '';
@@ -165,10 +220,57 @@ export class Asignaciones {
   constructor() {
     this.filtroMenorId = this.route.snapshot.queryParamMap.get('menor_id') ?? '';
     void this.cargar();
+    void this.cargarFiltros();
   }
 
   protected filtrar(): void {
     void this.cargar();
+  }
+
+  private async cargarFiltros(): Promise<void> {
+    this.cargandoFiltros.set(true);
+    try {
+      const peticiones: Promise<void>[] = [
+        firstValueFrom(this.http.get<Menor[]>(`${this.config.apiUrl}/menores`)).then((m) => this.menores.set(m)),
+      ];
+      if (this.puedeVerHogaresYZonas()) {
+        peticiones.push(
+          firstValueFrom(this.http.get<Zona[]>(`${this.config.apiUrl}/zonas-hogares/zonas`)).then((zonas) => {
+            this.zonas.set(zonas);
+            for (const z of zonas) this.zonasPorId.set(z.id, z.nombre);
+          }),
+        );
+        peticiones.push(
+          firstValueFrom(this.http.get<Hogar[]>(`${this.config.apiUrl}/zonas-hogares/hogares`)).then((h) =>
+            this.hogares.set(h),
+          ),
+        );
+      }
+      await Promise.all(peticiones);
+    } catch {
+      // Los desplegables quedan vacíos; se puede seguir filtrando/registrando sin ellos.
+    } finally {
+      this.cargandoFiltros.set(false);
+    }
+  }
+
+  protected etiquetaMenor(m: Menor): string {
+    return `${m.nombres} ${m.apellidos}${m.numero_documento ? ' — ' + m.numero_documento : ''}`;
+  }
+
+  protected etiquetaHogar(h: Hogar): string {
+    const zona = this.zonasPorId.get(h.zona_id);
+    return zona ? `Hogar de la zona ${zona}` : `Hogar ${h.id.slice(0, 8)}`;
+  }
+
+  protected nombreMenor(menorId: string): string {
+    const m = this.menores().find((x) => x.id === menorId);
+    return m ? this.etiquetaMenor(m) : menorId;
+  }
+
+  protected etiquetaHogarPorId(hogarId: string): string {
+    const h = this.hogares().find((x) => x.id === hogarId);
+    return h ? this.etiquetaHogar(h) : hogarId;
   }
 
   private async cargar(): Promise<void> {

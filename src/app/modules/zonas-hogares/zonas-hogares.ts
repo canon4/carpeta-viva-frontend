@@ -10,6 +10,7 @@ import type { components } from '../../core/api/schema';
 type Zona = components['schemas']['ZonaOut'];
 type Hogar = components['schemas']['HogarOut'];
 type EstadoHogar = components['schemas']['EstadoHogar'];
+type Madre = components['schemas']['MadreOut'];
 
 const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 
@@ -120,7 +121,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
                 
                 <div class="hogar-datos">
                   <p><strong>Capacidad máxima:</strong> {{ h.capacidad_maxima }}</p>
-                  <p><strong>Madre asignada:</strong> {{ h.madre_id || 'Sin asignar' }}</p>
+                  <p><strong>Madre asignada:</strong> {{ nombreMadre(h.madre_id) }}</p>
                 </div>
 
                 <div class="hogar-enlaces-rapidos">
@@ -140,8 +141,13 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
                   </div>
 
                   <div class="campo-grupo">
-                    <label [for]="'madre-' + h.id">Id de la madre (opcional)</label>
-                    <input [id]="'madre-' + h.id" name="madre" placeholder="ID de usuario" [(ngModel)]="madreEdicion[h.id]" />
+                    <label [for]="'madre-' + h.id">Madre asignada (opcional)</label>
+                    <select [id]="'madre-' + h.id" name="madre" [(ngModel)]="madreEdicion[h.id]" [disabled]="cargandoMadres()">
+                      <option value="">Sin asignar</option>
+                      @for (m of madres(); track m.id) {
+                        <option [value]="m.id">{{ etiquetaMadre(m) }}</option>
+                      }
+                    </select>
                   </div>
 
                   <button type="submit" class="btn-secundario" [disabled]="guardandoHogarId() === h.id">
@@ -573,8 +579,33 @@ export class ZonasHogares {
   protected readonly estadoEdicion: Record<string, EstadoHogar> = {};
   protected readonly madreEdicion: Record<string, string> = {};
 
+  protected readonly madres = signal<Madre[]>([]);
+  protected readonly cargandoMadres = signal(false);
+
   constructor() {
     void this.cargarZonas();
+    void this.cargarMadres();
+  }
+
+  private async cargarMadres(): Promise<void> {
+    this.cargandoMadres.set(true);
+    try {
+      this.madres.set(await firstValueFrom(this.http.get<Madre[]>(`${this.config.apiUrl}/madres`)));
+    } catch {
+      // El desplegable queda vacío; se puede seguir editando el hogar sin asignar madre.
+    } finally {
+      this.cargandoMadres.set(false);
+    }
+  }
+
+  protected etiquetaMadre(m: Madre): string {
+    return `${m.nombres} ${m.apellidos} — ${m.numero_identificacion}`;
+  }
+
+  protected nombreMadre(madreId: string | null | undefined): string {
+    if (!madreId) return 'Sin asignar';
+    const m = this.madres().find((x) => x.id === madreId);
+    return m ? this.etiquetaMadre(m) : madreId;
   }
 
   private async cargarZonas(): Promise<void> {

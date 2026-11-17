@@ -55,6 +55,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/contrasena": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Cambiar la contraseña propia (invalida las sesiones anteriores y devuelve un token nuevo) */
+        put: operations["cambiar_contrasena_endpoint_api_v1_auth_contrasena_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/_estado": {
         parameters: {
             query?: never;
@@ -2320,6 +2337,13 @@ export interface components {
             /** Declaracion Sin Menores */
             declaracion_sin_menores: boolean;
         };
+        /** CambioContrasenaRequest */
+        CambioContrasenaRequest: {
+            /** Actual */
+            actual: string;
+            /** Nueva */
+            nueva: string;
+        };
         /** CatalogoOpcionAdminOut */
         CatalogoOpcionAdminOut: {
             /**
@@ -3820,6 +3844,13 @@ export interface operations {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
+            /** @description Cuenta bloqueada temporalmente por intentos fallidos */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     me_api_v1_auth_me_get: {
@@ -3838,6 +3869,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsuarioOut"];
+                };
+            };
+        };
+    };
+    cambiar_contrasena_endpoint_api_v1_auth_contrasena_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CambioContrasenaRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

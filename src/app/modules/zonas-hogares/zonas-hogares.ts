@@ -1,9 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 
+import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
 import type { components } from '../../core/api/schema';
 
@@ -64,7 +65,8 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
           }
         </div>
 
-        <!-- Formulario para Crear Zona -->
+        <!-- Formulario para Crear Zona: solo admin (el coordinador trabaja en su zona) -->
+        @if (esAdmin()) {
         <form class="formulario-estilizado" (ngSubmit)="crearZona()" #fz="ngForm">
           <h3>Registrar nueva zona</h3>
           <div class="form-row">
@@ -81,6 +83,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
             {{ guardandoZona() ? 'Guardando...' : 'Crear zona' }}
           </button>
         </form>
+        }
       </section>
 
       <!-- Panel de Hogares (Visible al seleccionar una zona) -->
@@ -561,6 +564,8 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 export class ZonasHogares {
   private readonly http = inject(HttpClient);
   private readonly config = inject(AppConfigService);
+  private readonly auth = inject(AuthService);
+  protected readonly esAdmin = computed(() => this.auth.rol() === 'admin');
 
   protected readonly zonas = signal<Zona[]>([]);
   protected readonly cargandoZonas = signal(false);

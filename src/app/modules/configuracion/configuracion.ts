@@ -5,6 +5,8 @@ import { firstValueFrom } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config';
 import type { components } from '../../core/api/schema';
+import { ActivatedRoute } from '@angular/router';
+import { ConfiguracionIa } from './configuracion-ia';
 
 type GrupoCatalogo = components['schemas']['GrupoCatalogoOut'];
 type OpcionAdmin = components['schemas']['CatalogoOpcionAdminOut'];
@@ -38,7 +40,7 @@ function etiquetaSeccion(valor: string | null | undefined): string {
  */
 @Component({
   selector: 'app-configuracion',
-  imports: [FormsModule],
+  imports: [FormsModule, ConfiguracionIa],
   template: `
     <h1>Configuración</h1>
     <p class="nota">
@@ -46,14 +48,15 @@ function etiquetaSeccion(valor: string | null | undefined): string {
       cambios se aplican de inmediato, sin reinstalar la aplicación.
     </p>
 
-    <div class="formulario" style="grid-auto-flow: column; justify-content: start">
-      <button type="button" [disabled]="pestana() === 'catalogos'" (click)="cambiarPestana('catalogos')">
-        Catálogos
-      </button>
-      <button type="button" [disabled]="pestana() === 'parametros'" (click)="cambiarPestana('parametros')">
-        Parámetros
-      </button>
+    <div class="pestanas" role="tablist" aria-label="Secciones de configuración">
+      <button type="button" role="tab" [attr.aria-selected]="pestana() === 'catalogos'" [class.activa]="pestana() === 'catalogos'" (click)="cambiarPestana('catalogos')">Catálogos</button>
+      <button type="button" role="tab" [attr.aria-selected]="pestana() === 'parametros'" [class.activa]="pestana() === 'parametros'" (click)="cambiarPestana('parametros')">Parámetros</button>
+      <button type="button" role="tab" [attr.aria-selected]="pestana() === 'ia'" [class.activa]="pestana() === 'ia'" (click)="cambiarPestana('ia')">Asistente de IA</button>
     </div>
+
+    @if (pestana() === 'ia') {
+      <app-configuracion-ia />
+    }
 
     @if (pestana() === 'catalogos') {
       <section class="tarjeta">
@@ -241,7 +244,9 @@ export class Configuracion {
   protected readonly SIN_ELEGIR = SIN_ELEGIR;
   protected readonly etiquetaSeccion = etiquetaSeccion;
 
-  protected readonly pestana = signal<'catalogos' | 'parametros'>('catalogos');
+  protected readonly pestana = signal<'catalogos' | 'parametros' | 'ia'>(
+    inject(ActivatedRoute).snapshot.queryParamMap.get('seccion') === 'ia' ? 'ia' : 'catalogos',
+  );
 
   protected readonly grupos = signal<GrupoCatalogo[]>([]);
   protected readonly cargandoGrupos = signal(false);
@@ -287,7 +292,7 @@ export class Configuracion {
     void this.cargarParametros();
   }
 
-  protected cambiarPestana(p: 'catalogos' | 'parametros'): void {
+  protected cambiarPestana(p: 'catalogos' | 'parametros' | 'ia'): void {
     this.pestana.set(p);
   }
 

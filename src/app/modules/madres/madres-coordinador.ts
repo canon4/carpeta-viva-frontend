@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 
@@ -16,57 +16,94 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
   selector: 'app-madres-coordinador',
   imports: [FormsModule],
   template: `
-    <h1>Madres Sustitutas</h1>
+    <div class="encabezado-modulo">
+      <h1>Madres sustitutas</h1>
+      @if (!formularioAbierto()) {
+        <button type="button" (click)="formularioAbierto.set(true)">Registrar madre</button>
+      }
+    </div>
 
-    @if (cargando()) {
-      <p class="nota">Cargando madres...</p>
+    @if (formularioAbierto()) {
+      <form class="panel-formulario" (ngSubmit)="crear()" #f="ngForm" aria-labelledby="tituloMadre">
+        <h2 id="tituloMadre">Registrar madre sustituta</h2>
+        <div class="campos">
+          <div class="campo">
+            <label for="nombres">Nombres *</label>
+            <input id="nombres" name="nombres" required autocomplete="off" [(ngModel)]="nuevo.nombres" />
+          </div>
+          <div class="campo">
+            <label for="apellidos">Apellidos *</label>
+            <input id="apellidos" name="apellidos" required autocomplete="off" [(ngModel)]="nuevo.apellidos" />
+          </div>
+          <div class="campo">
+            <label for="identificacion">Cédula *</label>
+            <input id="identificacion" name="identificacion" required inputmode="numeric" autocomplete="off" [(ngModel)]="nuevo.numero_identificacion" />
+          </div>
+          <div class="campo">
+            <label for="telefono">Teléfono</label>
+            <input id="telefono" name="telefono" type="tel" inputmode="tel" autocomplete="off" [(ngModel)]="nuevo.telefono" />
+          </div>
+          <div class="campo">
+            <label for="direccion">Dirección</label>
+            <input id="direccion" name="direccion" autocomplete="off" [(ngModel)]="nuevo.direccion" />
+          </div>
+        </div>
+        <p class="nota">Los campos con * son obligatorios.</p>
+        <div class="acciones">
+          <button type="submit" [disabled]="f.invalid || guardandoNueva()">{{ guardandoNueva() ? 'Guardando...' : 'Guardar' }}</button>
+          <button type="button" class="boton-secundario" (click)="formularioAbierto.set(false)">Cancelar</button>
+        </div>
+      </form>
     }
+
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
 
-    <ul class="lista-simple">
-      @for (m of madres(); track m.id) {
-        <li class="tarjeta">
-          <h2>{{ m.nombres }} {{ m.apellidos }}</h2>
-          <p>Identificación: {{ m.numero_identificacion }}</p>
-          <p>Teléfono: {{ m.telefono || 'Sin registrar' }}</p>
-          <p>Dirección: {{ m.direccion || 'Sin registrar' }}</p>
-          <form class="formulario" (ngSubmit)="actualizarEstado(m)">
-            <label [for]="'estado-' + m.id">Estado de certificación</label>
-            <select [id]="'estado-' + m.id" name="estado" [(ngModel)]="estadoEdicion[m.id]">
-              <option value="pendiente">Pendiente</option>
-              <option value="vigente">Vigente</option>
-              <option value="vencida">Vencida</option>
-              <option value="suspendida">Suspendida</option>
-            </select>
-            <button type="submit" [disabled]="guardandoId() === m.id">
-              {{ guardandoId() === m.id ? 'Guardando...' : 'Guardar' }}
-            </button>
-          </form>
-        </li>
-      }
-      @if (!cargando() && madres().length === 0) {
-        <p class="nota">Todavía no hay madres registradas.</p>
-      }
-    </ul>
+    <div class="filtros">
+      <div class="campo">
+        <label for="buscar">Buscar</label>
+        <input id="buscar" type="search" autocomplete="off" placeholder="Nombre o cédula" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+      </div>
+    </div>
 
-    <form class="formulario tarjeta" (ngSubmit)="crear()" #f="ngForm">
-      <h2>Registrar madre sustituta</h2>
-      <label for="nombres">Nombres</label>
-      <input id="nombres" name="nombres" required [(ngModel)]="nuevo.nombres" />
-      <label for="apellidos">Apellidos</label>
-      <input id="apellidos" name="apellidos" required [(ngModel)]="nuevo.apellidos" />
-      <label for="identificacion">Número de identificación</label>
-      <input id="identificacion" name="identificacion" required [(ngModel)]="nuevo.numero_identificacion" />
-      <label for="telefono">Teléfono</label>
-      <input id="telefono" name="telefono" [(ngModel)]="nuevo.telefono" />
-      <label for="direccion">Dirección</label>
-      <input id="direccion" name="direccion" [(ngModel)]="nuevo.direccion" />
-      <button type="submit" [disabled]="f.invalid || guardandoNueva()">
-        {{ guardandoNueva() ? 'Guardando...' : 'Crear madre' }}
-      </button>
-    </form>
+    @if (cargando()) {
+      <p class="nota" role="status">Cargando madres...</p>
+    } @else if (filtradas().length === 0) {
+      <p class="nota">No hay madres para mostrar.</p>
+    } @else {
+      <table class="tabla-datos" aria-label="Madres sustitutas">
+        <thead>
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Cédula</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Certificación</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of filtradas(); track m.id) {
+            <tr>
+              <td data-etiqueta="Nombre"><strong>{{ m.nombres }} {{ m.apellidos }}</strong><br /><span class="nota">{{ m.direccion || 'Sin dirección' }}</span></td>
+              <td data-etiqueta="Cédula">{{ m.numero_identificacion }}</td>
+              <td data-etiqueta="Teléfono">
+                @if (m.telefono) { <a [href]="'tel:' + m.telefono">{{ m.telefono }}</a> } @else { — }
+              </td>
+              <td data-etiqueta="Certificación">
+                <label class="oculto" [for]="'estado-' + m.id">Certificación de {{ m.nombres }}</label>
+                <select [id]="'estado-' + m.id" [ngModel]="estadoEdicion[m.id]" (ngModelChange)="estadoEdicion[m.id] = $event; actualizarEstado(m)" [disabled]="guardandoId() === m.id">
+                  <option value="pendiente">Pendiente</option>
+                  <option value="vigente">Vigente</option>
+                  <option value="vencida">Vencida</option>
+                  <option value="suspendida">Suspendida</option>
+                </select>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <p class="nota">El cambio de certificación se guarda al elegirlo.</p>
+    }
   `,
 })
 export class MadresCoordinador {
@@ -78,6 +115,16 @@ export class MadresCoordinador {
   protected readonly error = signal('');
   protected readonly guardandoId = signal<string | null>(null);
   protected readonly guardandoNueva = signal(false);
+  protected readonly formularioAbierto = signal(false);
+  protected readonly busqueda = signal('');
+  protected readonly filtradas = computed(() => {
+    const texto = this.busqueda().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+    const lista = [...this.madres()].sort((a, b) => `${a.nombres} ${a.apellidos}`.localeCompare(`${b.nombres} ${b.apellidos}`, 'es'));
+    if (!texto) return lista;
+    return lista.filter((m) =>
+      `${m.nombres} ${m.apellidos} ${m.numero_identificacion}`.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().includes(texto),
+    );
+  });
   protected readonly estadoEdicion: Record<string, EstadoCertificacion> = {};
 
   protected nuevo = {
@@ -124,6 +171,7 @@ export class MadresCoordinador {
       this.madres.set([...this.madres(), creada]);
       this.estadoEdicion[creada.id] = creada.estado_certificacion as EstadoCertificacion;
       this.nuevo = { nombres: '', apellidos: '', numero_identificacion: '', telefono: '', direccion: '' };
+      this.formularioAbierto.set(false);
     } catch (e) {
       this.error.set(this.mensajeError(e));
     } finally {

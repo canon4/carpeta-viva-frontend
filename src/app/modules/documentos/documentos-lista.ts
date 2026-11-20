@@ -34,103 +34,151 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 @Component({
   selector: 'app-documentos-lista',
   imports: [FormsModule, RouterLink, SelectorMenor, SelectorHogar],
+  styles: [`
+    .atajos { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .atajo { background: var(--color-superficie); color: var(--color-texto); border: 1px solid var(--color-borde); border-radius: 999px; min-height: 40px; padding: 0 1rem; font-weight: 600; }
+    .atajo:hover:not(:disabled) { background: var(--color-primario-suave); border-color: var(--color-primario); color: var(--color-primario); }
+    .atajo.activo, .atajo.activo:hover { background: var(--color-primario); border-color: var(--color-primario); color: #fff; }
+  `],
   template: `
-    <h1>Gestión Documental</h1>
+    <div class="encabezado-modulo">
+      <h1>Gestión documental</h1>
+      @if (!esAuditor() && puedeSubir() && !formularioAbierto()) {
+        <button type="button" (click)="formularioAbierto.set(true)">Subir documento</button>
+      }
+    </div>
 
     @if (esAuditor()) {
       <p class="nota">
         Vista de auditoría: solo metadatos de documentos no sensibles. Nunca se muestra ni se
         descarga el contenido del archivo.
       </p>
-    } @else {
-      <form class="formulario" (ngSubmit)="filtrar()">
-        <app-selector-menor [(valor)]="filtroMenorId" etiqueta="Menor (opcional)" opcionVacia="Todos los menores" />
-        <app-selector-hogar [(valor)]="filtroHogarId" etiqueta="Hogar (opcional)" opcionVacia="Todos los hogares" />
-        <label for="fCategoria">Categoría (opcional)</label>
-        <select id="fCategoria" name="fCategoria" [(ngModel)]="filtroCategoria">
-          <option value="">Todas</option>
-          @for (c of todasCategorias(); track c.valor) {
-            <option [value]="c.valor">{{ c.etiqueta }}</option>
+    }
+
+    @if (formularioAbierto()) {
+      <form class="panel-formulario" (ngSubmit)="subir()" #f="ngForm" aria-labelledby="tituloSubir">
+        <h2 id="tituloSubir">Subir documento</h2>
+        <div class="campos">
+          <div class="campo">
+            <label for="nArchivo">Archivo o foto *</label>
+            <input id="nArchivo" name="nArchivo" type="file" required accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,image/*" (change)="seleccionarArchivo($event)" />
+          </div>
+          <div class="campo">
+            <label for="destino">El documento es de *</label>
+            <select id="destino" name="destino" [(ngModel)]="nuevo.destino" (ngModelChange)="nuevo.categoria = ''">
+              <option value="menor">Un menor</option>
+              <option value="hogar">El hogar</option>
+            </select>
+          </div>
+          <div class="campo">
+            @if (nuevo.destino === 'menor') {
+              <app-selector-menor etiqueta="Menor *" [(valor)]="nuevo.menor_id" [requerido]="true" />
+            } @else {
+              <app-selector-hogar etiqueta="Hogar *" [(valor)]="nuevo.hogar_id" [requerido]="true" />
+            }
+          </div>
+          <div class="campo">
+            <label for="nCategoria">Categoría *</label>
+            <select id="nCategoria" name="nCategoria" required [(ngModel)]="nuevo.categoria">
+              <option value="" disabled>Seleccione una categoría</option>
+              @for (c of (nuevo.destino === 'menor' ? categoriasMenor() : categoriasHogar()); track c.valor) {
+                <option [value]="c.valor">{{ c.etiqueta }}</option>
+              }
+            </select>
+          </div>
+          <div class="campo">
+            <label for="nTitulo">Título *</label>
+            <input id="nTitulo" name="nTitulo" required autocomplete="off" [(ngModel)]="nuevo.titulo" />
+          </div>
+          @if (puedeMigrar()) {
+            <div class="campo">
+              <label class="casilla">
+                <input type="checkbox" name="nMigracion" [(ngModel)]="nuevo.migracion" />
+                Es digitalización del historial físico
+              </label>
+              @if (nuevo.migracion) {
+                <label for="nMotivo">Motivo de la migración *</label>
+                <input id="nMotivo" name="nMotivo" required autocomplete="off" [(ngModel)]="nuevo.motivo" />
+              }
+            </div>
           }
-        </select>
-        <label for="fEstado">Estado (opcional)</label>
-        <select id="fEstado" name="fEstado" [(ngModel)]="filtroEstado">
-          <option value="">Todos</option>
-          @for (e of estados; track e.valor) {
-            <option [value]="e.valor">{{ e.etiqueta }}</option>
-          }
-        </select>
-        <button type="submit" [disabled]="cargando()">Filtrar</button>
+        </div>
+        <p class="nota">El título se llena con el nombre del archivo; puede cambiarlo. Los campos con * son obligatorios.</p>
+        <div class="acciones">
+          <button type="submit" [disabled]="f.invalid || !archivoSeleccionado() || subiendo()">
+            {{ subiendo() ? 'Subiendo...' : 'Subir' }}
+          </button>
+          <button type="button" class="boton-secundario" (click)="formularioAbierto.set(false)">Cancelar</button>
+        </div>
       </form>
     }
 
-    @if (cargando()) {
-      <p class="nota">Cargando documentos...</p>
+    @if (exito()) {
+      <p class="exito" role="status">{{ exito() }}</p>
     }
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
 
-    <ul class="lista-simple">
-      @for (d of documentos(); track d.id) {
-        <li class="tarjeta">
-          <a [routerLink]="['/documentos', d.id]">
-            <p><strong>{{ d.titulo }}</strong></p>
-            <p>Categoría: {{ etiquetaCategoria(d.categoria, todasCategorias()) }}</p>
-            <p>Estado: {{ etiquetaEstadoFlujo(d.estado_flujo) }} — Versión {{ d.version }}</p>
-            <p>Archivo: {{ d.nombre_original }} ({{ formatoTamanio(d.tamanio_bytes) }})</p>
-          </a>
-        </li>
-      }
-      @if (!cargando() && documentos().length === 0) {
-        <p class="nota">No hay documentos para mostrar con estos filtros.</p>
-      }
-    </ul>
-
-    @if (!esAuditor() && puedeSubir()) {
-      <form class="formulario tarjeta" (ngSubmit)="subir()" #f="ngForm">
-        <h2>Subir documento</h2>
-        <label for="destino">Este documento es de</label>
-        <select id="destino" name="destino" [(ngModel)]="nuevo.destino" (ngModelChange)="nuevo.categoria = ''">
-          <option value="menor">Un menor</option>
-          <option value="hogar">Un hogar</option>
-        </select>
-
-        @if (nuevo.destino === 'menor') {
-          <app-selector-menor [(valor)]="nuevo.menor_id" [requerido]="true" />
-        } @else {
-          <app-selector-hogar [(valor)]="nuevo.hogar_id" [requerido]="true" />
+    @if (!esAuditor()) {
+      <div class="atajos" role="group" aria-label="Atajos de estado">
+        @for (a of atajos(); track a.estado) {
+          <button type="button" class="atajo" [class.activo]="filtroEstado === a.estado" [attr.aria-pressed]="filtroEstado === a.estado" (click)="filtroEstado = a.estado; filtrar()">{{ a.etiqueta }}</button>
         }
-
-        <label for="nCategoria">Categoría</label>
-        <select id="nCategoria" name="nCategoria" required [(ngModel)]="nuevo.categoria">
-          <option value="" disabled>Seleccione una categoría</option>
-          @for (c of (nuevo.destino === 'menor' ? categoriasMenor() : categoriasHogar()); track c.valor) {
-            <option [value]="c.valor">{{ c.etiqueta }}</option>
-          }
-        </select>
-
-        <label for="nTitulo">Título</label>
-        <input id="nTitulo" name="nTitulo" required [(ngModel)]="nuevo.titulo" />
-
-        <label for="nArchivo">Archivo</label>
-        <input id="nArchivo" name="nArchivo" type="file" required (change)="seleccionarArchivo($event)" />
-
-        @if (puedeMigrar()) {
-          <label>
-            <input type="checkbox" name="nMigracion" [(ngModel)]="nuevo.migracion" />
-            Es digitalización del historial físico (migración)
-          </label>
-          @if (nuevo.migracion) {
-            <label for="nMotivo">Motivo de la migración</label>
-            <input id="nMotivo" name="nMotivo" required [(ngModel)]="nuevo.motivo" />
-          }
+      </div>
+      <div class="filtros">
+        <div class="campo">
+          <label for="buscar">Buscar</label>
+          <input id="buscar" type="search" autocomplete="off" placeholder="Título del documento" [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" />
+        </div>
+        <div class="campo">
+          <app-selector-menor etiqueta="Menor" opcionVacia="Todos los menores" [valor]="filtroMenorId" (valorChange)="filtroMenorId = $event; filtrar()" />
+        </div>
+        <!-- La madre tiene un solo hogar: filtrar por él ocultaría los documentos de sus niños. -->
+        @if (!esMadre()) {
+          <div class="campo">
+            <app-selector-hogar etiqueta="Hogar" opcionVacia="Todos los hogares" [valor]="filtroHogarId" (valorChange)="filtroHogarId = $event; filtrar()" />
+          </div>
         }
+        <div class="campo">
+          <label for="fCategoria">Categoría</label>
+          <select id="fCategoria" [ngModel]="filtroCategoria" (ngModelChange)="filtroCategoria = $event; filtrar()">
+            <option value="">Todas</option>
+            @for (c of todasCategorias(); track c.valor) {
+              <option [value]="c.valor">{{ c.etiqueta }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    }
 
-        <button type="submit" [disabled]="f.invalid || !archivoSeleccionado() || subiendo()">
-          {{ subiendo() ? 'Subiendo...' : 'Subir documento' }}
-        </button>
-      </form>
+    @if (cargando()) {
+      <p class="nota" role="status">Cargando documentos...</p>
+    } @else if (visibles().length === 0) {
+      <p class="nota">No hay documentos para mostrar.</p>
+    } @else {
+      <table class="tabla-datos" aria-label="Documentos">
+        <thead>
+          <tr>
+            <th scope="col">Título</th>
+            <th scope="col">De</th>
+            <th scope="col">Categoría</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of visibles(); track d.id) {
+            <tr>
+              <td data-etiqueta="Título"><a [routerLink]="['/documentos', d.id]">{{ d.titulo }}</a></td>
+              <td data-etiqueta="De">{{ d.menor_id ? nombreMenor(d.menor_id) : 'Hogar' }}</td>
+              <td data-etiqueta="Categoría">{{ etiquetaCategoria(d.categoria, todasCategorias()) }}</td>
+              <td data-etiqueta="Fecha">{{ fecha(d.created_at) }}</td>
+              <td data-etiqueta="Estado"><span [class]="'estado estado-flujo-' + d.estado_flujo">{{ etiquetaEstadoFlujo(d.estado_flujo) }}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
     }
   `,
 })
@@ -159,6 +207,8 @@ export class DocumentosLista {
   protected readonly error = signal('');
   protected readonly subiendo = signal(false);
   protected readonly archivoSeleccionado = signal<File | null>(null);
+  protected readonly formularioAbierto = signal(false);
+  protected readonly exito = signal('');
 
   protected filtroMenorId = '';
   protected filtroHogarId = '';
@@ -166,6 +216,57 @@ export class DocumentosLista {
   protected filtroEstado = '';
 
   protected readonly esAuditor = computed(() => this.auth.rol() === 'auditor');
+  protected readonly esMadre = computed(() => this.auth.rol() === 'madre');
+  protected readonly busqueda = signal('');
+  private readonly nombres = signal<Record<string, string>>({});
+
+  /** Atajos de estado según el rol: la madre corrige; el profesional revisa. */
+  protected readonly atajos = computed(() => {
+    if (this.esMadre()) {
+      return [
+        { estado: '', etiqueta: 'Todos' },
+        { estado: 'devuelto', etiqueta: 'Para corregir' },
+        { estado: 'borrador', etiqueta: 'Sin enviar' },
+        { estado: 'en_revision', etiqueta: 'En revisión' },
+        { estado: 'aprobado', etiqueta: 'Aprobados' },
+      ];
+    }
+    return [
+      { estado: '', etiqueta: 'Todos' },
+      { estado: 'en_revision', etiqueta: 'Por revisar' },
+      { estado: 'devuelto', etiqueta: 'Devueltos' },
+      { estado: 'aprobado', etiqueta: 'Aprobados' },
+    ];
+  });
+
+  /** Búsqueda local por título, más recientes primero. */
+  protected readonly visibles = computed(() => {
+    const texto = this.normalizar(this.busqueda());
+    const lista = [...this.documentos()].sort((a, b) => b.created_at.localeCompare(a.created_at));
+    return texto ? lista.filter((d) => this.normalizar(d.titulo).includes(texto)) : lista;
+  });
+
+  protected nombreMenor(id: string): string {
+    return this.nombres()[id] ?? 'Menor';
+  }
+
+  protected fecha(iso: string): string {
+    const f = new Date(iso);
+    return Number.isNaN(f.getTime()) ? iso : f.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  private normalizar(texto: string): string {
+    return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  }
+
+  private async cargarNombres(): Promise<void> {
+    try {
+      const menores = await firstValueFrom(this.http.get<{ id: string; nombres: string; apellidos: string }[]>(`${this.config.apiUrl}/menores`));
+      this.nombres.set(Object.fromEntries(menores.map((m) => [m.id, `${m.nombres} ${m.apellidos}`])));
+    } catch {
+      /* sin nombres se muestra "Menor" */
+    }
+  }
   protected readonly puedeSubir = computed(() => {
     const rol = this.auth.rol();
     return rol === 'madre' || rol === 'profesional' || rol === 'defensor' || rol === 'coordinador' || rol === 'admin';
@@ -189,13 +290,17 @@ export class DocumentosLista {
     this.filtroMenorId = this.route.snapshot.queryParamMap.get('menor_id') ?? '';
     this.filtroHogarId = this.route.snapshot.queryParamMap.get('hogar_id') ?? '';
     this.filtroCategoria = this.route.snapshot.queryParamMap.get('categoria') ?? '';
+    this.filtroEstado = this.route.snapshot.queryParamMap.get('estado') ?? '';
+    if (this.route.snapshot.queryParamMap.get('nuevo') === '1' && this.puedeSubir()) this.formularioAbierto.set(true);
     if (this.filtroMenorId) this.nuevo.menor_id = this.filtroMenorId;
+    if (this.filtroCategoria) this.nuevo.categoria = this.filtroCategoria;
     if (this.filtroHogarId) {
       this.nuevo.hogar_id = this.filtroHogarId;
       this.nuevo.destino = 'hogar';
     }
     void this.cargar();
     void this.cargarCatalogos();
+    void this.cargarNombres();
   }
 
   private async cargarCatalogos(): Promise<void> {
@@ -243,7 +348,12 @@ export class DocumentosLista {
 
   protected seleccionarArchivo(evento: Event): void {
     const input = evento.target as HTMLInputElement;
-    this.archivoSeleccionado.set(input.files?.[0] ?? null);
+    const archivo = input.files?.[0] ?? null;
+    this.archivoSeleccionado.set(archivo);
+    // Un campo menos que escribir: el título parte del nombre del archivo, sin extensión.
+    if (archivo && !this.nuevo.titulo.trim()) {
+      this.nuevo.titulo = archivo.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+    }
   }
 
   protected async subir(): Promise<void> {
@@ -267,6 +377,8 @@ export class DocumentosLista {
       }
       const creado = await firstValueFrom(this.http.post<Documento>(`${this.config.apiUrl}/documentos`, datos));
       this.documentos.set([creado, ...this.documentos()]);
+      this.exito.set(`Se subió "${creado.titulo}" en borrador. Ábralo para enviarlo a revisión.`);
+      this.formularioAbierto.set(false);
       this.nuevo = {
         destino: this.nuevo.destino,
         menor_id: this.nuevo.destino === 'menor' ? this.nuevo.menor_id : '',

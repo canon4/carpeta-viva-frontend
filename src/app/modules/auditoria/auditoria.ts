@@ -17,18 +17,37 @@ const MENSAJE_GENERICO = 'No se pudo cargar el registro de auditoría. Intente d
   selector: 'app-auditoria',
   imports: [FormsModule, DatePipe],
   template: `
-    <h1>Auditoría</h1>
+    <div class="encabezado-modulo"><h1>Auditoría</h1></div>
     <p class="nota">Registro de todo acceso al sistema. Esta pantalla es de solo lectura.</p>
 
-    <form class="formulario" (ngSubmit)="buscar()">
-      <label for="usuarioId">Id de usuario</label>
-      <input id="usuarioId" name="usuarioId" [(ngModel)]="filtroUsuarioId" placeholder="Opcional" />
-      <label for="accion">Acción</label>
-      <input id="accion" name="accion" [(ngModel)]="filtroAccion" placeholder="Ejemplo: login, crear_documento" />
-      <label for="desde">Desde</label>
-      <input id="desde" name="desde" type="date" [(ngModel)]="filtroDesde" />
-      <label for="hasta">Hasta</label>
-      <input id="hasta" name="hasta" type="date" [(ngModel)]="filtroHasta" />
+    <datalist id="acciones-auditoria">
+      <option value="login_ok"></option>
+      <option value="login_fallido"></option>
+      <option value="login_bloqueado"></option>
+      <option value="contrasena_cambiada"></option>
+      <option value="documento_creado"></option>
+      <option value="documento_descargado"></option>
+      <option value="evasion_reportada"></option>
+      <option value="permiso_otorgado"></option>
+    </datalist>
+
+    <form class="filtros" (ngSubmit)="buscar()">
+      <div class="campo">
+        <label for="accion">Acción</label>
+        <input id="accion" name="accion" list="acciones-auditoria" autocomplete="off" [(ngModel)]="filtroAccion" />
+      </div>
+      <div class="campo">
+        <label for="desde">Desde</label>
+        <input id="desde" name="desde" type="date" [(ngModel)]="filtroDesde" />
+      </div>
+      <div class="campo">
+        <label for="hasta">Hasta</label>
+        <input id="hasta" name="hasta" type="date" [(ngModel)]="filtroHasta" />
+      </div>
+      <div class="campo">
+        <label for="usuarioId">Usuario (id)</label>
+        <input id="usuarioId" name="usuarioId" autocomplete="off" [(ngModel)]="filtroUsuarioId" />
+      </div>
       <button type="submit" [disabled]="cargando()">Buscar</button>
     </form>
 
@@ -44,8 +63,8 @@ const MENSAJE_GENERICO = 'No se pudo cargar el registro de auditoría. Intente d
     }
 
     @if (accesos().length > 0) {
-      <div class="tarjeta" style="overflow-x:auto">
-        <table class="tabla">
+      <div>
+        <table class="tabla-datos" aria-label="Registro de accesos">
           <thead>
             <tr>
               <th scope="col">Fecha</th>
@@ -59,19 +78,19 @@ const MENSAJE_GENERICO = 'No se pudo cargar el registro de auditoría. Intente d
           <tbody>
             @for (a of accesos(); track a.id) {
               <tr>
-                <td>{{ a.created_at | date: 'short' }}</td>
-                <td>{{ a.usuario_id || 'Sin dato' }}</td>
-                <td>{{ a.accion }}</td>
-                <td>{{ a.recurso || '—' }}</td>
-                <td>{{ a.menor_id || '—' }}</td>
-                <td>{{ a.ip || '—' }}</td>
+                <td data-etiqueta="Fecha">{{ a.created_at | date: 'short' }}</td>
+                <td data-etiqueta="Usuario">{{ a.usuario_id ? a.usuario_id.slice(0, 8) : 'Sin dato' }}</td>
+                <td data-etiqueta="Acción"><strong>{{ a.accion }}</strong></td>
+                <td data-etiqueta="Recurso">{{ a.recurso ? a.recurso.slice(0, 8) : '—' }}</td>
+                <td data-etiqueta="Menor">{{ a.menor_id ? a.menor_id.slice(0, 8) : '—' }}</td>
+                <td data-etiqueta="IP">{{ a.ip || '—' }}</td>
               </tr>
             }
           </tbody>
         </table>
       </div>
 
-      <div class="formulario" style="grid-auto-flow: column; justify-content: start">
+      <div class="acciones">
         <button type="button" (click)="anterior()" [disabled]="pagina() === 0 || cargando()">Anterior</button>
         <button type="button" (click)="siguiente()" [disabled]="accesos().length < TAMANO_PAGINA || cargando()">Siguiente</button>
       </div>

@@ -6,8 +6,11 @@ import { firstValueFrom } from 'rxjs';
 
 import { AppConfigService } from '../../core/config/app-config';
 import type { components } from '../../core/api/schema';
+import { SelectorZona } from '../../shared/selector-zona/selector-zona';
 
 type ExpedienteArchivo = components['schemas']['ExpedienteArchivoOut'];
+type Menor = components['schemas']['MenorOut'];
+type Zona = components['schemas']['ZonaOut'];
 
 const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 
@@ -18,42 +21,58 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
  */
 @Component({
   selector: 'app-archivo-lista',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, SelectorZona],
   template: `
-    <h1>Expedientes archivados</h1>
+    <div class="encabezado-modulo">
+      <h1>Expedientes archivados</h1>
+    </div>
 
-    <form class="formulario" (ngSubmit)="filtrar()">
-      <label for="fZona">Id de la zona (opcional)</label>
-      <input id="fZona" name="fZona" [(ngModel)]="filtroZonaId" />
-      <label for="fDesde">Archivado desde (opcional)</label>
-      <input id="fDesde" name="fDesde" type="date" [(ngModel)]="filtroDesde" />
-      <label for="fHasta">Archivado hasta (opcional)</label>
-      <input id="fHasta" name="fHasta" type="date" [(ngModel)]="filtroHasta" />
-      <button type="submit" [disabled]="cargando()">Filtrar</button>
-    </form>
+    <div class="filtros">
+      <div class="campo">
+        <app-selector-zona [valor]="filtroZonaId" (valorChange)="filtroZonaId = $event; filtrar()" />
+      </div>
+      <div class="campo">
+        <label for="fDesde">Archivado desde</label>
+        <input id="fDesde" type="date" [ngModel]="filtroDesde" (ngModelChange)="filtroDesde = $event; filtrar()" />
+      </div>
+      <div class="campo">
+        <label for="fHasta">Archivado hasta</label>
+        <input id="fHasta" type="date" [ngModel]="filtroHasta" (ngModelChange)="filtroHasta = $event; filtrar()" />
+      </div>
+    </div>
 
-    @if (cargando()) {
-      <p class="nota">Cargando expedientes archivados...</p>
-    }
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
 
-    <ul class="lista-simple">
-      @for (e of expedientes(); track e.menor_id) {
-        <li class="tarjeta">
-          <p>Menor: {{ e.menor_id }}</p>
-          <p>Zona: {{ e.zona_id || 'Sin registrar' }}</p>
-          <p>Archivado el: {{ e.archivado_en }}</p>
-          <p>Motivo: {{ e.motivo || 'Sin motivo registrado' }}</p>
-          <p>Destino: {{ e.destino }}</p>
-          <p><a [routerLink]="['/archivo/menores', e.menor_id]">Ver detalle de este expediente archivado</a></p>
-        </li>
-      }
-      @if (!cargando() && expedientes().length === 0) {
-        <p class="nota">No hay expedientes archivados con estos filtros.</p>
-      }
-    </ul>
+    @if (cargando()) {
+      <p class="nota" role="status">Cargando expedientes archivados...</p>
+    } @else if (expedientes().length === 0) {
+      <p class="nota">No hay expedientes archivados con estos filtros.</p>
+    } @else {
+      <table class="tabla-datos" aria-label="Expedientes archivados">
+        <thead>
+          <tr>
+            <th scope="col">Menor</th>
+            <th scope="col">Zona</th>
+            <th scope="col">Archivado</th>
+            <th scope="col">Motivo</th>
+            <th scope="col">Destino</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of expedientes(); track e.menor_id) {
+            <tr>
+              <td data-etiqueta="Menor"><a [routerLink]="['/archivo/menores', e.menor_id]">{{ nombreMenor(e.menor_id) }}</a></td>
+              <td data-etiqueta="Zona">{{ nombreZona(e.zona_id) }}</td>
+              <td data-etiqueta="Archivado">{{ e.archivado_en ? e.archivado_en.slice(0, 10) : '—' }}</td>
+              <td data-etiqueta="Motivo">{{ e.motivo || 'Sin motivo' }}</td>
+              <td data-etiqueta="Destino">{{ e.destino }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
   `,
 })
 export class ArchivoLista {
@@ -68,8 +87,35 @@ export class ArchivoLista {
   protected filtroDesde = '';
   protected filtroHasta = '';
 
+  private readonly nombresMenor = signal<Record<string, string>>({});
+  private readonly nombresZona = signal<Record<string, string>>({});
+
   constructor() {
     void this.cargar();
+    void this.cargarNombres();
+  }
+
+  protected nombreMenor(id: string): string {
+    return this.nombresMenor()[id] ?? `Expediente ${id.slice(0, 8)}`;
+  }
+
+  protected nombreZona(id: string | null | undefined): string {
+    if (!id) return 'Sin registrar';
+    return this.nombresZona()[id] ?? `Zona ${id.slice(0, 8)}`;
+  }
+
+  /** Nombres legibles en lugar de ids. Si una consulta falla (rol sin acceso), queda el id corto. */
+  private async cargarNombres(): Promise<void> {
+    const [menores, zonas] = await Promise.allSettled([
+      firstValueFrom(this.http.get<Menor[]>(`${this.config.apiUrl}/menores`)),
+      firstValueFrom(this.http.get<Zona[]>(`${this.config.apiUrl}/zonas-hogares/zonas`)),
+    ]);
+    if (menores.status === 'fulfilled') {
+      this.nombresMenor.set(Object.fromEntries(menores.value.map((m) => [m.id, `${m.nombres} ${m.apellidos}`])));
+    }
+    if (zonas.status === 'fulfilled') {
+      this.nombresZona.set(Object.fromEntries(zonas.value.map((z) => [z.id, z.nombre])));
+    }
   }
 
   protected filtrar(): void {

@@ -13,6 +13,7 @@ import type { components } from '../../core/api/schema';
 // en el módulo `ia` (cita a una fuente documental, Fase 5) porque ambos backends usan el mismo
 // nombre de clase en módulos distintos.
 type Cita = components['schemas']['app__modules__citas__schemas__CitaOut'];
+type Menor = components['schemas']['MenorOut'];
 
 const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 
@@ -39,103 +40,132 @@ const ETIQUETAS_ESTADO: Record<string, string> = {
   selector: 'app-citas-lista',
   imports: [FormsModule, SelectorMenor],
   template: `
-    <h1>Citas y Recordatorios</h1>
+    <div class="encabezado-modulo">
+      <h1>Citas y recordatorios</h1>
+      @if (tiposPermitidos().length > 0 && !formularioAbierto()) {
+        <button type="button" (click)="abrirFormulario()">Registrar cita</button>
+      }
+    </div>
 
-    <form class="formulario" (ngSubmit)="filtrar()">
-      <app-selector-menor [(valor)]="filtroMenorId" etiqueta="Menor (opcional)" opcionVacia="Todos los menores" />
-      <label for="fTipo">Tipo (opcional)</label>
-      <select id="fTipo" name="fTipo" [(ngModel)]="filtroTipo">
-        <option value="">Todos</option>
-        <option value="medica">Médica</option>
-        <option value="psicosocial">Psicosocial</option>
-        <option value="reunion_familia">Reunión con familia biológica</option>
-        <option value="otro">Otro</option>
-      </select>
-      <label for="fEstado">Estado (opcional)</label>
-      <select id="fEstado" name="fEstado" [(ngModel)]="filtroEstado">
-        <option value="">Todos</option>
-        <option value="pendiente">Pendiente</option>
-        <option value="cumplida">Cumplida</option>
-        <option value="no_asistio">No asistió</option>
-      </select>
-      <button type="submit" [disabled]="cargando()">Filtrar</button>
-      <button type="button" (click)="verProximas()" [disabled]="cargando()">Ver mis próximas citas</button>
-    </form>
-
-    @if (cargando()) {
-      <p class="nota">Cargando citas...</p>
+    @if (formularioAbierto()) {
+      <form class="panel-formulario" (ngSubmit)="registrar()" #f="ngForm" aria-labelledby="tituloCita">
+        <h2 id="tituloCita">Registrar cita</h2>
+        <div class="campos">
+          <div class="campo">
+            <app-selector-menor etiqueta="Menor *" [(valor)]="nueva.menor_id" [requerido]="true" />
+          </div>
+          @if (tiposPermitidos().length > 1) {
+            <div class="campo">
+              <label for="nTipo">Tipo de cita *</label>
+              <select id="nTipo" name="nTipo" required [(ngModel)]="nueva.tipo">
+                @for (t of tiposPermitidos(); track t) {
+                  <option [value]="t">{{ etiquetaTipo(t) }}</option>
+                }
+              </select>
+            </div>
+          } @else {
+            <div class="campo">
+              <span>Tipo de cita</span>
+              <strong>{{ etiquetaTipo(tiposPermitidos()[0]) }}</strong>
+            </div>
+          }
+          <div class="campo">
+            <label for="nFechaHora">Fecha y hora *</label>
+            <input id="nFechaHora" name="nFechaHora" type="datetime-local" required [(ngModel)]="nueva.fecha_hora" />
+          </div>
+          <div class="campo">
+            <label for="nLugar">Lugar</label>
+            <input id="nLugar" name="nLugar" autocomplete="off" [(ngModel)]="nueva.lugar" />
+          </div>
+          <div class="campo">
+            <label for="nNotas">Notas de logística</label>
+            <input id="nNotas" name="nNotas" autocomplete="off" placeholder="Ej.: traer carné de vacunas" [(ngModel)]="nueva.notas" />
+          </div>
+        </div>
+        <p class="nota">Las notas son solo para logística. El contenido clínico o psicosocial va en Gestión documental.</p>
+        <div class="acciones">
+          <button type="submit" [disabled]="f.invalid || guardando()">{{ guardando() ? 'Guardando...' : 'Guardar' }}</button>
+          <button type="button" class="boton-secundario" (click)="formularioAbierto.set(false)">Cancelar</button>
+        </div>
+      </form>
     }
+
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
 
-    <ul class="lista-simple">
-      @for (c of citas(); track c.id) {
-        <li class="tarjeta">
-          <p><strong>{{ etiquetaTipo(c.tipo) }}</strong> — {{ etiquetaEstado(c.estado) }}</p>
-          <p>Fecha y hora: {{ c.fecha_hora }}</p>
-          <p>Lugar: {{ c.lugar || 'Sin registrar' }}</p>
-          <p>
-            Notas:
-            {{ c.notas === null ? 'Sin acceso a las notas de esta cita.' : (c.notas || 'Sin notas registradas.') }}
-          </p>
-
-          @if (c.estado === 'pendiente' && puedeGestionarCita(c)) {
-            <button type="button" (click)="cambiarEstado(c, 'cumplida')" [disabled]="guardandoId() === c.id">
-              Marcar cumplida
-            </button>
-            <button type="button" (click)="cambiarEstado(c, 'no_asistio')" [disabled]="guardandoId() === c.id">
-              Marcar no asistió
-            </button>
-          }
-        </li>
-      }
-      @if (!cargando() && citas().length === 0) {
-        <p class="nota">No hay citas para mostrar con estos filtros.</p>
-      }
-    </ul>
-
-    @if (esMadreOAdmin()) {
-      <form class="formulario tarjeta" (ngSubmit)="crearMadre()" #fm="ngForm">
-        <h2>Registrar cita</h2>
-        <app-selector-menor [(valor)]="nuevaMadre.menor_id" [requerido]="true" />
-        <label for="nTipoMadre">Tipo</label>
-        <select id="nTipoMadre" name="nTipoMadre" required [(ngModel)]="nuevaMadre.tipo">
-          <option value="medica">Médica</option>
-          <option value="psicosocial">Psicosocial</option>
-          <option value="otro">Otro</option>
+    <div class="filtros">
+      <div class="campo">
+        <label for="fVista">Mostrar</label>
+        <select id="fVista" [ngModel]="soloProximas()" (ngModelChange)="soloProximas.set($event); filtrar()">
+          <option [ngValue]="true">Próximas citas</option>
+          <option [ngValue]="false">Todas</option>
         </select>
-        <label for="nFechaHoraMadre">Fecha y hora</label>
-        <input id="nFechaHoraMadre" name="nFechaHoraMadre" type="datetime-local" required [(ngModel)]="nuevaMadre.fecha_hora" />
-        <label for="nLugarMadre">Lugar (opcional)</label>
-        <input id="nLugarMadre" name="nLugarMadre" [(ngModel)]="nuevaMadre.lugar" />
-        <label for="nNotasMadre">Notas de logística (opcional, p. ej. "traer carné de vacunas")</label>
-        <input id="nNotasMadre" name="nNotasMadre" [(ngModel)]="nuevaMadre.notas" />
-        <p class="nota">
-          Las notas son para logística, no para contenido clínico o psicosocial: ese contenido se
-          registra en Gestión Documental.
-        </p>
-        <button type="submit" [disabled]="fm.invalid || guardando()">
-          {{ guardando() ? 'Guardando...' : 'Registrar cita' }}
-        </button>
-      </form>
-    }
+      </div>
+      @if (!soloProximas()) {
+        <div class="campo">
+          <app-selector-menor etiqueta="Menor" opcionVacia="Todos los menores" [valor]="filtroMenorId" (valorChange)="filtroMenorId = $event; filtrar()" />
+        </div>
+        <div class="campo">
+          <label for="fTipo">Tipo</label>
+          <select id="fTipo" [ngModel]="filtroTipo" (ngModelChange)="filtroTipo = $event; filtrar()">
+            <option value="">Todos</option>
+            @for (t of todosLosTipos; track t) {
+              <option [value]="t">{{ etiquetaTipo(t) }}</option>
+            }
+          </select>
+        </div>
+        <div class="campo">
+          <label for="fEstado">Estado</label>
+          <select id="fEstado" [ngModel]="filtroEstado" (ngModelChange)="filtroEstado = $event; filtrar()">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="cumplida">Cumplida</option>
+            <option value="no_asistio">No asistió</option>
+          </select>
+        </div>
+      }
+    </div>
 
-    @if (esDefensorOAdmin()) {
-      <form class="formulario tarjeta" (ngSubmit)="crearDefensor()" #fd="ngForm">
-        <h2>Registrar cita con familia biológica</h2>
-        <app-selector-menor [(valor)]="nuevaDefensor.menor_id" [requerido]="true" />
-        <p class="nota">Tipo: Reunión con familia biológica</p>
-        <label for="nFechaHoraDefensor">Fecha y hora</label>
-        <input id="nFechaHoraDefensor" name="nFechaHoraDefensor" type="datetime-local" required [(ngModel)]="nuevaDefensor.fecha_hora" />
-        <label for="nLugarDefensor">Lugar (opcional)</label>
-        <input id="nLugarDefensor" name="nLugarDefensor" [(ngModel)]="nuevaDefensor.lugar" />
-        <label for="nNotasDefensor">Notas de logística (opcional)</label>
-        <input id="nNotasDefensor" name="nNotasDefensor" [(ngModel)]="nuevaDefensor.notas" />
-        <button type="submit" [disabled]="fd.invalid || guardando()">
-          {{ guardando() ? 'Guardando...' : 'Registrar cita' }}
-        </button>
-      </form>
+    @if (cargando()) {
+      <p class="nota" role="status">Cargando citas...</p>
+    } @else if (citas().length === 0) {
+      <p class="nota">{{ soloProximas() ? 'No hay citas próximas.' : 'No hay citas para mostrar con estos filtros.' }}</p>
+    } @else {
+      <table class="tabla-datos" aria-label="Citas">
+        <thead>
+          <tr>
+            <th scope="col">Fecha y hora</th>
+            <th scope="col">Menor</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Lugar y notas</th>
+            <th scope="col">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of citas(); track c.id) {
+            <tr>
+              <td data-etiqueta="Fecha y hora">{{ fechaLegible(c.fecha_hora) }}</td>
+              <td data-etiqueta="Menor">{{ nombreMenor(c.menor_id) }}</td>
+              <td data-etiqueta="Tipo">{{ etiquetaTipo(c.tipo) }}</td>
+              <td data-etiqueta="Lugar y notas">
+                {{ c.lugar || 'Sin lugar' }}
+                <br /><span class="nota">{{ c.notas === null ? 'Sin acceso a las notas' : (c.notas || 'Sin notas') }}</span>
+              </td>
+              <td data-etiqueta="Estado">
+                @if (c.estado === 'pendiente' && puedeGestionarCita(c)) {
+                  <div class="acciones-fila">
+                    <button type="button" (click)="cambiarEstado(c, 'cumplida')" [disabled]="guardandoId() === c.id">Cumplida</button>
+                    <button type="button" class="boton-secundario" (click)="cambiarEstado(c, 'no_asistio')" [disabled]="guardandoId() === c.id">No asistió</button>
+                  </div>
+                } @else {
+                  <span [class]="'estado estado-cita-' + c.estado">{{ etiquetaEstado(c.estado) }}</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     }
   `,
 })
@@ -161,44 +191,75 @@ export class CitasLista {
   protected readonly error = signal('');
   protected readonly guardando = signal(false);
   protected readonly guardandoId = signal<string | null>(null);
+  protected readonly formularioAbierto = signal(false);
+  protected readonly soloProximas = signal(true);
+  private readonly nombres = signal<Record<string, string>>({});
 
   protected filtroMenorId = '';
   protected filtroTipo = '';
   protected filtroEstado = '';
 
-  protected nuevaMadre: { menor_id: string; tipo: string; fecha_hora: string; lugar: string; notas: string } = {
-    menor_id: '',
-    tipo: 'medica',
-    fecha_hora: '',
-    lugar: '',
-    notas: '',
-  };
+  protected readonly todosLosTipos = Object.keys(ETIQUETAS_TIPO);
+  /** Un solo formulario: el rol decide qué tipos puede registrar (ADR-0015, un dueño por tipo). */
+  protected readonly tiposPermitidos = computed(() => {
+    const rol = this.auth.rol();
+    if (rol === 'admin') return this.todosLosTipos;
+    if (rol === 'madre') return ['medica', 'psicosocial', 'otro'];
+    if (rol === 'defensor') return ['reunion_familia'];
+    return [];
+  });
 
-  protected nuevaDefensor: { menor_id: string; fecha_hora: string; lugar: string; notas: string } = {
-    menor_id: '',
-    fecha_hora: '',
-    lugar: '',
-    notas: '',
-  };
+  protected nueva = { menor_id: '', tipo: '', fecha_hora: '', lugar: '', notas: '' };
 
   constructor() {
     this.filtroMenorId = this.route.snapshot.queryParamMap.get('menor_id') ?? '';
     if (this.filtroMenorId) {
-      this.nuevaMadre.menor_id = this.filtroMenorId;
-      this.nuevaDefensor.menor_id = this.filtroMenorId;
+      this.soloProximas.set(false);
+      this.nueva.menor_id = this.filtroMenorId;
     }
+    if (this.route.snapshot.queryParamMap.get('nuevo') === '1' && this.tiposPermitidos().length > 0) this.abrirFormulario();
     void this.cargar();
+    void this.cargarNombres();
+  }
+
+  protected abrirFormulario(): void {
+    this.nueva.tipo = this.tiposPermitidos()[0] ?? '';
+    this.formularioAbierto.set(true);
+  }
+
+  protected nombreMenor(id: string): string {
+    return this.nombres()[id] ?? 'Menor';
+  }
+
+  protected fechaLegible(iso: string): string {
+    const fecha = new Date(iso);
+    if (Number.isNaN(fecha.getTime())) return iso;
+    return fecha.toLocaleString('es-CO', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+  }
+
+  private async cargarNombres(): Promise<void> {
+    try {
+      const menores = await firstValueFrom(this.http.get<Menor[]>(`${this.config.apiUrl}/menores`));
+      this.nombres.set(Object.fromEntries(menores.map((m) => [m.id, `${m.nombres} ${m.apellidos}`])));
+    } catch {
+      /* sin nombres se muestra "Menor" */
+    }
   }
 
   protected filtrar(): void {
     void this.cargar();
   }
 
-  protected verProximas(): void {
-    void this.cargar(true);
+  protected async registrar(): Promise<void> {
+    const exito = await this.crear({ ...this.nueva, tipo: this.nueva.tipo || this.tiposPermitidos()[0] });
+    if (exito) {
+      this.nueva = { menor_id: this.nueva.menor_id, tipo: '', fecha_hora: '', lugar: '', notas: '' };
+      this.formularioAbierto.set(false);
+    }
   }
 
-  private async cargar(proximas = false): Promise<void> {
+  private async cargar(): Promise<void> {
+    const proximas = this.soloProximas();
     this.cargando.set(true);
     this.error.set('');
     try {
@@ -215,32 +276,6 @@ export class CitasLista {
       this.error.set(MENSAJE_GENERICO);
     } finally {
       this.cargando.set(false);
-    }
-  }
-
-  protected async crearMadre(): Promise<void> {
-    const exito = await this.crear({
-      menor_id: this.nuevaMadre.menor_id,
-      tipo: this.nuevaMadre.tipo,
-      fecha_hora: this.nuevaMadre.fecha_hora,
-      lugar: this.nuevaMadre.lugar,
-      notas: this.nuevaMadre.notas,
-    });
-    if (exito) {
-      this.nuevaMadre = { menor_id: this.nuevaMadre.menor_id, tipo: 'medica', fecha_hora: '', lugar: '', notas: '' };
-    }
-  }
-
-  protected async crearDefensor(): Promise<void> {
-    const exito = await this.crear({
-      menor_id: this.nuevaDefensor.menor_id,
-      tipo: 'reunion_familia',
-      fecha_hora: this.nuevaDefensor.fecha_hora,
-      lugar: this.nuevaDefensor.lugar,
-      notas: this.nuevaDefensor.notas,
-    });
-    if (exito) {
-      this.nuevaDefensor = { menor_id: this.nuevaDefensor.menor_id, fecha_hora: '', lugar: '', notas: '' };
     }
   }
 

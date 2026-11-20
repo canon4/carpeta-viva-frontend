@@ -440,6 +440,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/menores/{menor_id}/hogar-vigente": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Hogar, zona y madre actuales del menor (null si no tiene asignación vigente) */
+        get: operations["hogar_vigente_endpoint_api_v1_menores__menor_id__hogar_vigente_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/menores/{menor_id}/permisos": {
         parameters: {
             query?: never;
@@ -1695,6 +1712,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ia/configuracion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Proveedor, modelo y estado de la clave de API (admin; la clave nunca se devuelve) */
+        get: operations["obtener_configuracion_endpoint_api_v1_ia_configuracion_get"];
+        /** Cambia proveedor, modelo o clave de API (admin; la clave se guarda cifrada) */
+        put: operations["actualizar_configuracion_endpoint_api_v1_ia_configuracion_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/configuracion/modelos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Modelos que la cuenta puede usar, consultados al proveedor (admin) */
+        get: operations["listar_modelos_endpoint_api_v1_ia_configuracion_modelos_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ia/configuracion/probar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Prueba la conexión con el proveedor configurado, sin datos de expedientes (admin) */
+        post: operations["probar_configuracion_endpoint_api_v1_ia_configuracion_probar_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ia/consultas": {
         parameters: {
             query?: never;
@@ -2936,6 +3005,71 @@ export interface components {
             capacidad_maxima?: number | null;
             estado?: components["schemas"]["EstadoHogar"] | null;
         };
+        /**
+         * HogarVigenteOut
+         * @description Hogar y madre actuales del menor, con nombres legibles para el expediente.
+         */
+        HogarVigenteOut: {
+            /**
+             * Hogar Id
+             * Format: uuid
+             */
+            hogar_id: string;
+            /** Zona Nombre */
+            zona_nombre?: string | null;
+            /**
+             * Fecha Inicio
+             * Format: date
+             */
+            fecha_inicio: string;
+            /** Madre Nombre */
+            madre_nombre?: string | null;
+            /** Madre Usuario Id */
+            madre_usuario_id?: string | null;
+        };
+        /**
+         * IaConfiguracionOut
+         * @description Nunca incluye la clave: solo si existe, de dónde viene y sus últimos caracteres.
+         */
+        IaConfiguracionOut: {
+            /** Proveedor */
+            proveedor: string;
+            /** Modelo */
+            modelo: string;
+            /** Clave Origen */
+            clave_origen: string;
+            /** Clave Sufijo */
+            clave_sufijo?: string | null;
+            /** Actualizado En */
+            actualizado_en?: string | null;
+            /** Proveedores Disponibles */
+            proveedores_disponibles: string[];
+        };
+        /** IaConfiguracionUpdate */
+        IaConfiguracionUpdate: {
+            /** Proveedor */
+            proveedor?: string | null;
+            /** Modelo */
+            modelo?: string | null;
+            /** Api Key */
+            api_key?: string | null;
+        };
+        /** IaModelosOut */
+        IaModelosOut: {
+            /** Proveedor */
+            proveedor: string;
+            /** Modelos */
+            modelos: string[];
+            /** Error */
+            error?: string | null;
+        };
+        /** IaPruebaOut */
+        IaPruebaOut: {
+            /** Ok */
+            ok: boolean;
+            /** Mensaje */
+            mensaje: string;
+        };
         /** InformeGeneradoOut */
         InformeGeneradoOut: {
             /**
@@ -3270,11 +3404,8 @@ export interface components {
         /** PermisoCreate */
         PermisoCreate: {
             seccion: components["schemas"]["SeccionSensible"];
-            /**
-             * Usuario Id
-             * Format: uuid
-             */
-            usuario_id: string;
+            /** Usuario Id */
+            usuario_id?: string | null;
             /** Notas */
             notas?: string | null;
         };
@@ -4823,6 +4954,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FamiliarOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    hogar_vigente_endpoint_api_v1_menores__menor_id__hogar_vigente_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HogarVigenteOut"] | null;
                 };
             };
             /** @description Validation Error */
@@ -7440,6 +7602,110 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EstadoIaOut"];
+                };
+            };
+        };
+    };
+    obtener_configuracion_endpoint_api_v1_ia_configuracion_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IaConfiguracionOut"];
+                };
+            };
+        };
+    };
+    actualizar_configuracion_endpoint_api_v1_ia_configuracion_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IaConfiguracionUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IaConfiguracionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listar_modelos_endpoint_api_v1_ia_configuracion_modelos_get: {
+        parameters: {
+            query?: {
+                proveedor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IaModelosOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    probar_configuracion_endpoint_api_v1_ia_configuracion_probar_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IaPruebaOut"];
                 };
             };
         };

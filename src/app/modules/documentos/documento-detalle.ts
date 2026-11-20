@@ -34,142 +34,162 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 @Component({
   selector: 'app-documento-detalle',
   imports: [FormsModule, RouterLink, VisorDocumento],
+  styles: [`
+    .volver { text-decoration: none; font-weight: 600; color: var(--color-primario); }
+    .titulo-documento { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+    .titulo-documento h1 { margin: 0; }
+    .aviso-devuelto { background: #fde4e1; color: #8a1f12; padding: 0.75rem 1rem; border-radius: var(--radio); margin: 0 0 1rem; }
+    .detalle { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 3fr) minmax(16rem, 2fr); align-items: start; }
+    .columna-vista { background: var(--color-superficie); border: 1px solid var(--color-borde); border-radius: var(--radio); padding: 0.75rem; max-height: 70vh; overflow: auto; }
+    .columna-info { display: grid; gap: 1rem; background: var(--color-superficie); border: 1px solid var(--color-borde); border-radius: var(--radio); padding: 1rem; }
+    .datos { display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; margin: 0; }
+    .datos dt { font-weight: 600; color: #3e4c59; }
+    .datos dd { margin: 0; overflow-wrap: anywhere; }
+    .pasos { list-style: none; display: flex; margin: 0; padding: 0; gap: 0.25rem; }
+    .pasos li { flex: 1; text-align: center; font-size: 0.85rem; padding: 0.4rem 0.25rem; border-radius: 6px; background: #e8efed; color: #4f6461; }
+    .pasos li.hecho { background: var(--color-primario-suave); color: var(--color-primario); }
+    .pasos li.actual { background: var(--color-primario); color: #fff; font-weight: 700; }
+    .accion-principal .nota { margin: 0.4rem 0 0; }
+    .version-nueva { border-top: 1px solid var(--color-borde); padding-top: 0.75rem; }
+    @media (max-width: 900px) { .detalle { grid-template-columns: 1fr; } }
+  `],
   template: `
+    <p><a routerLink="/documentos" class="volver">← Documentos</a></p>
+
     @if (cargando()) {
-      <p class="nota">Cargando documento...</p>
+      <p class="nota" role="status">Cargando documento...</p>
     }
     @if (errorGeneral()) {
       <p class="error" role="alert">{{ errorGeneral() }}</p>
     }
 
-    @if (documento()) {
-      <h1>{{ documento()!.titulo }}</h1>
-      <p><a routerLink="/documentos">Volver a la lista de documentos</a></p>
+    @if (documento(); as d) {
+      <div class="titulo-documento">
+        <h1>{{ d.titulo }}</h1>
+        <span [class]="'estado estado-flujo-' + d.estado_flujo">{{ etiquetaEstadoFlujo(d.estado_flujo) }}</span>
+      </div>
 
-      @if (!esAuditor()) {
-        <section class="tarjeta">
-          <h2>Vista previa</h2>
-          <app-visor-documento
-            [documentoId]="documento()!.id"
-            [mimeType]="documento()!.mime_type"
-            [nombreArchivo]="documento()!.nombre_original"
-          />
-        </section>
+      @if (d.estado_flujo === 'devuelto' && d.motivo_devolucion) {
+        <p class="aviso-devuelto" role="alert"><strong>Devuelto para corregir:</strong> {{ d.motivo_devolucion }}</p>
       }
 
-      <section class="tarjeta">
-        <h2>Metadatos</h2>
-        <p>Categoría: {{ etiquetaCategoria(documento()!.categoria, catalogoCategorias()) }}</p>
-        <p>Nombre del archivo: {{ documento()!.nombre_original }}</p>
-        <p>Tipo: {{ documento()!.mime_type }}</p>
-        <p>Tamaño: {{ formatoTamanio(documento()!.tamanio_bytes) }}</p>
-        <p>Versión actual: {{ documento()!.version }}</p>
-        <p>Estado del flujo: {{ etiquetaEstadoFlujo(documento()!.estado_flujo) }}</p>
-        <p>Creado por: {{ documento()!.creado_por }}</p>
-        @if (documento()!.revisado_por) {
-          <p>Revisado por: {{ documento()!.revisado_por }} — {{ documento()!.revisado_en }}</p>
-        }
-        @if (documento()!.estado_flujo === 'devuelto' && documento()!.motivo_devolucion) {
-          <p class="error" role="alert">Motivo de la devolución: {{ documento()!.motivo_devolucion }}</p>
-        }
-
+      <div class="detalle">
         @if (!esAuditor()) {
-          <button type="button" (click)="descargar()" [disabled]="descargando()">
-            {{ descargando() ? 'Descargando...' : 'Descargar archivo' }}
-          </button>
-          @if (documento()!.estado_flujo === 'borrador' || documento()!.estado_flujo === 'devuelto') {
-            <p class="nota">
-              Para corregirlo: descárguelo, edítelo fuera del sistema y suba la nueva versión abajo.
-              No se puede editar directamente aquí.
-            </p>
-          }
-        } @else {
-          <p class="nota">El rol auditor solo ve metadatos; la descarga del archivo no está disponible.</p>
-        }
-      </section>
-
-      <section class="tarjeta">
-        <h2>Acciones</h2>
-
-        @if (documento()!.estado_flujo === 'borrador') {
-          <button type="button" (click)="enviar()" [disabled]="accionando()">Enviar a revisión</button>
+          <section class="columna-vista" aria-label="Vista previa">
+            <app-visor-documento [documentoId]="d.id" [mimeType]="d.mime_type" [nombreArchivo]="d.nombre_original" />
+          </section>
         }
 
-        @if (documento()!.estado_flujo === 'en_revision') {
-          <button type="button" (click)="aprobar()" [disabled]="accionando()">Aprobar</button>
-          @if (!mostrarDevolver()) {
-            <button type="button" (click)="mostrarDevolver.set(true)" [disabled]="accionando()">Devolver</button>
-          } @else {
-            <form class="formulario" (ngSubmit)="devolver()" #fd="ngForm">
-              <label for="motivoDevolucion">Motivo de la devolución</label>
-              <input id="motivoDevolucion" name="motivoDevolucion" required [(ngModel)]="motivoDevolucion" />
-              <button type="submit" [disabled]="fd.invalid || accionando()">Confirmar devolución</button>
-              <button type="button" (click)="mostrarDevolver.set(false)">Cancelar</button>
-            </form>
-          }
-        }
-
-        @if (documento()!.estado_flujo === 'borrador' || documento()!.estado_flujo === 'devuelto') {
-          <form class="formulario" (ngSubmit)="subirVersion()" #fv="ngForm">
-            <label for="archivoVersion">Subir nueva versión (corrige el archivo cargado)</label>
-            <input id="archivoVersion" name="archivoVersion" type="file" required (change)="seleccionarArchivo($event)" />
-            <button type="submit" [disabled]="!archivoNuevaVersion() || accionando()">
-              {{ accionando() ? 'Subiendo...' : 'Subir nueva versión' }}
-            </button>
-          </form>
-        }
-
-        @if (documento()!.estado_flujo === 'aprobado') {
-          <p class="nota">Este documento ya está aprobado. No tiene acciones de flujo pendientes.</p>
-        }
-      </section>
-
-      <section class="tarjeta">
-        <h2>Versiones anteriores</h2>
-        @if (!mostrarVersiones()) {
-          <button type="button" (click)="cargarVersiones()">Ver versiones anteriores</button>
-        } @else {
-          @if (cargandoVersiones()) {
-            <p class="nota">Cargando versiones...</p>
-          }
-          <table class="tabla">
-            <thead>
-              <tr>
-                <th>Versión</th>
-                <th>Archivo</th>
-                <th>Estado en ese momento</th>
-                <th>Fecha</th>
-                <th>Calidad</th>
-                @if (!esAuditor()) {
-                  <th>Descarga</th>
-                }
-              </tr>
-            </thead>
-            <tbody>
-              @for (v of versiones(); track v.id) {
-                <tr>
-                  <td>{{ v.version }}</td>
-                  <td>{{ v.nombre_original || 'Sin nombre' }}</td>
-                  <td>{{ etiquetaEstadoFlujo(v.estado_flujo) }}</td>
-                  <td>{{ v.created_at }}</td>
-                  <td>
-                    {{ v.comprimida ? 'Comprimida (copia liviana de historial)' : 'Original' }}
-                    — {{ formatoTamanio(v.tamanio_bytes || 0) }}
-                  </td>
-                  @if (!esAuditor()) {
-                    <td>
-                      <button type="button" (click)="descargarVersion(v)" [disabled]="descargando()">Descargar</button>
-                    </td>
-                  }
-                </tr>
+        <section class="columna-info" aria-label="Información y acciones">
+          <dl class="datos">
+            <dt>De</dt>
+            <dd>
+              @if (d.menor_id) {
+                <a [routerLink]="['/menores', d.menor_id]">{{ nombreMenor() || 'Ver expediente del menor' }}</a>
+              } @else {
+                Documento del hogar
               }
-            </tbody>
-          </table>
-          @if (!cargandoVersiones() && versiones().length === 0) {
-            <p class="nota">Este documento no tiene versiones anteriores.</p>
+            </dd>
+            <dt>Categoría</dt>
+            <dd>{{ etiquetaCategoria(d.categoria, catalogoCategorias()) }}</dd>
+            <dt>Subido</dt>
+            <dd>{{ quien(d.creado_por) }} · {{ fecha(d.created_at) }}</dd>
+            @if (d.revisado_por) {
+              <dt>{{ d.estado_flujo === 'devuelto' ? 'Devuelto' : 'Revisado' }}</dt>
+              <dd>{{ quien(d.revisado_por) }}{{ d.revisado_en ? ' · ' + fecha(d.revisado_en) : '' }}</dd>
+            }
+            <dt>Archivo</dt>
+            <dd>{{ d.nombre_original }} · {{ formatoTamanio(d.tamanio_bytes) }} · versión {{ d.version }}</dd>
+          </dl>
+
+          <ol class="pasos" aria-label="Estado del documento">
+            @for (p of pasos; track p.valor) {
+              <li [class.hecho]="pasoHecho(p.valor)" [class.actual]="pasoActual(p.valor)" [attr.aria-current]="pasoActual(p.valor) ? 'step' : null">{{ p.etiqueta }}</li>
+            }
+          </ol>
+
+          <div class="accion-principal">
+            @if (d.estado_flujo === 'borrador' && puedeEnviar()) {
+              <button type="button" (click)="enviar()" [disabled]="accionando()">Enviar a revisión</button>
+              <p class="nota">El profesional asignado lo revisará y lo aprobará o lo devolverá con un motivo.</p>
+            } @else if (d.estado_flujo === 'en_revision' && puedeRevisar()) {
+              @if (!mostrarDevolver()) {
+                <div class="acciones">
+                  <button type="button" (click)="aprobar()" [disabled]="accionando()">Aprobar</button>
+                  <button type="button" class="boton-secundario" (click)="mostrarDevolver.set(true)" [disabled]="accionando()">Devolver</button>
+                </div>
+              } @else {
+                <form (ngSubmit)="devolver()" #fd="ngForm" class="campo">
+                  <label for="motivoDevolucion">¿Qué debe corregir? *</label>
+                  <input id="motivoDevolucion" name="motivoDevolucion" required autocomplete="off" [(ngModel)]="motivoDevolucion" />
+                  <div class="acciones">
+                    <button type="submit" [disabled]="fd.invalid || accionando()">Devolver</button>
+                    <button type="button" class="boton-secundario" (click)="mostrarDevolver.set(false)">Cancelar</button>
+                  </div>
+                </form>
+              }
+            } @else if (d.estado_flujo === 'en_revision') {
+              <p class="nota">Enviado. Está esperando la revisión del profesional.</p>
+            } @else if (d.estado_flujo === 'aprobado') {
+              <p class="nota">Aprobado. No tiene acciones pendientes.</p>
+            }
+          </div>
+
+          @if (!esAuditor()) {
+            <div class="acciones">
+              <button type="button" class="boton-secundario" (click)="descargar()" [disabled]="descargando()">{{ descargando() ? 'Descargando...' : 'Descargar' }}</button>
+              @if ((d.estado_flujo === 'borrador' || d.estado_flujo === 'devuelto') && puedeEnviar() && !mostrarVersionNueva()) {
+                <button type="button" class="boton-secundario" (click)="mostrarVersionNueva.set(true)">Subir versión corregida</button>
+              }
+            </div>
+            @if (mostrarVersionNueva()) {
+              <form class="campo version-nueva" (ngSubmit)="subirVersion()">
+                <label for="archivoVersion">Archivo corregido *</label>
+                <input id="archivoVersion" name="archivoVersion" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,image/*" required (change)="seleccionarArchivo($event)" />
+                <p class="nota">La versión actual se guarda en el historial y el documento vuelve a revisión.</p>
+                <div class="acciones">
+                  <button type="submit" [disabled]="!archivoNuevaVersion() || accionando()">{{ accionando() ? 'Subiendo...' : 'Subir' }}</button>
+                  <button type="button" class="boton-secundario" (click)="mostrarVersionNueva.set(false)">Cancelar</button>
+                </div>
+              </form>
+            }
+          } @else {
+            <p class="nota">Como auditor ve solo los datos del documento, no su contenido.</p>
           }
-        }
-      </section>
+        </section>
+      </div>
+
+      @if (d.version > 1) {
+        <section class="seccion" aria-labelledby="tituloVersiones">
+          <h2 id="tituloVersiones">Versiones anteriores</h2>
+          @if (cargandoVersiones()) {
+            <p class="nota" role="status">Cargando versiones...</p>
+          } @else if (versiones().length === 0) {
+            <p class="nota">No hay versiones anteriores.</p>
+          } @else {
+            <table class="tabla-datos" aria-label="Versiones anteriores">
+              <thead>
+                <tr><th scope="col">Versión</th><th scope="col">Fecha</th><th scope="col">Estado entonces</th><th scope="col">Archivo</th>
+                  @if (!esAuditor()) { <th scope="col">Acción</th> }
+                </tr>
+              </thead>
+              <tbody>
+                @for (v of versiones(); track v.id) {
+                  <tr>
+                    <td data-etiqueta="Versión">{{ v.version }}</td>
+                    <td data-etiqueta="Fecha">{{ fecha(v.created_at) }}</td>
+                    <td data-etiqueta="Estado entonces">{{ etiquetaEstadoFlujo(v.estado_flujo) }}</td>
+                    <td data-etiqueta="Archivo">{{ v.nombre_original || 'Sin nombre' }}{{ v.comprimida ? ' (copia liviana)' : '' }}</td>
+                    @if (!esAuditor()) {
+                      <td data-etiqueta="Acción"><button type="button" class="boton-secundario" (click)="descargarVersion(v)" [disabled]="descargando()">Descargar</button></td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </section>
+      }
     }
   `,
 })
@@ -201,12 +221,70 @@ export class DocumentoDetalle {
   protected readonly versiones = signal<DocumentoVersion[]>([]);
 
   protected readonly archivoNuevaVersion = signal<File | null>(null);
+  protected readonly mostrarVersionNueva = signal(false);
 
   protected readonly esAuditor = computed(() => this.auth.rol() === 'auditor');
+  // Envía y corrige quien lo creó (la madre); aprueban o devuelven los profesionales asignados.
+  protected readonly puedeEnviar = computed(() => {
+    const d = this.documento();
+    return !!d && (d.creado_por === this.auth.usuario()?.id || this.auth.rol() === 'admin');
+  });
+  protected readonly puedeRevisar = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'profesional' || rol === 'defensor' || rol === 'admin';
+  });
+
+  protected readonly nombreMenor = signal('');
+  private readonly madre = signal<{ usuario_id: string | null; nombre: string | null }>({ usuario_id: null, nombre: null });
+
+  protected readonly pasos = [
+    { valor: 'borrador', etiqueta: 'Borrador' },
+    { valor: 'en_revision', etiqueta: 'En revisión' },
+    { valor: 'final', etiqueta: 'Aprobado o devuelto' },
+  ];
+  private readonly orden: Record<string, number> = { borrador: 0, en_revision: 1, aprobado: 2, devuelto: 2 };
 
   constructor() {
     void this.cargar();
     void this.cargarCatalogos();
+  }
+
+  protected pasoActual(paso: string): boolean {
+    const estado = this.documento()?.estado_flujo ?? '';
+    return paso === 'final' ? this.orden[estado] === 2 : paso === estado;
+  }
+
+  protected pasoHecho(paso: string): boolean {
+    const estado = this.documento()?.estado_flujo ?? '';
+    const indice = paso === 'final' ? 2 : this.orden[paso];
+    return indice < (this.orden[estado] ?? 0);
+  }
+
+  /** "usted", la madre del hogar por su nombre, o un texto genérico: nunca el identificador. */
+  protected quien(usuarioId: string | null | undefined): string {
+    if (!usuarioId) return 'Sin dato';
+    if (usuarioId === this.auth.usuario()?.id) return 'Por usted';
+    if (usuarioId === this.madre().usuario_id && this.madre().nombre) return `Por ${this.madre().nombre}`;
+    return 'Por otro usuario';
+  }
+
+  protected fecha(iso: string): string {
+    const f = new Date(iso);
+    if (Number.isNaN(f.getTime())) return iso;
+    return f.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  /** Nombre del menor y de la madre de su hogar, para mostrar personas en lugar de códigos. */
+  private async cargarPersonas(menorId: string): Promise<void> {
+    const api = this.config.apiUrl;
+    const [menor, hogar] = await Promise.allSettled([
+      firstValueFrom(this.http.get<{ nombres: string; apellidos: string }>(`${api}/menores/${menorId}`)),
+      firstValueFrom(this.http.get<{ madre_usuario_id?: string | null; madre_nombre?: string | null } | null>(`${api}/menores/${menorId}/hogar-vigente`)),
+    ]);
+    if (menor.status === 'fulfilled') this.nombreMenor.set(`${menor.value.nombres} ${menor.value.apellidos}`);
+    if (hogar.status === 'fulfilled' && hogar.value) {
+      this.madre.set({ usuario_id: hogar.value.madre_usuario_id ?? null, nombre: hogar.value.madre_nombre ?? null });
+    }
   }
 
   private async cargarCatalogos(): Promise<void> {
@@ -229,9 +307,10 @@ export class DocumentoDetalle {
     this.cargando.set(true);
     this.errorGeneral.set('');
     try {
-      this.documento.set(
-        await firstValueFrom(this.http.get<Documento>(`${this.config.apiUrl}/documentos/${this.documentoId}`)),
-      );
+      const documento = await firstValueFrom(this.http.get<Documento>(`${this.config.apiUrl}/documentos/${this.documentoId}`));
+      this.documento.set(documento);
+      if (documento.menor_id) void this.cargarPersonas(documento.menor_id);
+      if (documento.version > 1) void this.cargarVersiones();
     } catch (e) {
       this.errorGeneral.set(
         e instanceof HttpErrorResponse && e.status === 403
@@ -346,7 +425,8 @@ export class DocumentoDetalle {
         ),
       );
       this.archivoNuevaVersion.set(null);
-      if (this.mostrarVersiones()) await this.cargarVersiones();
+      this.mostrarVersionNueva.set(false);
+      await this.cargarVersiones();
     } catch (e) {
       this.errorGeneral.set(this.mensajeError(e));
     } finally {

@@ -25,231 +25,358 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
   selector: 'app-inventario',
   imports: [FormsModule, SelectorHogar],
   template: `
-    <h1>Inventario del Hogar</h1>
+    <div class="encabezado-modulo">
+      <h1>Inventario del hogar</h1>
+    </div>
 
-    <form class="formulario" (ngSubmit)="cargarTodo()">
-      <app-selector-hogar [(valor)]="hogarId" [requerido]="true" />
-      <button type="submit" [disabled]="!hogarId.trim() || cargando()">Cargar</button>
-    </form>
+    <datalist id="relaciones">
+      <option value="Hijo o hija"></option>
+      <option value="Esposo o compañero"></option>
+      <option value="Madre o padre"></option>
+      <option value="Hermano o hermana"></option>
+      <option value="Nieto o nieta"></option>
+      <option value="Otro familiar"></option>
+      <option value="Vecino o vecina"></option>
+      <option value="Amigo o amiga"></option>
+    </datalist>
+
+    <div class="filtros">
+      <div class="campo">
+        <app-selector-hogar [valor]="hogarId" [requerido]="true" (valorChange)="hogarId = $event; cargarTodo()" />
+      </div>
+    </div>
 
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
+    @if (cargando()) {
+      <p class="nota" role="status">Cargando inventario...</p>
+    } @else if (!hogarCargado()) {
+      <p class="nota">Elija un hogar para ver su inventario.</p>
+    }
 
     @if (hogarCargado()) {
-      <section class="tarjeta">
-        <h2>Camas y muebles</h2>
-        <ul class="lista-simple">
-          @for (i of items(); track i.id) {
-            <li class="tarjeta">
-              <p>{{ i.tipo }} — {{ i.descripcion }} (cantidad: {{ i.cantidad }})</p>
-              @if (i.recibido) {
-                <p class="etiqueta-recibido">Recibido</p>
+      <div class="pestanas" role="tablist" aria-label="Secciones del inventario">
+        <button type="button" role="tab" [attr.aria-selected]="pestana() === 'items'" [class.activa]="pestana() === 'items'" (click)="cambiarPestana('items')">
+          Camas y muebles ({{ items().length }})
+        </button>
+        <button type="button" role="tab" [attr.aria-selected]="pestana() === 'personas'" [class.activa]="pestana() === 'personas'" (click)="cambiarPestana('personas')">
+          Personas del hogar ({{ convivientesActivos() }})
+        </button>
+        <button type="button" role="tab" [attr.aria-selected]="pestana() === 'red'" [class.activa]="pestana() === 'red'" (click)="cambiarPestana('red')">
+          Red de apoyo ({{ redActiva() }})
+        </button>
+      </div>
+
+      @if (pestana() === 'items') {
+        <section role="tabpanel" aria-label="Camas y muebles">
+          @if (puedeEscribir() && !formularioAbierto()) {
+            <div class="acciones" style="margin-bottom: 1rem">
+              <button type="button" (click)="formularioAbierto.set(true)">{{ esCoordinador() ? 'Hacer pedido' : 'Registrar cama o mueble' }}</button>
+            </div>
+          }
+          @if (formularioAbierto()) {
+            <form class="panel-formulario" (ngSubmit)="crearItem()" #fi="ngForm" aria-labelledby="tituloItem">
+              <h2 id="tituloItem">{{ esCoordinador() ? 'Hacer pedido' : 'Registrar cama o mueble' }}</h2>
+              <p class="nota">
+                {{ esCoordinador() ? 'Quedará pendiente hasta que la madre confirme que llegó.' : 'Registre algo que ya está en el hogar.' }}
+              </p>
+              <div class="campos">
+                <div class="campo">
+                  <label for="nTipoItem">Tipo *</label>
+                  <select id="nTipoItem" name="nTipoItem" required [(ngModel)]="nuevoItem.tipo">
+                    <option value="cama">Cama</option>
+                    <option value="mueble">Mueble</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+                <div class="campo">
+                  <label for="nDescItem">Descripción *</label>
+                  <input id="nDescItem" name="nDescItem" required autocomplete="off" placeholder="Ej.: cama sencilla con colchón" [(ngModel)]="nuevoItem.descripcion" />
+                </div>
+                <div class="campo">
+                  <label for="nCantItem">Cantidad *</label>
+                  <input id="nCantItem" name="nCantItem" type="number" inputmode="numeric" min="1" required [(ngModel)]="nuevoItem.cantidad" />
+                </div>
+              </div>
+              <div class="acciones">
+                <button type="submit" [disabled]="fi.invalid || guardando()">{{ guardando() ? 'Guardando...' : 'Guardar' }}</button>
+                <button type="button" class="boton-secundario" (click)="formularioAbierto.set(false)">Cancelar</button>
+              </div>
+            </form>
+          }
+
+          @if (itemSeleccionado(); as i) {
+            <section class="panel-formulario" [attr.aria-label]="'Ítem ' + i.descripcion">
+              @if (modo() === 'recepcion') {
+                <h2>Confirmar que llegó: {{ i.descripcion }}</h2>
+                <div class="campos">
+                  <div class="campo">
+                    <label for="estadoRecepcion">¿En qué estado llegó? *</label>
+                    <select id="estadoRecepcion" [(ngModel)]="estadoRecepcion[i.id]">
+                      <option value="bueno">Bueno</option>
+                      <option value="regular">Regular</option>
+                      <option value="malo">Malo</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="acciones">
+                  <button type="button" (click)="confirmarRecepcion(i); cerrarPanel()" [disabled]="guardandoId() === i.id">Confirmar que llegó</button>
+                  <button type="button" class="boton-secundario" (click)="cerrarPanel()">Cancelar</button>
+                </div>
+              } @else if (modo() === 'estado') {
+                <h2>Cambiar estado: {{ i.descripcion }}</h2>
+                <div class="campos">
+                  <div class="campo">
+                    <label for="estadoItem">Estado *</label>
+                    <select id="estadoItem" [(ngModel)]="estadoItemEdicion[i.id]">
+                      <option value="bueno">Bueno</option>
+                      <option value="regular">Regular</option>
+                      <option value="malo">Malo</option>
+                      <option value="retirado">Retirado (ya no está en el hogar)</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="acciones">
+                  <button type="button" (click)="actualizarItem(i); cerrarPanel()" [disabled]="guardandoId() === i.id">Guardar</button>
+                  <button type="button" class="boton-secundario" (click)="cerrarPanel()">Cancelar</button>
+                </div>
               } @else {
-                <p class="etiqueta-pendiente">Pedido, aún no llega</p>
-              }
-              <p>Estado: {{ i.estado }}</p>
-
-              @if (!i.recibido) {
-                <form class="formulario" (ngSubmit)="confirmarRecepcion(i)" #frec="ngForm">
-                  <h4>Confirmar recepción</h4>
-                  <p class="nota">
-                    Marque esto cuando el pedido llegue físicamente al hogar e indique en qué
-                    estado llegó.
-                  </p>
-                  <label [for]="'estadoRecepcion-' + i.id">Estado al llegar</label>
-                  <select
-                    [id]="'estadoRecepcion-' + i.id"
-                    [name]="'estadoRecepcion-' + i.id"
-                    required
-                    [(ngModel)]="estadoRecepcion[i.id]"
-                  >
-                    <option value="bueno">Bueno</option>
-                    <option value="regular">Regular</option>
-                    <option value="malo">Malo</option>
-                  </select>
-                  <button type="submit" [disabled]="frec.invalid || guardandoId() === i.id">
-                    {{ guardandoId() === i.id ? 'Guardando...' : 'Confirmar que llegó' }}
-                  </button>
-                </form>
-
-                @if (esCoordinadorOAdmin()) {
-                  <label [for]="'estadoItem-' + i.id">Editar pedido — cambiar estado</label>
-                  <select [id]="'estadoItem-' + i.id" [(ngModel)]="estadoItemEdicion[i.id]" [name]="'estadoItem-' + i.id">
-                    <option value="bueno">Bueno</option>
-                    <option value="regular">Regular</option>
-                    <option value="malo">Malo</option>
-                    <option value="retirado">Retirado (sustituye a eliminar)</option>
-                  </select>
-                  <button type="button" (click)="actualizarItem(i)" [disabled]="guardandoId() === i.id">
-                    Guardar
-                  </button>
+                <h2>Fotos de evidencia: {{ i.descripcion }}</h2>
+                @if (errorFotos()[i.id]) {
+                  <p class="error" role="alert">{{ errorFotos()[i.id] }}</p>
                 }
-              } @else {
-                <label [for]="'estadoItem-' + i.id">Cambiar estado</label>
-                <select [id]="'estadoItem-' + i.id" [(ngModel)]="estadoItemEdicion[i.id]" [name]="'estadoItem-' + i.id">
-                  <option value="bueno">Bueno</option>
-                  <option value="regular">Regular</option>
-                  <option value="malo">Malo</option>
-                  <option value="retirado">Retirado (sustituye a eliminar)</option>
-                </select>
-                <button type="button" (click)="actualizarItem(i)" [disabled]="guardandoId() === i.id">
-                  Guardar
-                </button>
-
-                <details (toggle)="alAbrirFotos(i, $event)">
-                  <summary>Fotos de evidencia</summary>
-
-                  @if (errorFotos()[i.id]) {
-                    <p class="error" role="alert">{{ errorFotos()[i.id] }}</p>
-                  }
-                  @if (cargandoFotos() === i.id) {
-                    <p class="nota">Cargando fotos...</p>
-                  }
-
-                  <ul class="lista-simple">
-                    @for (f of fotosPorItem()[i.id] ?? []; track f.id) {
-                      <li>
-                        <p>
-                          Subida el {{ f.creado_en }} ({{ f.mime_type }})
-                          @if (f.oculta) {
-                            <span class="etiqueta-pendiente">— oculta</span>
-                          }
-                        </p>
-                        @if (urlFoto()[f.id]) {
-                          <img [src]="urlFoto()[f.id]" alt="Foto de evidencia de recepción" class="foto-evidencia" />
-                        } @else {
-                          <button type="button" (click)="verFoto(i, f)">Ver foto</button>
-                        }
+                @if (cargandoFotos() === i.id) {
+                  <p class="nota" role="status">Cargando fotos...</p>
+                } @else if ((fotosPorItem()[i.id] ?? []).length === 0 && !errorFotos()[i.id]) {
+                  <p class="nota">Este ítem no tiene fotos.</p>
+                }
+                <div class="galeria">
+                  @for (f of fotosPorItem()[i.id] ?? []; track f.id) {
+                    <figure>
+                      @if (urlFoto()[f.id]) {
+                        <img [src]="urlFoto()[f.id]" alt="Foto de evidencia de recepción" class="foto-evidencia" />
+                      } @else {
+                        <button type="button" class="boton-secundario" (click)="verFoto(i, f)">Ver foto</button>
+                      }
+                      <figcaption class="nota">
+                        {{ f.creado_en.slice(0, 10) }}{{ f.oculta ? ' · oculta' : '' }}
                         @if (esAdmin() && !f.oculta) {
-                          <button type="button" (click)="ocultarFoto(i, f)">Ocultar</button>
+                          <button type="button" class="boton-secundario" (click)="ocultarFoto(i, f)">Ocultar</button>
                         }
-                      </li>
-                    }
-                    @if ((fotosPorItem()[i.id] ?? []).length === 0 && cargandoFotos() !== i.id && !errorFotos()[i.id]) {
-                      <p class="nota">Este ítem no tiene fotos de evidencia.</p>
-                    }
-                  </ul>
-
-                  <form class="formulario" (ngSubmit)="subirFoto(i)" #ff="ngForm">
-                    <label [for]="'archivoFoto-' + i.id">Subir foto nueva</label>
-                    <input
-                      [id]="'archivoFoto-' + i.id"
-                      [name]="'archivoFoto-' + i.id"
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      (change)="seleccionarFoto(i, $event)"
-                    />
-                    <label [for]="'declaracionFoto-' + i.id">
-                      <input
-                        type="checkbox"
-                        [id]="'declaracionFoto-' + i.id"
-                        [name]="'declaracionFoto-' + i.id"
-                        required
-                        [(ngModel)]="declaracionSinMenores[i.id]"
-                      />
-                      Confirmo que esta foto no muestra a ningún NNA
-                    </label>
-                    <button
-                      type="submit"
-                      [disabled]="!archivoFotoSeleccionado[i.id] || !declaracionSinMenores[i.id] || subiendoFoto() === i.id"
-                    >
-                      {{ subiendoFoto() === i.id ? 'Subiendo...' : 'Subir foto' }}
-                    </button>
+                      </figcaption>
+                    </figure>
+                  }
+                </div>
+                @if (esMadreOAdmin()) {
+                  <form class="campos" (ngSubmit)="subirFoto(i)" style="margin-top: 1rem">
+                    <div class="campo">
+                      <label for="archivoFoto">Tomar o subir foto</label>
+                      <input id="archivoFoto" name="archivoFoto" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" (change)="seleccionarFoto(i, $event)" />
+                    </div>
+                    <div class="campo">
+                      <label class="casilla">
+                        <input type="checkbox" name="declaracionFoto" required [(ngModel)]="declaracionSinMenores[i.id]" />
+                        Confirmo que la foto no muestra a ningún niño, niña o adolescente
+                      </label>
+                    </div>
+                    <div class="acciones">
+                      <button type="submit" [disabled]="!archivoFotoSeleccionado[i.id] || !declaracionSinMenores[i.id] || subiendoFoto() === i.id">
+                        {{ subiendoFoto() === i.id ? 'Subiendo...' : 'Subir foto' }}
+                      </button>
+                    </div>
                   </form>
-                </details>
+                }
+                <div class="acciones">
+                  <button type="button" class="boton-secundario" (click)="cerrarPanel()">Cerrar</button>
+                </div>
               }
-            </li>
+            </section>
           }
-          @if (items().length === 0) {
-            <p class="nota">Este hogar no tiene ítems de inventario registrados.</p>
-          }
-        </ul>
-        <form class="formulario" (ngSubmit)="crearItem()" #fi="ngForm">
-          <h3>Registrar ítem</h3>
-          <p class="nota">
-            @if (esCoordinador()) {
-              Está registrando un pedido: lo que este hogar necesita. Quedará pendiente hasta que
-              la madre confirme que llegó.
-            } @else {
-              Está registrando algo que ya está físicamente en el hogar.
-            }
-          </p>
-          <label for="nTipoItem">Tipo</label>
-          <select id="nTipoItem" name="nTipoItem" required [(ngModel)]="nuevoItem.tipo">
-            <option value="cama">Cama</option>
-            <option value="mueble">Mueble</option>
-            <option value="otro">Otro</option>
-          </select>
-          <label for="nDescItem">Descripción</label>
-          <input id="nDescItem" name="nDescItem" required [(ngModel)]="nuevoItem.descripcion" />
-          <label for="nCantItem">Cantidad</label>
-          <input id="nCantItem" name="nCantItem" type="number" min="1" required [(ngModel)]="nuevoItem.cantidad" />
-          <button type="submit" [disabled]="fi.invalid || guardando()">Registrar</button>
-        </form>
-      </section>
 
-      <section class="tarjeta">
-        <h2>Personas que viven en el hogar</h2>
-        <ul class="lista-simple">
-          @for (c of convivientes(); track c.id) {
-            <li>
-              <p>{{ c.nombres }} — {{ c.relacion_con_madre }}</p>
-              <p>Desde: {{ c.fecha_desde || 'Sin registrar' }}</p>
-              <p>Estado: {{ c.activo ? 'Vive en el hogar' : 'Ya no vive en el hogar' }}</p>
-              @if (c.activo) {
-                <button type="button" (click)="desactivarConviviente(c)" [disabled]="guardandoId() === c.id">
-                  Marcar que ya no vive aquí
-                </button>
-              }
-            </li>
+          @if (items().length === 0) {
+            <p class="nota">Este hogar no tiene camas ni muebles registrados.</p>
+          } @else {
+            <table class="tabla-datos" aria-label="Camas y muebles">
+              <thead>
+                <tr>
+                  <th scope="col">Descripción</th>
+                  <th scope="col">Tipo</th>
+                  <th scope="col">Cantidad</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (i of items(); track i.id) {
+                  <tr>
+                    <td data-etiqueta="Descripción"><strong>{{ i.descripcion }}</strong></td>
+                    <td data-etiqueta="Tipo">{{ etiquetaTipo(i.tipo) }}</td>
+                    <td data-etiqueta="Cantidad">{{ i.cantidad }}</td>
+                    <td data-etiqueta="Estado">
+                      @if (!i.recibido) {
+                        <span class="estado estado-flujo-en_revision">Pedido, no ha llegado</span>
+                      } @else {
+                        <span [class]="'estado estado-item-' + i.estado">{{ etiquetaEstadoItem(i.estado) }}</span>
+                      }
+                    </td>
+                    <td data-etiqueta="Acciones">
+                      <div class="acciones-fila">
+                        @if (!i.recibido && esMadreOAdmin()) {
+                          <button type="button" (click)="abrirPanel(i, 'recepcion')">Llegó</button>
+                        }
+                        @if (i.recibido && puedeEscribir()) {
+                          <button type="button" class="boton-secundario" (click)="abrirPanel(i, 'estado')">Cambiar estado</button>
+                        }
+                        @if (i.recibido && puedeVerFotos()) {
+                          <button type="button" class="boton-secundario" (click)="abrirPanel(i, 'fotos')">Fotos</button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </section>
+      }
+
+      @if (pestana() === 'personas') {
+        <section role="tabpanel" aria-label="Personas del hogar">
+          <p class="nota">Personas que viven en el hogar además de la madre y los niños, niñas y adolescentes.</p>
+          @if (puedeEscribir() && !formularioAbierto()) {
+            <div class="acciones" style="margin-bottom: 1rem">
+              <button type="button" (click)="formularioAbierto.set(true)">Agregar persona</button>
+            </div>
+          }
+          @if (formularioAbierto()) {
+            <form class="panel-formulario" (ngSubmit)="crearConviviente()" #fc="ngForm" aria-label="Agregar persona">
+              <div class="campos">
+                <div class="campo">
+                  <label for="nNombresConv">Nombre completo *</label>
+                  <input id="nNombresConv" name="nNombresConv" required autocomplete="off" [(ngModel)]="nuevoConviviente.nombres" />
+                </div>
+                <div class="campo">
+                  <label for="nRelacionConv">Relación con la madre *</label>
+                  <input id="nRelacionConv" name="nRelacionConv" required list="relaciones" autocomplete="off" [(ngModel)]="nuevoConviviente.relacion_con_madre" />
+                </div>
+                <div class="campo">
+                  <label for="nFechaConv">Vive en el hogar desde</label>
+                  <input id="nFechaConv" name="nFechaConv" type="date" [max]="hoy" [(ngModel)]="nuevoConviviente.fecha_desde" />
+                </div>
+              </div>
+              <div class="acciones">
+                <button type="submit" [disabled]="fc.invalid || guardando()">{{ guardando() ? 'Guardando...' : 'Guardar' }}</button>
+                <button type="button" class="boton-secundario" (click)="formularioAbierto.set(false)">Cancelar</button>
+              </div>
+            </form>
           }
           @if (convivientes().length === 0) {
-            <p class="nota">No hay otras personas registradas en este hogar.</p>
+            <p class="nota">No hay otras personas registradas.</p>
+          } @else {
+            <table class="tabla-datos" aria-label="Personas del hogar">
+              <thead>
+                <tr>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Relación</th>
+                  <th scope="col">Desde</th>
+                  <th scope="col">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of convivientes(); track c.id) {
+                  <tr>
+                    <td data-etiqueta="Nombre"><strong>{{ c.nombres }}</strong></td>
+                    <td data-etiqueta="Relación">{{ c.relacion_con_madre }}</td>
+                    <td data-etiqueta="Desde">{{ c.fecha_desde || '—' }}</td>
+                    <td data-etiqueta="Estado">
+                      @if (c.activo) {
+                        <div class="acciones-fila">
+                          <span class="estado estado-activo">Vive aquí</span>
+                          @if (puedeEscribir()) {
+                            <button type="button" class="boton-secundario" (click)="desactivarConviviente(c)" [disabled]="guardandoId() === c.id">Ya no vive aquí</button>
+                          }
+                        </div>
+                      } @else {
+                        <span class="estado">Ya no vive aquí</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           }
-        </ul>
-        <form class="formulario" (ngSubmit)="crearConviviente()" #fc="ngForm">
-          <h3>Registrar persona</h3>
-          <label for="nNombresConv">Nombres</label>
-          <input id="nNombresConv" name="nNombresConv" required [(ngModel)]="nuevoConviviente.nombres" />
-          <label for="nRelacionConv">Relación con la madre</label>
-          <input id="nRelacionConv" name="nRelacionConv" required [(ngModel)]="nuevoConviviente.relacion_con_madre" />
-          <label for="nFechaConv">Vive desde (opcional)</label>
-          <input id="nFechaConv" name="nFechaConv" type="date" [(ngModel)]="nuevoConviviente.fecha_desde" />
-          <button type="submit" [disabled]="fc.invalid || guardando()">Registrar</button>
-        </form>
-      </section>
+        </section>
+      }
 
-      <section class="tarjeta">
-        <h2>Red de apoyo</h2>
-        <ul class="lista-simple">
-          @for (r of redApoyo(); track r.id) {
-            <li>
-              <p>{{ r.nombres }} — {{ r.relacion }}</p>
-              <p>Teléfono: {{ r.telefono || 'Sin registrar' }}</p>
-              <p>Estado: {{ r.activo ? 'Activo' : 'Desactivado' }}</p>
-              @if (r.activo) {
-                <button type="button" (click)="desactivarRedApoyo(r)" [disabled]="guardandoId() === r.id">
-                  Desactivar
-                </button>
-              }
-            </li>
+      @if (pestana() === 'red') {
+        <section role="tabpanel" aria-label="Red de apoyo">
+          @if (puedeEscribir() && !formularioAbierto()) {
+            <div class="acciones" style="margin-bottom: 1rem">
+              <button type="button" (click)="formularioAbierto.set(true)">Agregar contacto</button>
+            </div>
+          }
+          @if (formularioAbierto()) {
+            <form class="panel-formulario" (ngSubmit)="crearRedApoyo()" #fr="ngForm" aria-label="Agregar contacto">
+              <div class="campos">
+                <div class="campo">
+                  <label for="nNombresRed">Nombre completo *</label>
+                  <input id="nNombresRed" name="nNombresRed" required autocomplete="off" [(ngModel)]="nuevoRedApoyo.nombres" />
+                </div>
+                <div class="campo">
+                  <label for="nRelacionRed">Relación *</label>
+                  <input id="nRelacionRed" name="nRelacionRed" required list="relaciones" autocomplete="off" [(ngModel)]="nuevoRedApoyo.relacion" />
+                </div>
+                <div class="campo">
+                  <label for="nTelefonoRed">Teléfono</label>
+                  <input id="nTelefonoRed" name="nTelefonoRed" type="tel" inputmode="tel" autocomplete="off" [(ngModel)]="nuevoRedApoyo.telefono" />
+                </div>
+              </div>
+              <div class="acciones">
+                <button type="submit" [disabled]="fr.invalid || guardando()">{{ guardando() ? 'Guardando...' : 'Guardar' }}</button>
+                <button type="button" class="boton-secundario" (click)="formularioAbierto.set(false)">Cancelar</button>
+              </div>
+            </form>
           }
           @if (redApoyo().length === 0) {
-            <p class="nota">No hay contactos de red de apoyo registrados.</p>
+            <p class="nota">No hay contactos de red de apoyo.</p>
+          } @else {
+            <table class="tabla-datos" aria-label="Red de apoyo">
+              <thead>
+                <tr>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Relación</th>
+                  <th scope="col">Teléfono</th>
+                  <th scope="col">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of redApoyo(); track r.id) {
+                  <tr>
+                    <td data-etiqueta="Nombre"><strong>{{ r.nombres }}</strong></td>
+                    <td data-etiqueta="Relación">{{ r.relacion }}</td>
+                    <td data-etiqueta="Teléfono">
+                      @if (r.telefono) { <a [href]="'tel:' + r.telefono">{{ r.telefono }}</a> } @else { — }
+                    </td>
+                    <td data-etiqueta="Estado">
+                      @if (r.activo) {
+                        <div class="acciones-fila">
+                          <span class="estado estado-activo">Activo</span>
+                          @if (puedeEscribir()) {
+                            <button type="button" class="boton-secundario" (click)="desactivarRedApoyo(r)" [disabled]="guardandoId() === r.id">Desactivar</button>
+                          }
+                        </div>
+                      } @else {
+                        <span class="estado">Desactivado</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           }
-        </ul>
-        <form class="formulario" (ngSubmit)="crearRedApoyo()" #fr="ngForm">
-          <h3>Registrar contacto</h3>
-          <label for="nNombresRed">Nombres</label>
-          <input id="nNombresRed" name="nNombresRed" required [(ngModel)]="nuevoRedApoyo.nombres" />
-          <label for="nRelacionRed">Relación</label>
-          <input id="nRelacionRed" name="nRelacionRed" required [(ngModel)]="nuevoRedApoyo.relacion" />
-          <label for="nTelefonoRed">Teléfono (opcional)</label>
-          <input id="nTelefonoRed" name="nTelefonoRed" [(ngModel)]="nuevoRedApoyo.telefono" />
-          <button type="submit" [disabled]="fr.invalid || guardando()">Registrar</button>
-        </form>
-      </section>
+        </section>
+      }
     }
   `,
   styles: [
@@ -282,6 +409,56 @@ export class Inventario {
   protected readonly esCoordinadorOAdmin = computed(
     () => this.auth.rol() === 'coordinador' || this.auth.rol() === 'admin',
   );
+
+  protected readonly esMadreOAdmin = computed(() => this.auth.rol() === 'madre' || this.auth.rol() === 'admin');
+  // Escriben madre, coordinador y admin; profesionales y defensores solo consultan (supuesto S14).
+  protected readonly puedeEscribir = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'madre' || rol === 'coordinador' || rol === 'admin';
+  });
+  // Fotos de evidencia: solo madre, admin y auditor las ven (ADR-0014 sección 2.1).
+  protected readonly puedeVerFotos = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'madre' || rol === 'admin' || rol === 'auditor';
+  });
+
+  protected readonly hoy = new Date().toLocaleDateString('en-CA'); // AAAA-MM-DD en hora local (toISOString usa UTC)
+  protected readonly pestana = signal<'items' | 'personas' | 'red'>('items');
+  protected readonly formularioAbierto = signal(false);
+  protected readonly itemSeleccionadoId = signal<string | null>(null);
+  protected readonly modo = signal<'recepcion' | 'estado' | 'fotos'>('estado');
+  protected readonly itemSeleccionado = computed(
+    () => this.items().find((i) => i.id === this.itemSeleccionadoId()) ?? null,
+  );
+  protected readonly convivientesActivos = computed(() => this.convivientes().filter((c) => c.activo).length);
+  protected readonly redActiva = computed(() => this.redApoyo().filter((r) => r.activo).length);
+
+  protected cambiarPestana(p: 'items' | 'personas' | 'red'): void {
+    this.pestana.set(p);
+    this.formularioAbierto.set(false);
+    this.cerrarPanel();
+  }
+
+  protected abrirPanel(i: Item, modo: 'recepcion' | 'estado' | 'fotos'): void {
+    this.modo.set(modo);
+    this.itemSeleccionadoId.set(i.id);
+    if (modo === 'fotos' && !this.itemsConFotosCargadas.has(i.id)) {
+      this.itemsConFotosCargadas.add(i.id);
+      void this.cargarFotos(i);
+    }
+  }
+
+  protected cerrarPanel(): void {
+    this.itemSeleccionadoId.set(null);
+  }
+
+  protected etiquetaTipo(tipo: string): string {
+    return ({ cama: 'Cama', mueble: 'Mueble', otro: 'Otro' } as Record<string, string>)[tipo] ?? tipo;
+  }
+
+  protected etiquetaEstadoItem(estado: string): string {
+    return ({ bueno: 'Bueno', regular: 'Regular', malo: 'Malo', retirado: 'Retirado' } as Record<string, string>)[estado] ?? estado;
+  }
 
   protected hogarId = '';
   protected readonly hogarCargado = signal(false);
@@ -369,6 +546,7 @@ export class Inventario {
       this.estadoRecepcion[creado.id] = 'bueno';
       this.declaracionSinMenores[creado.id] = false;
       this.nuevoItem = { tipo: 'cama', descripcion: '', cantidad: 1 };
+      this.formularioAbierto.set(false);
     } catch (e) {
       this.error.set(this.mensajeError(e));
     } finally {
@@ -409,15 +587,6 @@ export class Inventario {
     } finally {
       this.guardandoId.set(null);
     }
-  }
-
-  /** Carga las fotos solo cuando se abre el panel de evidencia de ese ítem, no de entrada. */
-  protected alAbrirFotos(i: Item, evento: Event): void {
-    const detalle = evento.target as HTMLDetailsElement;
-    if (!detalle.open) return;
-    if (this.itemsConFotosCargadas.has(i.id)) return;
-    this.itemsConFotosCargadas.add(i.id);
-    void this.cargarFotos(i);
   }
 
   private async cargarFotos(i: Item): Promise<void> {
@@ -508,6 +677,7 @@ export class Inventario {
         }),
       );
       this.convivientes.set([...this.convivientes(), creado]);
+      this.formularioAbierto.set(false);
       this.nuevoConviviente = { nombres: '', relacion_con_madre: '', fecha_desde: '' };
     } catch (e) {
       this.error.set(this.mensajeError(e));
@@ -544,6 +714,7 @@ export class Inventario {
         }),
       );
       this.redApoyo.set([...this.redApoyo(), creado]);
+      this.formularioAbierto.set(false);
       this.nuevoRedApoyo = { nombres: '', relacion: '', telefono: '' };
     } catch (e) {
       this.error.set(this.mensajeError(e));

@@ -1,246 +1,383 @@
-import { Component, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from '../../core/auth/auth';
-import { MODULOS } from '../../core/navegacion';
+import { AppConfigService } from '../../core/config/app-config';
+import type { components } from '../../core/api/schema';
+import type { Rol } from '../../core/navegacion';
 
+type Alerta = components['schemas']['AlertaOut'];
+type Documento = components['schemas']['DocumentoOut'];
+type Cita = components['schemas']['app__modules__citas__schemas__CitaOut'];
+type Menor = components['schemas']['MenorOut'];
+type Alimento = components['schemas']['AlimentoItemOut'];
+type Madre = components['schemas']['MadreOut'];
+
+interface Indicador {
+  id: string;
+  titulo: string;
+  valor: number | null;
+  ruta: string;
+  query?: Record<string, string>;
+  urgente?: boolean;
+}
+
+interface Tarea {
+  id: string;
+  tipo: 'alerta' | 'documento' | 'cita';
+  titulo: string;
+  detalle: string;
+  accion: string;
+  ruta: string[];
+  query?: Record<string, string>;
+  urgente: boolean;
+}
+
+interface Acceso {
+  titulo: string;
+  ruta: string;
+  query?: Record<string, string>;
+  emergencia?: boolean;
+}
+
+const TIPO_ALERTA: Record<string, string> = {
+  evasion: 'Evasión',
+  visita_vencida: 'Visita vencida',
+  documento_faltante: 'Documento faltante',
+  indexacion_pendiente: 'Indexación pendiente',
+};
+
+const TIPO_CITA: Record<string, string> = {
+  medica: 'Cita médica',
+  psicosocial: 'Cita psicosocial',
+  reunion_familia: 'Reunión con familia biológica',
+  otro: 'Cita',
+};
+
+/** Acciones más frecuentes de cada rol; `nuevo=1` abre el formulario del módulo de una vez. */
+const ACCESOS: Record<Rol, Acceso[]> = {
+  madre: [
+    { titulo: 'Subir documento', ruta: '/documentos', query: { nuevo: '1' } },
+    { titulo: 'Registrar compra', ruta: '/alimentos', query: { nuevo: '1' } },
+    { titulo: 'Registrar cita', ruta: '/citas', query: { nuevo: '1' } },
+    { titulo: 'Reportar evasión', ruta: '/alertas/reportar-evasion', emergencia: true },
+  ],
+  profesional: [
+    { titulo: 'Documentos por revisar', ruta: '/documentos', query: { estado: 'en_revision' } },
+    { titulo: 'Mis menores', ruta: '/menores/panel' },
+    { titulo: 'Asistente de IA', ruta: '/ia' },
+    { titulo: 'Reportar evasión', ruta: '/alertas/reportar-evasion', emergencia: true },
+  ],
+  defensor: [
+    { titulo: 'Documentos por revisar', ruta: '/documentos', query: { estado: 'en_revision' } },
+    { titulo: 'Mis menores', ruta: '/menores/panel' },
+    { titulo: 'Reunión con familia', ruta: '/citas', query: { nuevo: '1' } },
+    { titulo: 'Reportar evasión', ruta: '/alertas/reportar-evasion', emergencia: true },
+  ],
+  coordinador: [
+    { titulo: 'Registrar menor', ruta: '/menores', query: { nuevo: '1' } },
+    { titulo: 'Ingreso o traslado', ruta: '/asignaciones', query: { nuevo: '1' } },
+    { titulo: 'Hacer pedido', ruta: '/inventario' },
+    { titulo: 'Reportes', ruta: '/reportes' },
+  ],
+  auditor: [
+    { titulo: 'Registro de accesos', ruta: '/auditoria' },
+    { titulo: 'Documentos', ruta: '/documentos' },
+    { titulo: 'Reportes', ruta: '/reportes' },
+  ],
+  admin: [
+    { titulo: 'Zonas y hogares', ruta: '/zonas-hogares' },
+    { titulo: 'Configuración', ruta: '/configuracion' },
+    { titulo: 'Reportes', ruta: '/reportes' },
+    { titulo: 'Auditoría', ruta: '/auditoria' },
+  ],
+};
+
+const ROL_LEGIBLE: Record<Rol, string> = {
+  madre: 'Madre sustituta',
+  profesional: 'Profesional',
+  defensor: 'Defensor de familia',
+  coordinador: 'Coordinador de zona',
+  auditor: 'Auditor',
+  admin: 'Administrador',
+};
+
+/**
+ * Panel de inicio por rol: en lugar de repetir el menú, muestra lo que requiere atención
+ * (alertas sin ver, documentos por revisar o por corregir, próximas citas, alimentos vencidos)
+ * y las acciones más frecuentes del rol. Cada dato sale de la API con los permisos del usuario.
+ */
 @Component({
   selector: 'app-panel',
   imports: [RouterLink],
   template: `
-    <div class="panel-container">
-      <!-- Banner superior moderno -->
-      <section class="welcome-banner">
-        <div class="welcome-text">
-          <h1>Panel de Control</h1>
-          <p>Bienvenido al sistema. Su rol actual es <span class="rol-badge">{{ auth.rol() }}</span></p>
-        </div>
-        <div class="welcome-icon-box">
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="7" height="9" x="3" y="3" rx="1"/>
-            <rect width="7" height="5" x="14" y="3" rx="1"/>
-            <rect width="7" height="9" x="14" y="12" rx="1"/>
-            <rect width="7" height="5" x="3" y="16" rx="1"/>
-          </svg>
-        </div>
-      </section>
+    <div class="encabezado-panel">
+      <h1>{{ saludo }}</h1>
+      <p class="nota">{{ rolLegible() }}</p>
+    </div>
 
-      <!-- Rejilla de tarjetas con colores e iconos únicos para cada módulo -->
-      <div class="rejilla">
-        @for (m of visibles(); track m.ruta) {
-          @let cfg = obtenerConfig(m.ruta);
-          <a class="tarjeta-modulo" [routerLink]="'/' + m.ruta" [style.background]="cfg.fondo" [style.border-color]="cfg.borde">
-            <div class="tarjeta-header">
-              <!-- Caja de icono con color vibrante único y sombra flotante -->
-              <div class="icono-wrapper" [style.background-color]="cfg.color" [style.box-shadow]="'0 8px 20px -4px ' + cfg.color + '88'">
-                @if (m.ruta.includes('zona')) {
-                  <!-- 1. Zonas y Hogares (Casa) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                } @else if (m.ruta.includes('madre')) {
-                  <!-- 2. Madres Sustitutas (Escudo) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                } @else if (m.ruta.includes('profesional')) {
-                  <!-- 3. Profesionales (Usuarios) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                } @else if (m.ruta.includes('menor')) {
-                  <!-- 4. Menores y Expedientes (Archivo) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                } @else if (m.ruta.includes('asignacion')) {
-                  <!-- 5. Asignaciones y Traslados (Enlace) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                } @else if (m.ruta.includes('documental')) {
-                  <!-- 6. Gestión Documental (Carpeta) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                } @else if (m.ruta.includes('inventario')) {
-                  <!-- 7. Inventario del Hogar (Caja) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                } @else if (m.ruta.includes('alimento')) {
-                  <!-- 8. Control de Alimentos (Utensilios) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-                } @else if (m.ruta.includes('cita')) {
-                  <!-- 9. Citas y Recordatorios (Calendario) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                } @else if (m.ruta.includes('alerta')) {
-                  <!-- 10. Alertas y Evasiones (Campana) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                } @else if (m.ruta.includes('reporte')) {
-                  <!-- 11. Reportes (Gráfico) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
-                } @else if (m.ruta.includes('asistente') || m.ruta.includes('ia')) {
-                  <!-- 12. Asistente de IA (Estrellas / IA) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-                } @else if (m.ruta.includes('archivo') || m.ruta.includes('cierre')) {
-                  <!-- 13. Archivo y Cierre (Caja de archivo) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-                } @else {
-                  <!-- 14. Auditoría (Lupa / Verificación) -->
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                }
-              </div>
-              <span class="flecha-indicador" [style.color]="cfg.color">→</span>
-            </div>
-            <div class="tarjeta-body">
-              <h2>{{ m.titulo }}</h2>
-              <p>{{ m.descripcion }}</p>
-            </div>
-          </a>
+    <section aria-labelledby="tituloAccesos" class="bloque">
+      <h2 id="tituloAccesos" class="oculto">Acciones rápidas</h2>
+      <div class="accesos">
+        @for (a of accesos(); track a.titulo) {
+          <a [routerLink]="a.ruta" [queryParams]="a.query" class="acceso" [class.emergencia]="a.emergencia">{{ a.titulo }}</a>
         }
       </div>
-    </div>
+    </section>
+
+    @if (indicadores().length > 0) {
+      <section aria-labelledby="tituloResumen" class="bloque">
+        <h2 id="tituloResumen" class="oculto">Resumen</h2>
+        <div class="indicadores">
+          @for (i of indicadores(); track i.id) {
+            <a class="indicador" [class.urgente]="i.urgente && !!i.valor" [routerLink]="i.ruta" [queryParams]="i.query">
+              <span class="valor">{{ i.valor === null ? '…' : i.valor }}</span>
+              <span class="titulo">{{ i.titulo }}</span>
+            </a>
+          }
+        </div>
+      </section>
+    }
+
+    <section aria-labelledby="tituloAtencion" class="bloque">
+      <h2 id="tituloAtencion">Lo que requiere su atención</h2>
+      @if (cargando()) {
+        <p class="nota" role="status">Revisando pendientes...</p>
+      } @else if (tareas().length === 0) {
+        <p class="al-dia">Está al día: no hay pendientes.</p>
+      } @else {
+        <ul class="tareas">
+          @for (t of tareas(); track t.id) {
+            <li [class.urgente]="t.urgente">
+              <div>
+                <strong>{{ t.titulo }}</strong>
+                <span class="nota">{{ t.detalle }}</span>
+              </div>
+              <a [routerLink]="t.ruta" [queryParams]="t.query" class="boton-secundario enlace-accion">{{ t.accion }}</a>
+            </li>
+          }
+        </ul>
+      }
+    </section>
   `,
   styles: [`
-    :host {
-      --texto-principal: #344B49;
-    }
+    .encabezado-panel { margin-bottom: 1.25rem; }
+    .encabezado-panel h1 { margin: 0; }
+    .encabezado-panel p { margin: 0.15rem 0 0; }
+    .bloque { margin-bottom: 1.75rem; }
+    .bloque h2 { font-size: 1.1rem; margin: 0 0 0.75rem; }
+    .oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
-    .panel-container {
-      display: flex;
-      flex-direction: column;
-      gap: 1.75rem;
-      max-width: 1300px;
-      margin: 0 auto;
+    .accesos { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); }
+    .acceso {
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      min-height: 64px; padding: 0.75rem 1rem; border-radius: var(--radio);
+      background: var(--color-primario); color: #fff; font-weight: 700; text-decoration: none;
     }
+    .acceso:hover { background: var(--color-primario-hover); }
+    .acceso.emergencia { background: #b00020; }
+    .acceso.emergencia:hover { background: #8a0019; }
 
-    .welcome-banner {
-      background: linear-gradient(135deg, #00A88F 0%, #007A66 100%);
-      border-radius: 18px;
-      padding: 2.2rem 2.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 10px 25px -5px rgb(0 168 143 / 0.25);
-      color: #ffffff;
+    .indicadores { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); }
+    .indicador {
+      display: grid; gap: 0.15rem; padding: 0.9rem 1rem; border-radius: var(--radio);
+      background: var(--color-superficie); border: 1px solid var(--color-borde);
+      color: inherit; text-decoration: none;
     }
+    .indicador:hover { border-color: var(--color-primario); }
+    .indicador .valor { font-size: 1.9rem; font-weight: 800; line-height: 1.1; color: var(--color-primario); }
+    .indicador .titulo { font-size: 0.95rem; }
+    .indicador.urgente { border-color: #b00020; background: #fff5f5; }
+    .indicador.urgente .valor { color: #b00020; }
 
-    .welcome-text h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      margin: 0 0 0.35rem 0;
-      letter-spacing: -0.02em;
+    .tareas { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+    .tareas li {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem;
+      padding: 0.75rem 1rem; background: var(--color-superficie);
+      border: 1px solid var(--color-borde); border-left: 4px solid var(--color-primario); border-radius: var(--radio);
     }
-
-    .welcome-text p {
-      font-size: 1.05rem;
-      opacity: 0.9;
-      margin: 0;
+    .tareas li.urgente { border-left-color: #b00020; }
+    .tareas li div { display: grid; gap: 0.1rem; }
+    .enlace-accion {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem;
+      border: 1px solid var(--color-primario); border-radius: var(--radio); text-decoration: none; font-weight: 600;
     }
-
-    .rol-badge {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(4px);
-      color: #ffffff;
-      padding: 0.2rem 0.75rem;
-      border-radius: 8px;
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 0.85rem;
-      letter-spacing: 0.05em;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .welcome-icon-box {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(6px);
-      color: #ffffff;
-      width: 54px;
-      height: 54px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-    }
-
-    .rejilla {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 1.25rem;
-    }
-
-    .tarjeta-modulo {
-      border: 1.5px solid;
-      border-radius: 18px;
-      padding: 1.75rem;
-      text-decoration: none;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-      transition: all 0.25s ease;
-      box-shadow: 0 6px 15px rgb(0 0 0 / 0.02);
-    }
-
-    .tarjeta-modulo:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 25px -5px rgb(0 0 0 / 0.08);
-      filter: brightness(0.98);
-    }
-
-    .tarjeta-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .icono-wrapper {
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      transition: transform 0.25s ease;
-    }
-
-    .tarjeta-modulo:hover .icono-wrapper {
-      transform: scale(1.08);
-    }
-
-    .flecha-indicador {
-      font-weight: 700;
-      font-size: 1.2rem;
-      transition: transform 0.25s ease;
-    }
-
-    .tarjeta-modulo:hover .flecha-indicador {
-      transform: translateX(5px);
-    }
-
-    .tarjeta-body h2 {
-      color: var(--texto-principal);
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin: 0 0 0.4rem 0;
-      letter-spacing: -0.01em;
-    }
-
-    .tarjeta-body p {
-      color: var(--texto-principal);
-      opacity: 0.75;
-      font-size: 0.92rem;
-      line-height: 1.5;
-      margin: 0;
-    }
-  `]
+    .al-dia { padding: 1rem; background: var(--color-primario-suave); border-radius: var(--radio); margin: 0; }
+  `],
 })
 export class Panel {
   protected readonly auth = inject(AuthService);
-  protected readonly visibles = computed(() => {
+  private readonly http = inject(HttpClient);
+  private readonly config = inject(AppConfigService);
+
+  protected readonly cargando = signal(true);
+  private readonly alertas = signal<Alerta[] | null>(null);
+  private readonly documentos = signal<Documento[] | null>(null);
+  private readonly citas = signal<Cita[] | null>(null);
+  private readonly vencidos = signal<number | null>(null);
+  private readonly nombres = signal<Record<string, string>>({});
+
+  protected readonly saludo = (() => {
+    const hora = new Date().getHours();
+    return hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
+  })();
+
+  protected readonly rolLegible = computed(() => {
     const rol = this.auth.rol();
-    return MODULOS.filter((m) => rol !== null && m.roles.includes(rol));
+    return rol ? ROL_LEGIBLE[rol] : '';
   });
 
-  protected obtenerConfig(ruta: string) {
-    if (ruta.includes('zona')) return { color: '#E02424', fondo: '#FDF2F2', borde: '#FECACA' };       // 1. Rojo (Zonas)
-    if (ruta.includes('madre')) return { color: '#0066FF', fondo: '#EFF6FF', borde: '#BFDBFE' };      // 2. Azul (Madres)
-    if (ruta.includes('profesional')) return { color: '#10B981', fondo: '#ECFDF5', borde: '#A7F3D0' }; // 3. Verde (Profesionales)
-    if (ruta.includes('menor')) return { color: '#8B5CF6', fondo: '#F5F3FF', borde: '#DDD6FE' };      // 4. Morado (Menores)
-    if (ruta.includes('asignacion')) return { color: '#F59E0B', fondo: '#FFFBEB', borde: '#FDE68A' };  // 5. Amarillo (Asignaciones)
-    if (ruta.includes('documental')) return { color: '#EC4899', fondo: '#FDF2F8', borde: '#FBCFE8' };  // 6. Fucsia (Documental)
-    if (ruta.includes('inventario')) return { color: '#06B6D4', fondo: '#ECFEFF', borde: '#A5F3FC' };  // 7. Cian (Inventario)
-    if (ruta.includes('alimento')) return { color: '#F97316', fondo: '#FFF7ED', borde: '#FED7AA' };    // 8. Naranja (Alimentos)
-    if (ruta.includes('cita')) return { color: '#6366F1', fondo: '#EEF2FF', borde: '#C7D2FE' };        // 9. Índigo (Citas)
-    if (ruta.includes('alerta')) return { color: '#DC2626', fondo: '#FEF2F2', borde: '#FCA5A5' };      // 10. Rojo oscuro (Alertas)
-    if (ruta.includes('reporte')) return { color: '#059669', fondo: '#ECFDF5', borde: '#A7F3D0' };     // 11. Verde esmeralda (Reportes)
-    if (ruta.includes('asistente') || ruta.includes('ia')) return { color: '#7C3AED', fondo: '#F5F3FF', borde: '#DDD6FE' }; // 12. Morado IA (Asistente)
-    if (ruta.includes('archivo') || ruta.includes('cierre')) return { color: '#4B5563', fondo: '#F3F4F6', borde: '#D1D5DB' }; // 13. Gris plomo (Archivo)
-    return { color: '#2563EB', fondo: '#EFF6FF', borde: '#BFDBFE' };                                 // 14. Azul rey (Auditoría)
+  protected readonly accesos = computed(() => {
+    const rol = this.auth.rol();
+    return rol ? ACCESOS[rol] : [];
+  });
+
+  private readonly esMadre = computed(() => this.auth.rol() === 'madre');
+  private readonly revisaDocumentos = computed(() => {
+    const rol = this.auth.rol();
+    return rol === 'profesional' || rol === 'defensor' || rol === 'coordinador' || rol === 'admin';
+  });
+
+  protected readonly indicadores = computed<Indicador[]>(() => {
+    const rol = this.auth.rol();
+    if (!rol || rol === 'auditor') return [];
+    const lista: Indicador[] = [
+      { id: 'alertas', titulo: 'Alertas sin ver', valor: this.alertas()?.length ?? null, ruta: '/alertas', urgente: true },
+    ];
+    if (this.esMadre()) {
+      lista.push({ id: 'corregir', titulo: 'Documentos para corregir', valor: this.documentos()?.length ?? null, ruta: '/documentos', query: { estado: 'devuelto' }, urgente: true });
+    } else if (this.revisaDocumentos()) {
+      lista.push({ id: 'revisar', titulo: 'Documentos por revisar', valor: this.documentos()?.length ?? null, ruta: '/documentos', query: { estado: 'en_revision' } });
+    }
+    lista.push({ id: 'citas', titulo: 'Citas en 7 días', valor: this.citasSemana()?.length ?? null, ruta: '/citas' });
+    if (this.esMadre()) {
+      lista.push({ id: 'vencidos', titulo: 'Alimentos vencidos', valor: this.vencidos(), ruta: '/alimentos', query: { vista: 'vencidos' }, urgente: true });
+    }
+    return lista;
+  });
+
+  private readonly citasSemana = computed(() => {
+    const citas = this.citas();
+    if (!citas) return null;
+    const limite = Date.now() + 7 * 24 * 60 * 60 * 1000;
+    return citas.filter((c) => new Date(c.fecha_hora).getTime() <= limite);
+  });
+
+  /** Pendientes concretos, lo más urgente primero: evasiones, otras alertas, documentos y citas de 48 h. */
+  protected readonly tareas = computed<Tarea[]>(() => {
+    const tareas: Tarea[] = [];
+    for (const a of this.alertas() ?? []) {
+      tareas.push({
+        id: 'a' + a.id,
+        tipo: 'alerta',
+        titulo: `${TIPO_ALERTA[a.tipo] ?? a.tipo}: ${this.nombreMenor(a.menor_id)}`,
+        detalle: `${a.descripcion} · ${this.haceCuanto(a.created_at)}`,
+        accion: 'Ver alerta',
+        ruta: ['/alertas'],
+        urgente: a.tipo === 'evasion',
+      });
+    }
+    const madre = this.esMadre();
+    for (const d of this.documentos() ?? []) {
+      tareas.push({
+        id: 'd' + d.id,
+        tipo: 'documento',
+        titulo: madre ? `Corregir: ${d.titulo}` : `Revisar: ${d.titulo}`,
+        detalle: madre
+          ? `Devuelto${d.motivo_devolucion ? ': ' + d.motivo_devolucion : ''}`
+          : `${d.menor_id ? this.nombreMenor(d.menor_id) : 'Documento del hogar'} · enviado ${this.haceCuanto(d.created_at)}`,
+        accion: madre ? 'Corregir' : 'Revisar',
+        ruta: ['/documentos', d.id],
+        urgente: false,
+      });
+    }
+    const limite48 = Date.now() + 48 * 60 * 60 * 1000;
+    for (const c of this.citas() ?? []) {
+      if (new Date(c.fecha_hora).getTime() > limite48) continue;
+      tareas.push({
+        id: 'c' + c.id,
+        tipo: 'cita',
+        titulo: `${TIPO_CITA[c.tipo] ?? 'Cita'}: ${this.nombreMenor(c.menor_id)}`,
+        detalle: `${this.fechaLegible(c.fecha_hora)}${c.lugar ? ' · ' + c.lugar : ''}`,
+        accion: 'Ver citas',
+        ruta: ['/citas'],
+        urgente: false,
+      });
+    }
+    const orden = (t: Tarea) => (t.urgente ? 0 : t.tipo === 'alerta' ? 1 : t.tipo === 'documento' ? 2 : 3);
+    return tareas.sort((a, b) => orden(a) - orden(b)).slice(0, 8);
+  });
+
+  constructor() {
+    void this.cargar();
+  }
+
+  private async cargar(): Promise<void> {
+    const rol = this.auth.rol();
+    const api = this.config.apiUrl;
+    const tareas: Promise<unknown>[] = [
+      this.intentar(this.http.get<Alerta[]>(`${api}/alertas/mis-pendientes`), (v) => this.alertas.set(v), () => this.alertas.set([])),
+      this.intentar(this.http.get<Cita[]>(`${api}/citas/proximas`), (v) => this.citas.set(v), () => this.citas.set([])),
+      this.intentar(this.http.get<Menor[]>(`${api}/menores`), (v) =>
+        this.nombres.set(Object.fromEntries(v.map((m) => [m.id, `${m.nombres} ${m.apellidos}`]))),
+      ),
+    ];
+    if (rol === 'madre') {
+      tareas.push(
+        this.intentar(this.http.get<Documento[]>(`${api}/documentos`, { params: { estado_flujo: 'devuelto' } }), (v) => this.documentos.set(v), () => this.documentos.set([])),
+        this.cargarVencidos(),
+      );
+    } else if (this.revisaDocumentos()) {
+      tareas.push(
+        this.intentar(this.http.get<Documento[]>(`${api}/documentos`, { params: { estado_flujo: 'en_revision' } }), (v) => this.documentos.set(v), () => this.documentos.set([])),
+      );
+    }
+    await Promise.all(tareas);
+    this.cargando.set(false);
+  }
+
+  private async cargarVencidos(): Promise<void> {
+    try {
+      const madre = await firstValueFrom(this.http.get<Madre>(`${this.config.apiUrl}/madres/yo`));
+      if (!madre.hogar_id) {
+        this.vencidos.set(0);
+        return;
+      }
+      const vencidos = await firstValueFrom(
+        this.http.get<Alimento[]>(`${this.config.apiUrl}/alimentos`, { params: { hogar_id: madre.hogar_id, vencidos: 'true' } }),
+      );
+      this.vencidos.set(vencidos.length);
+    } catch {
+      this.vencidos.set(0);
+    }
+  }
+
+  /** Cada consulta falla por su cuenta: un pendiente que no carga no oculta los demás. */
+  private async intentar<T>(peticion: import('rxjs').Observable<T>, ok: (v: T) => void, error?: () => void): Promise<void> {
+    try {
+      ok(await firstValueFrom(peticion));
+    } catch {
+      error?.();
+    }
+  }
+
+  private nombreMenor(id: string): string {
+    return this.nombres()[id] ?? 'un menor';
+  }
+
+  private fechaLegible(iso: string): string {
+    const fecha = new Date(iso);
+    return fecha.toLocaleString('es-CO', { weekday: 'long', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+  }
+
+  private haceCuanto(iso: string): string {
+    const minutos = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+    if (minutos < 60) return `hace ${minutos} min`;
+    const horas = Math.round(minutos / 60);
+    if (horas < 24) return `hace ${horas} h`;
+    const dias = Math.round(horas / 24);
+    return dias === 1 ? 'hace 1 día' : `hace ${dias} días`;
   }
 }

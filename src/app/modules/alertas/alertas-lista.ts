@@ -10,6 +10,7 @@ import { SelectorMenor } from '../../shared/selector-menor/selector-menor';
 import type { components } from '../../core/api/schema';
 
 type Alerta = components['schemas']['AlertaOut'];
+type Menor = components['schemas']['MenorOut'];
 
 const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
 
@@ -32,106 +33,161 @@ function etiquetaTipo(tipo: string): string {
   selector: 'app-alertas-lista',
   imports: [FormsModule, RouterLink, SelectorMenor],
   template: `
-    <h1>Alertas y Evasiones</h1>
-
-    <p>
-      <a routerLink="/alertas/reportar-evasion" class="boton-destacado">Reportar una evasión ahora</a>
-    </p>
+    <div class="encabezado-modulo">
+      <h1>Alertas y evasiones</h1>
+      <a routerLink="/alertas/reportar-evasion" class="boton-emergencia">Reportar una evasión</a>
+    </div>
 
     @if (pendientes().length > 0) {
-      <section class="tarjeta alerta-pendiente" role="alert">
-        <h2>Tiene {{ pendientes().length }} alerta(s) sin ver</h2>
-        <ul class="lista-simple">
-          @for (a of pendientes(); track a.id) {
-            <li>
-              <p><strong>{{ etiquetaTipo(a.tipo) }}</strong> — {{ a.descripcion }}</p>
-              <p>Menor: {{ a.menor_id }} — Creada: {{ a.created_at }}</p>
-              <button type="button" (click)="marcarVisto(a)" [disabled]="guardandoId() === a.id">
-                {{ guardandoId() === a.id ? 'Marcando...' : 'Marcar como vista' }}
-              </button>
-            </li>
-          }
-        </ul>
+      <section class="panel-formulario alerta-pendiente" role="alert" aria-labelledby="tituloPendientes">
+        <h2 id="tituloPendientes">Tiene {{ pendientes().length }} {{ pendientes().length === 1 ? 'alerta sin ver' : 'alertas sin ver' }}</h2>
+        <table class="tabla-datos" aria-label="Alertas sin ver">
+          <tbody>
+            @for (a of pendientes(); track a.id) {
+              <tr>
+                <td data-etiqueta="Tipo"><strong>{{ etiquetaTipo(a.tipo) }}</strong></td>
+                <td data-etiqueta="Menor">{{ nombreMenor(a.menor_id) }}</td>
+                <td data-etiqueta="Detalle">{{ a.descripcion }}</td>
+                <td data-etiqueta="Acción">
+                  <button type="button" (click)="marcarVisto(a)" [disabled]="guardandoId() === a.id">
+                    {{ guardandoId() === a.id ? 'Marcando...' : 'Ya la vi' }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </section>
     }
 
-    <form class="formulario" (ngSubmit)="filtrar()">
-      <app-selector-menor [(valor)]="filtroMenorId" etiqueta="Menor (opcional)" opcionVacia="Todos los menores" />
-      <label for="fTipo">Tipo (opcional)</label>
-      <select id="fTipo" name="fTipo" [(ngModel)]="filtroTipo">
-        <option value="">Todos</option>
-        <option value="evasion">Evasión</option>
-        <option value="visita_vencida">Visita vencida</option>
-        <option value="documento_faltante">Documento faltante</option>
-      </select>
-      <label for="fEstado">Estado (opcional)</label>
-      <select id="fEstado" name="fEstado" [(ngModel)]="filtroEstado">
-        <option value="">Todos</option>
-        <option value="activa">Activa</option>
-        <option value="cerrada">Cerrada</option>
-      </select>
-      <button type="submit" [disabled]="cargando()">Filtrar</button>
-      <button type="button" (click)="verPanel()" [disabled]="cargando()">Ver panel (mis menores / mi zona)</button>
-    </form>
-
-    @if (cargando()) {
-      <p class="nota">Cargando alertas...</p>
-    }
     @if (error()) {
       <p class="error" role="alert">{{ error() }}</p>
     }
 
-    <ul class="lista-simple">
-      @for (a of alertas(); track a.id) {
-        <li class="tarjeta" [class.alerta-activa]="a.estado === 'activa'">
-          <p><strong>{{ etiquetaTipo(a.tipo) }}</strong> — Estado: {{ a.estado }}</p>
-          <p>Menor: {{ a.menor_id }} — Origen: {{ a.origen }}</p>
-          <p>{{ a.descripcion }}</p>
-          <p>Creada: {{ a.created_at }}</p>
+    <div class="filtros">
+      <div class="campo">
+        <label for="fVista">Mostrar</label>
+        <select id="fVista" [ngModel]="vista()" (ngModelChange)="vista.set($event); filtrar()">
+          <option value="panel">Mis menores o mi zona</option>
+          <option value="buscar">Buscar</option>
+        </select>
+      </div>
+      @if (vista() === 'buscar') {
+        <div class="campo">
+          <app-selector-menor etiqueta="Menor" opcionVacia="Todos los menores" [valor]="filtroMenorId" (valorChange)="filtroMenorId = $event; filtrar()" />
+        </div>
+        <div class="campo">
+          <label for="fTipo">Tipo</label>
+          <select id="fTipo" [ngModel]="filtroTipo" (ngModelChange)="filtroTipo = $event; filtrar()">
+            <option value="">Todos</option>
+            <option value="evasion">Evasión</option>
+            <option value="visita_vencida">Visita vencida</option>
+            <option value="documento_faltante">Documento faltante</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="fEstado">Estado</label>
+          <select id="fEstado" [ngModel]="filtroEstado" (ngModelChange)="filtroEstado = $event; filtrar()">
+            <option value="">Todos</option>
+            <option value="activa">Activa</option>
+            <option value="cerrada">Cerrada</option>
+          </select>
+        </div>
+      }
+    </div>
 
-          @if (a.destinatarios && a.destinatarios.length > 0) {
-            <p>Destinatarios:</p>
-            <ul class="lista-simple">
-              @for (d of a.destinatarios; track d.id) {
-                <li>
-                  Usuario {{ d.usuario_id }} —
-                  {{ d.visto_en ? 'Vista el ' + d.visto_en : 'Sin ver todavía' }}
-                  @if (esMiFila(d) && !d.visto_en) {
-                    <button type="button" (click)="marcarVisto(a)" [disabled]="guardandoId() === a.id">
-                      Marcar como vista
+    @if (alertaSeleccionada(); as a) {
+      <section class="panel-formulario" aria-labelledby="tituloDestinatarios">
+        <h2 id="tituloDestinatarios">Quién recibió la alerta</h2>
+        <p class="nota">{{ etiquetaTipo(a.tipo) }} · {{ nombreMenor(a.menor_id) }} · {{ fechaLegible(a.created_at) }}</p>
+        <table class="tabla-datos" aria-label="Destinatarios">
+          <thead>
+            <tr><th scope="col">Destinatario</th><th scope="col">La vio</th></tr>
+          </thead>
+          <tbody>
+            @for (d of a.destinatarios ?? []; track d.id) {
+              <tr>
+                <td data-etiqueta="Destinatario">{{ esMiFila(d) ? 'Usted' : 'Usuario ' + d.usuario_id.slice(0, 8) }}</td>
+                <td data-etiqueta="La vio">
+                  @if (d.visto_en) {
+                    {{ fechaLegible(d.visto_en) }}
+                  } @else if (esMiFila(d)) {
+                    <button type="button" (click)="marcarVisto(a)" [disabled]="guardandoId() === a.id">Ya la vi</button>
+                  } @else {
+                    <span class="estado estado-flujo-en_revision">Sin ver</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        <div class="acciones">
+          <button type="button" class="boton-secundario" (click)="seleccionadaId.set(null)">Cerrar</button>
+        </div>
+      </section>
+    }
+
+    @if (cargando()) {
+      <p class="nota" role="status">Cargando alertas...</p>
+    } @else if (alertas().length === 0) {
+      <p class="nota">No hay alertas para mostrar.</p>
+    } @else {
+      <table class="tabla-datos" aria-label="Alertas">
+        <thead>
+          <tr>
+            <th scope="col">Tipo</th>
+            <th scope="col">Menor</th>
+            <th scope="col">Detalle</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of alertas(); track a.id) {
+            <tr>
+              <td data-etiqueta="Tipo"><strong>{{ etiquetaTipo(a.tipo) }}</strong></td>
+              <td data-etiqueta="Menor">{{ nombreMenor(a.menor_id) }}</td>
+              <td data-etiqueta="Detalle">{{ a.descripcion }}</td>
+              <td data-etiqueta="Fecha">{{ fechaLegible(a.created_at) }}</td>
+              <td data-etiqueta="Estado">
+                <span [class]="a.estado === 'activa' ? 'estado estado-evadido' : 'estado'">{{ a.estado === 'activa' ? 'Activa' : 'Cerrada' }}</span>
+              </td>
+              <td data-etiqueta="Acciones">
+                <div class="acciones-fila">
+                  @if ((a.destinatarios ?? []).length > 0) {
+                    <button type="button" class="boton-secundario" (click)="seleccionadaId.set(a.id)">Quién la vio ({{ vistas(a) }}/{{ (a.destinatarios ?? []).length }})</button>
+                  }
+                  @if (a.estado === 'activa' && puedeCerrar(a)) {
+                    <button type="button" class="boton-secundario" (click)="cerrar(a)" [disabled]="guardandoId() === a.id">
+                      {{ guardandoId() === a.id ? 'Cerrando...' : 'Cerrar' }}
                     </button>
                   }
-                </li>
-              }
-            </ul>
+                </div>
+              </td>
+            </tr>
           }
-
-          @if (a.estado === 'activa' && puedeCerrar(a)) {
-            <button type="button" (click)="cerrar(a)" [disabled]="guardandoId() === a.id">
-              {{ guardandoId() === a.id ? 'Cerrando...' : 'Cerrar alerta' }}
-            </button>
-          }
-        </li>
-      }
-      @if (!cargando() && alertas().length === 0) {
-        <p class="nota">No hay alertas para mostrar con estos filtros.</p>
-      }
-    </ul>
+        </tbody>
+      </table>
+    }
   `,
   styles: [
     `
-      .boton-destacado {
-        display: inline-block;
-        font-weight: bold;
-        padding: 0.6rem 1rem;
-        border: 2px solid #b00020;
-        border-radius: 4px;
+      /* Acción de emergencia: siempre visible, roja y grande. */
+      .boton-emergencia {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tamano-tactil);
+        padding: 0 1.25rem;
+        background: #b00020;
+        color: #ffffff;
+        font-weight: 700;
+        border-radius: var(--radio);
+        text-decoration: none;
       }
+      .boton-emergencia:hover { background: #8a0019; }
       .alerta-pendiente {
         border: 2px solid #b00020;
-      }
-      .alerta-activa {
-        border-left: 4px solid #b00020;
       }
     `,
   ],
@@ -153,6 +209,36 @@ export class AlertasLista {
   protected filtroMenorId = '';
   protected filtroTipo = '';
   protected filtroEstado = '';
+  /** "panel": las alertas de mis menores o mi zona (genera las automáticas); "buscar": con filtros. */
+  protected readonly vista = signal<'panel' | 'buscar'>('panel');
+  protected readonly seleccionadaId = signal<string | null>(null);
+  protected readonly alertaSeleccionada = computed(
+    () => this.alertas().find((a) => a.id === this.seleccionadaId()) ?? null,
+  );
+  private readonly nombres = signal<Record<string, string>>({});
+
+  protected nombreMenor(id: string): string {
+    return this.nombres()[id] ?? 'Menor';
+  }
+
+  protected vistas(a: Alerta): number {
+    return (a.destinatarios ?? []).filter((d) => !!d.visto_en).length;
+  }
+
+  protected fechaLegible(iso: string): string {
+    const fecha = new Date(iso);
+    if (Number.isNaN(fecha.getTime())) return iso;
+    return fecha.toLocaleString('es-CO', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+  }
+
+  private async cargarNombres(): Promise<void> {
+    try {
+      const menores = await firstValueFrom(this.http.get<Menor[]>(`${this.config.apiUrl}/menores`));
+      this.nombres.set(Object.fromEntries(menores.map((m) => [m.id, `${m.nombres} ${m.apellidos}`])));
+    } catch {
+      /* sin nombres se muestra "Menor" */
+    }
+  }
 
   protected readonly puedeGestionar = computed(() => {
     const rol = this.auth.rol();
@@ -161,8 +247,10 @@ export class AlertasLista {
 
   constructor() {
     this.filtroMenorId = this.route.snapshot.queryParamMap.get('menor_id') ?? '';
+    if (this.filtroMenorId) this.vista.set('buscar');
     void this.cargarPendientes();
     void this.cargar();
+    void this.cargarNombres();
   }
 
   protected esMiFila(d: components['schemas']['AlertaDestinatarioOut']): boolean {
@@ -187,11 +275,8 @@ export class AlertasLista {
     void this.cargar();
   }
 
-  protected verPanel(): void {
-    void this.cargar(true);
-  }
-
-  private async cargar(panel = false): Promise<void> {
+  private async cargar(): Promise<void> {
+    const panel = this.vista() === 'panel';
     this.cargando.set(true);
     this.error.set('');
     try {

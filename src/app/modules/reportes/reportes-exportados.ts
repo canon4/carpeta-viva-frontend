@@ -32,23 +32,32 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
       <p class="error" role="alert">{{ error() }}</p>
     }
 
-    <ul class="lista-simple">
-      @for (i of informes(); track i.id) {
-        <li class="tarjeta">
-          <p><strong>{{ etiquetaNivel(i.nivel) }}</strong> — formato {{ i.formato }}</p>
-          <p>Generado: {{ i.generado_en }}</p>
-          @if (mensajeDescarga()[i.id]) {
-            <p class="nota" role="alert">{{ mensajeDescarga()[i.id] }}</p>
+    @if (!cargando() && informes().length === 0) {
+      <p class="nota">Todavía no hay informes exportados.</p>
+    } @else if (informes().length > 0) {
+      <table class="tabla-datos" aria-label="Informes exportados">
+        <thead>
+          <tr><th scope="col">Informe</th><th scope="col">Formato</th><th scope="col">Generado</th><th scope="col">Acción</th></tr>
+        </thead>
+        <tbody>
+          @for (i of informes(); track i.id) {
+            <tr>
+              <td data-etiqueta="Informe"><strong>{{ etiquetaNivel(i.nivel) }}</strong></td>
+              <td data-etiqueta="Formato">{{ i.formato.toUpperCase() }}</td>
+              <td data-etiqueta="Generado">{{ i.generado_en.slice(0, 10) }}</td>
+              <td data-etiqueta="Acción">
+                <button type="button" class="boton-secundario" (click)="descargar(i)" [disabled]="descargandoId() === i.id">
+                  {{ descargandoId() === i.id ? 'Descargando...' : 'Descargar' }}
+                </button>
+                @if (mensajeDescarga()[i.id]) {
+                  <p class="nota" role="alert">{{ mensajeDescarga()[i.id] }}</p>
+                }
+              </td>
+            </tr>
           }
-          <button type="button" (click)="descargar(i)" [disabled]="descargandoId() === i.id">
-            {{ descargandoId() === i.id ? 'Descargando...' : 'Descargar' }}
-          </button>
-        </li>
-      }
-      @if (!cargando() && informes().length === 0) {
-        <p class="nota">Todavía no hay informes exportados.</p>
-      }
-    </ul>
+        </tbody>
+      </table>
+    }
   `,
 })
 export class ReportesExportados {

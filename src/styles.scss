@@ -1,11 +1,13 @@
 /* Paleta provisional: la marca propia aún no está definida (ver agente ux-ui). */
 :root {
-  --color-fondo: #f6f7f9;
+  --color-fondo: #F2F7F6;
   --color-superficie: #ffffff;
   --color-texto: #1d2733;
-  --color-primario: #1f5f8b;
+  --color-primario: #0d7a6e; /* turquesa oscuro: 5.2:1 con blanco (AA) */
+  --color-primario-hover: #0a6359;
+  --color-primario-suave: #E3F5F1;
   --color-primario-texto: #ffffff;
-  --color-borde: #c9d1da;
+  --color-borde: #c7d8d4;
   --color-error: #a4262c;
   --radio: 8px;
   --tamano-tactil: 48px;
@@ -30,7 +32,8 @@ button, input {
   border: 1px solid var(--color-borde);
   padding: 0 1rem;
 }
-button { background: var(--color-primario); color: var(--color-primario-texto); cursor: pointer; }
+button { background: var(--color-primario); color: var(--color-primario-texto); border-color: var(--color-primario); font-weight: 600; cursor: pointer; transition: background-color 0.15s ease; }
+button:hover:not(:disabled) { background: var(--color-primario-hover); border-color: var(--color-primario-hover); }
 button:disabled { opacity: 0.6; cursor: not-allowed; }
 :focus-visible { outline: 3px solid #f0a202; outline-offset: 2px; }
 
@@ -54,6 +57,87 @@ table.tabla { width: 100%; border-collapse: collapse; }
 table.tabla th, table.tabla td { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--color-borde); }
 .exito { color: #1f7a3d; margin: 0; }
 
+/* Encabezado de módulo: título a la izquierda y acción principal a la derecha. */
+.encabezado-modulo { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 1rem; }
+.encabezado-modulo h1 { margin: 0; }
+.boton-secundario { background: var(--color-superficie); color: var(--color-primario); border-color: var(--color-primario); }
+button.boton-secundario:hover:not(:disabled), a.boton-secundario:hover { background: var(--color-primario-suave); color: var(--color-primario-hover); }
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }
+
+/* Filtros en una sola fila que se acomoda al ancho disponible. */
+.filtros { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.75rem; margin-bottom: 1rem; }
+.filtros .campo { display: grid; gap: 0.25rem; min-width: 12rem; flex: 1 1 12rem; max-width: 20rem; }
+/* Los campos ocupan su columna y nunca la desbordan (evita el scroll horizontal). */
+.campo input:not([type=checkbox]):not([type=radio]), .campo select { width: 100%; min-width: 0; }
+/* La madre no elige hogar (se resuelve solo): el selector queda vacío y no debe dejar un hueco. */
+.filtros .campo:has(> app-selector-hogar:empty), .filtros .campo:has(> app-selector-zona:empty) { display: none; }
+.filtros .campo > app-selector-hogar, .filtros .campo > app-selector-zona,
+.panel-formulario .campo > app-selector-hogar, .panel-formulario .campo > app-selector-zona { display: grid; gap: 0.25rem; }
+.filtros select, .formulario select, .panel-formulario select { font: inherit; min-height: var(--tamano-tactil); border-radius: var(--radio); border: 1px solid var(--color-borde); padding: 0 0.75rem; background: var(--color-superficie); }
+
+/* Formulario que se abre con un botón (divulgación progresiva). */
+.panel-formulario { background: var(--color-superficie); border: 1px solid var(--color-borde); border-radius: var(--radio); padding: 1rem; margin-bottom: 1rem; }
+.panel-formulario .campos { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); }
+.panel-formulario .campo { display: grid; gap: 0.25rem; }
+textarea { font: inherit; width: 100%; padding: 0.6rem 0.75rem; border: 1px solid var(--color-borde); border-radius: var(--radio); background: var(--color-superficie); resize: vertical; }
+.enlace-boton { display: inline-flex; align-items: center; gap: 0.4rem; min-height: var(--tamano-tactil); padding: 0 1rem; border: 1px solid var(--color-primario); border-radius: var(--radio); text-decoration: none; font-weight: 600; }
+.enlace-boton svg { width: 1.1rem; height: 1.1rem; flex: none; }
+.panel-formulario .campo-ancho { grid-column: 1 / -1; }
+.panel-formulario h2 { margin-bottom: 0.75rem; }
+.citas { margin: 0.5rem 0 0; padding-left: 1.25rem; display: grid; gap: 0.4rem; }
+.citas li { padding-left: 0.25rem; }
+.citas .origen { font-weight: 600; color: #3e4c59; }
+.texto-respuesta { white-space: pre-wrap; margin: 0 0 1rem; line-height: 1.6; }
+.panel-formulario .acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+
+/* Tabla de datos: tabla en computador, tarjetas apiladas en el celular (sin scroll horizontal). */
+.tabla-datos { width: 100%; border-collapse: collapse; background: var(--color-superficie); border: 1px solid var(--color-borde); border-radius: var(--radio); overflow: hidden; }
+.tabla-datos th { text-align: left; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: #3e4c59; background: var(--color-primario-suave); padding: 0.75rem; }
+.tabla-datos td { padding: 0.75rem; border-top: 1px solid var(--color-borde); vertical-align: middle; }
+.tabla-datos tbody tr:hover { background: #f4faf8; }
+.tabla-datos a { color: var(--color-primario); font-weight: 600; }
+.estado-item-bueno { background: #dff3e6; color: #1b5e33; }
+.estado-item-regular { background: #fff1d6; color: #7a4b00; }
+.estado-item-malo { background: #fde4e1; color: #8a1f12; }
+.estado-item-retirado { background: #ececec; color: #3a3a3a; }
+
+/* Pestañas: separan secciones de un módulo sin mostrarlas todas a la vez. */
+.pestanas { display: flex; flex-wrap: wrap; gap: 0.25rem; border-bottom: 2px solid var(--color-borde); margin-bottom: 1rem; }
+.pestanas button { background: transparent; color: var(--color-texto); border: none; border-bottom: 3px solid transparent; border-radius: 0; margin-bottom: -2px; font-weight: 600; }
+.pestanas button:hover:not(:disabled) { background: var(--color-primario-suave); color: var(--color-primario); border-color: transparent; border-bottom-color: var(--color-borde); }
+.pestanas button.activa, .pestanas button.activa:hover { color: var(--color-primario); border-bottom-color: var(--color-primario); }
+.galeria { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); }
+.galeria figure { margin: 0; display: grid; gap: 0.25rem; }
+.galeria img { width: 100%; border-radius: var(--radio); }
+
+.seccion { margin-top: 2rem; }
+.seccion h2 { margin: 0; }
+.acciones-fila { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.acciones-fila button { min-height: 40px; padding: 0 0.75rem; font-size: 0.95rem; }
+.estado { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; background: #e8efed; color: #2c3e3b; }
+.estado-activo { background: #dff3e6; color: #1b5e33; }
+.estado-evadido { background: #fde4e1; color: #8a1f12; }
+.estado-egresado { background: #e8eaf6; color: #2f3a8a; }
+.estado-fallecido { background: #ececec; color: #3a3a3a; }
+.estado-flujo-borrador { background: #ececec; color: #3a3a3a; }
+.estado-flujo-en_revision { background: #fff1d6; color: #7a4b00; }
+.estado-flujo-aprobado { background: #dff3e6; color: #1b5e33; }
+.estado-flujo-devuelto { background: #fde4e1; color: #8a1f12; }
+.estado-cita-pendiente { background: #fff1d6; color: #7a4b00; }
+.estado-cita-cumplida { background: #dff3e6; color: #1b5e33; }
+.estado-cita-no_asistio { background: #fde4e1; color: #8a1f12; }
+.casilla { display: flex; align-items: center; gap: 0.5rem; min-height: var(--tamano-tactil); }
+.casilla input { min-height: auto; width: 1.25rem; height: 1.25rem; }
+
+@media (max-width: 700px) {
+  .tabla-datos, .tabla-datos tbody, .tabla-datos tr, .tabla-datos td { display: block; width: 100%; }
+  .tabla-datos { border: none; background: transparent; }
+  .tabla-datos thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .tabla-datos tr { background: var(--color-superficie); border: 1px solid var(--color-borde); border-radius: var(--radio); margin-bottom: 0.75rem; padding: 0.5rem 0.75rem; }
+  .tabla-datos td { border: none; padding: 0.35rem 0; display: grid; grid-template-columns: 9rem 1fr; gap: 0.5rem; }
+  .tabla-datos td::before { content: attr(data-etiqueta); font-weight: 600; color: #3e4c59; font-size: 0.9rem; }
+}
+
 .barra { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: var(--color-superficie); border-bottom: 1px solid var(--color-borde); }
 .barra .marca { font-weight: 700; flex: 1; }
 .barra .usuario { font-size: 0.85rem; display: none; }
@@ -70,3 +154,61 @@ table.tabla th, table.tabla td { text-align: left; padding: 0.5rem; border-botto
   .contenedor { display: grid; grid-template-columns: 16rem 1fr; min-height: calc(100vh - 3.5rem); }
   .lateral { display: flex; border-bottom: 0; border-right: 1px solid var(--color-borde); }
 }
+
+/* Vista de chat del asistente de IA (consulta, redacción y resumen). Todo va dentro de .chat. */
+.chat {
+  /* Alto de la ventana menos la barra superior (~4.4rem) y el relleno del contenido (2rem arriba y abajo). */
+  display: flex; flex-direction: column; height: calc(100dvh - 8.75rem); min-height: 26rem; max-width: 60rem; margin: 0 auto;
+  background: var(--color-superficie); border: 1px solid var(--color-borde); border-radius: var(--radio); overflow: hidden;
+}
+.chat__encabezado { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--color-borde); }
+.chat__titulo { display: flex; align-items: center; gap: 0.75rem; }
+.chat__titulo h1 { margin: 0; font-size: 1.25rem; }
+.chat__titulo .nota { margin: 0; font-size: 0.85rem; }
+.chat .acciones-fila .boton-secundario, .chat .acciones-fila .enlace-boton { min-height: 40px; font-size: 0.95rem; }
+.chat__contexto { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--color-fondo); border-bottom: 1px solid var(--color-borde); }
+.chat__contexto select { font: inherit; font-size: 0.95rem; min-height: 40px; max-width: 100%; border-radius: var(--radio); border: 1px solid var(--color-borde); padding: 0 0.6rem; background: var(--color-superficie); }
+.chat__hilo { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; scroll-behavior: smooth; }
+.chat__aviso { text-align: center; margin: 0; font-size: 0.85rem; }
+.chat__vacio { margin: auto; text-align: center; max-width: 30rem; }
+.chat__vacio p { margin: 0 0 0.25rem; }
+.chat .sugerencias { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 0.75rem; }
+.chat .chip { min-height: 40px; padding: 0 0.9rem; font-size: 0.95rem; font-weight: 500; border-radius: 999px; background: var(--color-primario-suave); color: var(--color-primario); border-color: transparent; }
+.chat .chip:hover:not(:disabled) { background: var(--color-primario); color: var(--color-primario-texto); border-color: var(--color-primario); }
+.chat .fila { display: flex; align-items: flex-end; gap: 0.5rem; }
+.chat .fila--usuario { justify-content: flex-end; }
+.chat .burbuja { max-width: min(85%, 40rem); padding: 0.6rem 0.9rem; border-radius: 1rem; overflow-wrap: anywhere; }
+.chat .burbuja p { margin: 0; }
+.chat .burbuja--usuario { background: var(--color-primario); color: var(--color-primario-texto); border-bottom-right-radius: 0.25rem; }
+.chat .burbuja--ia { background: var(--color-fondo); border: 1px solid var(--color-borde); border-bottom-left-radius: 0.25rem; }
+.chat .burbuja .texto { white-space: pre-wrap; line-height: 1.55; }
+.chat .burbuja__etiqueta { display: block; font-size: 0.8rem; font-weight: 600; opacity: 0.85; margin-bottom: 0.2rem; }
+.chat .hora { display: block; text-align: right; font-size: 0.75rem; opacity: 0.85; margin-top: 0.15rem; }
+.chat .avatar { display: grid; place-items: center; flex: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; }
+.chat .avatar svg { width: 60%; height: 60%; }
+.chat .avatar--ia { background: var(--color-primario-suave); color: var(--color-primario); }
+.chat .avatar--chico { width: 2rem; height: 2rem; }
+.chat .fuentes { margin-top: 0.5rem; font-size: 0.9rem; }
+.chat .fuentes summary { cursor: pointer; color: var(--color-primario); font-weight: 600; min-height: 32px; display: flex; align-items: center; }
+.chat .fuentes ol { margin: 0.25rem 0 0; padding-left: 1.25rem; display: grid; gap: 0.25rem; color: #3e4c59; }
+.chat .acciones-burbuja { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; align-items: center; }
+.chat .boton-chico { min-height: 36px; padding: 0 0.75rem; font-size: 0.9rem; }
+.chat .escribiendo { display: inline-flex; gap: 0.3rem; padding: 0.35rem 0; }
+.chat .escribiendo i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--color-primario); opacity: 0.35; animation: chat-punto 1.2s infinite ease-in-out; }
+.chat .escribiendo i:nth-child(2) { animation-delay: 0.2s; }
+.chat .escribiendo i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes chat-punto { 0%, 80%, 100% { opacity: 0.35; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .chat .escribiendo i { animation: none; opacity: 0.7; } .chat__hilo { scroll-behavior: auto; } }
+.chat__compositor { display: flex; align-items: flex-end; gap: 0.5rem; padding: 0.75rem 1rem 0.25rem; border-top: 1px solid var(--color-borde); }
+.chat__compositor textarea { flex: 1; min-height: var(--tamano-tactil); max-height: 10rem; border-radius: 1.5rem; padding: 0.7rem 1rem; field-sizing: content; }
+.chat .enviar { width: var(--tamano-tactil); padding: 0; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.chat .enviar svg { width: 1.25rem; height: 1.25rem; }
+.chat__pie { margin: 0; padding: 0 1rem 0.6rem; font-size: 0.8rem; text-align: center; }
+.solo-lector { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 700px) {
+  .chat__titulo .nota { display: none; }
+  .chat .burbuja { max-width: 90%; }
+}
+.chat .tabla-ia { border-collapse: collapse; margin: 0.5rem 0; font-size: 0.9rem; white-space: normal; display: block; overflow-x: auto; max-width: 100%; }
+.chat .tabla-ia th, .chat .tabla-ia td { border: 1px solid var(--color-borde); padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; }
+.chat .tabla-ia th { background: var(--color-primario-suave); }

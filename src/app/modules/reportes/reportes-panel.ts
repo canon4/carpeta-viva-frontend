@@ -7,6 +7,7 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../core/auth/auth';
 import { AppConfigService } from '../../core/config/app-config';
 import type { components } from '../../core/api/schema';
+import { SelectorZona } from '../../shared/selector-zona/selector-zona';
 import { FORMATOS, pares } from './opciones';
 
 type ReporteAgregado = components['schemas']['ReporteAgregadoOut'];
@@ -26,7 +27,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
  */
 @Component({
   selector: 'app-reportes-panel',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, SelectorZona],
   template: `
     <h1>Reportes</h1>
     <p>
@@ -107,9 +108,8 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
       <section class="tarjeta">
         <h2>Reporte de una zona específica</h2>
         <form class="formulario" (ngSubmit)="irAZona()">
-          <label for="zonaId">Id de la zona</label>
-          <input id="zonaId" name="zonaId" required [(ngModel)]="zonaIdConsulta" />
-          <button type="submit">Ver reporte de esa zona</button>
+          <app-selector-zona [requerido]="true" opcionVacia="Seleccione una zona" [valor]="zonaIdConsulta" (valorChange)="zonaIdConsulta = $event" />
+          <button type="submit" [disabled]="!zonaIdConsulta">Ver reporte de esa zona</button>
         </form>
       </section>
     }

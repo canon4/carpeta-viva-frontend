@@ -170,7 +170,17 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
         <tbody>
           @for (d of visibles(); track d.id) {
             <tr>
-              <td data-etiqueta="Título"><a [routerLink]="['/documentos', d.id]">{{ d.titulo }}</a></td>
+              <td data-etiqueta="Título">
+                @if (d.reservado) {
+                  <span class="reservado" title="Solo el profesional puede abrirlo">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                    {{ d.titulo }}
+                  </span>
+                  <span class="nota"> · Reservado: solo el profesional puede abrirlo</span>
+                } @else {
+                  <a [routerLink]="['/documentos', d.id]">{{ d.titulo }}</a>
+                }
+              </td>
               <td data-etiqueta="De">{{ d.menor_id ? nombreMenor(d.menor_id) : 'Hogar' }}</td>
               <td data-etiqueta="Categoría">{{ etiquetaCategoria(d.categoria, todasCategorias()) }}</td>
               <td data-etiqueta="Fecha">{{ fecha(d.created_at) }}</td>
@@ -377,7 +387,8 @@ export class DocumentosLista {
       }
       const creado = await firstValueFrom(this.http.post<Documento>(`${this.config.apiUrl}/documentos`, datos));
       if (this.esMadre() && creado.estado_flujo === 'en_revision') {
-        // Sección sensible sin permiso de lectura: la madre lo sube, pero no lo ve en su lista.
+        // Sección sensible sin permiso de lectura: queda en su lista como reservado, sin enlace.
+        this.documentos.set([{ ...creado, reservado: true }, ...this.documentos()]);
         this.exito.set(
           `Se subió "${creado.titulo}" y se envió a revisión del profesional. Por ser información reservada, solo el profesional puede abrirlo.`,
         );

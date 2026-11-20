@@ -2737,6 +2737,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Reservado
+             * @default false
+             */
+            reservado: boolean;
         };
         /** DocumentoResumen */
         DocumentoResumen: {

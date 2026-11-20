@@ -16,6 +16,11 @@ jobs:
     steps:
       - name: Llamar al webhook de despliegue de Dokploy
         run: |
+          # Sin el secreto, curl falla con "blank argument": se explica qué falta y se omite el paso.
+          if [ -z "${DOKPLOY_DEPLOY_WEBHOOK}" ]; then
+            echo "::warning title=Despliegue omitido::Falta el secreto DOKPLOY_DEPLOY_WEBHOOK. Créelo en Settings > Secrets and variables > Actions con la URL 'Deploy Webhook' de la app en Dokploy."
+            exit 0
+          fi
           curl --fail --silent --show-error --request POST "${DOKPLOY_DEPLOY_WEBHOOK}"
         env:
           DOKPLOY_DEPLOY_WEBHOOK: ${{ secrets.DOKPLOY_DEPLOY_WEBHOOK }}

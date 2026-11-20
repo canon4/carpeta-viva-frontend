@@ -21,6 +21,23 @@ jobs:
             echo "::warning title=Despliegue omitido::Falta el secreto DOKPLOY_DEPLOY_WEBHOOK. Créelo en Settings > Secrets and variables > Actions con la URL 'Deploy Webhook' de la app en Dokploy."
             exit 0
           fi
-          curl --fail --silent --show-error --request POST "${DOKPLOY_DEPLOY_WEBHOOK}"
+          # Dokploy lee la rama del cuerpo con el formato de un push de GitHub; sin él responde
+          # "Branch Not Match" (con código 200) y no despliega. El cuerpo se arma con jq para no
+          # interpolar el mensaje del commit dentro del JSON.
+          cuerpo=$(jq -n --arg ref "${GITHUB_REF}" --arg sha "${GITHUB_SHA}" --arg msg "${MENSAJE_COMMIT}" \
+            '{ref: $ref, after: $sha, head_commit: {id: $sha, message: $msg}}')
+          respuesta=$(curl --fail --silent --show-error --request POST \
+            --header "Content-Type: application/json" \
+            --header "X-GitHub-Event: push" \
+            --data "${cuerpo}" \
+            "${DOKPLOY_DEPLOY_WEBHOOK}")
+          echo "Respuesta de Dokploy: ${respuesta}"
+          # curl solo detecta errores HTTP: un 200 con "Not Match" o un error también es un fallo.
+          case "${respuesta}" in
+            *"Not Match"*|*"rror"*|*"not found"*)
+              echo "::error title=Dokploy no desplegó::${respuesta}. Revise que la rama configurada en la app de Dokploy sea main."
+              exit 1 ;;
+          esac
         env:
           DOKPLOY_DEPLOY_WEBHOOK: ${{ secrets.DOKPLOY_DEPLOY_WEBHOOK }}
+          MENSAJE_COMMIT: ${{ github.event.head_commit.message }}

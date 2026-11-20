@@ -376,8 +376,19 @@ export class DocumentosLista {
         datos.append('motivo', this.nuevo.motivo);
       }
       const creado = await firstValueFrom(this.http.post<Documento>(`${this.config.apiUrl}/documentos`, datos));
-      this.documentos.set([creado, ...this.documentos()]);
-      this.exito.set(`Se subió "${creado.titulo}" en borrador. Ábralo para enviarlo a revisión.`);
+      if (this.esMadre() && creado.estado_flujo === 'en_revision') {
+        // Sección sensible sin permiso de lectura: la madre lo sube, pero no lo ve en su lista.
+        this.exito.set(
+          `Se subió "${creado.titulo}" y se envió a revisión del profesional. Por ser información reservada, solo el profesional puede abrirlo.`,
+        );
+      } else {
+        this.documentos.set([creado, ...this.documentos()]);
+        this.exito.set(
+          creado.estado_flujo === 'borrador'
+            ? `Se subió "${creado.titulo}" en borrador. Ábralo para enviarlo a revisión.`
+            : `Se subió "${creado.titulo}".`,
+        );
+      }
       this.formularioAbierto.set(false);
       this.nuevo = {
         destino: this.nuevo.destino,
@@ -398,7 +409,12 @@ export class DocumentosLista {
 
   private mensajeError(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
-      if (error.status === 403) return 'Su rol no tiene permiso para esta acción.';
+      if (error.status === 403) {
+        return this.esMadre()
+          ? 'No puede subir documentos de este menor: no está asignado a su hogar o el expediente está archivado.'
+          : 'Su rol no tiene permiso para esta acción.';
+      }
+      if (error.status === 413) return 'El archivo es demasiado grande. El máximo es 25 MB.';
       if (error.status === 422) {
         const detalle = (error.error as { detail?: unknown })?.detail;
         return typeof detalle === 'string' ? detalle : 'Revise los datos ingresados: hay un valor no válido.';

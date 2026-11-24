@@ -72,6 +72,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/yo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Actualizar nombre propio (solo coordinador, admin, auditor) */
+        put: operations["actualizar_mi_nombre_endpoint_api_v1_auth_yo_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/yo/foto": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver la foto de perfil propia */
+        get: operations["obtener_mi_foto_endpoint_api_v1_auth_yo_foto_get"];
+        /** Subir o reemplazar la foto de perfil propia */
+        put: operations["subir_mi_foto_endpoint_api_v1_auth_yo_foto_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/_estado": {
         parameters: {
             query?: never;
@@ -204,7 +239,8 @@ export interface paths {
         };
         /** Perfil de la madre autenticada */
         get: operations["mi_perfil_api_v1_madres_yo_get"];
-        put?: never;
+        /** Actualizar mis datos básicos (dirección, teléfono) */
+        put: operations["actualizar_mi_perfil_endpoint_api_v1_madres_yo_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -275,6 +311,24 @@ export interface paths {
         /** Estado del módulo */
         get: operations["estado_api_v1_profesionales__estado_get"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/profesionales/yo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Perfil del profesional/defensor autenticado */
+        get: operations["mi_perfil_api_v1_profesionales_yo_get"];
+        /** Actualizar mis datos de contacto (teléfono, especialidad) */
+        put: operations["actualizar_mi_perfil_endpoint_api_v1_profesionales_yo_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1036,6 +1090,24 @@ export interface paths {
         get?: never;
         /** Actualizar contacto de red de apoyo */
         put: operations["actualizar_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inventario/red-apoyo/{contacto_id}/foto": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver la foto de perfil de un contacto de red de apoyo */
+        get: operations["obtener_foto_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__foto_get"];
+        /** Subir o reemplazar la foto de perfil de un contacto de red de apoyo */
+        put: operations["subir_foto_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__foto_put"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2020,6 +2092,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/usuarios/{usuario_id}/foto": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ver la foto de perfil de cualquier usuario */
+        get: operations["obtener_foto_de_usuario_endpoint_api_v1_usuarios__usuario_id__foto_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2405,6 +2494,16 @@ export interface components {
             archivo: string;
             /** Declaracion Sin Menores */
             declaracion_sin_menores: boolean;
+        };
+        /** Body_subir_foto_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__foto_put */
+        Body_subir_foto_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__foto_put: {
+            /** Archivo */
+            archivo: string;
+        };
+        /** Body_subir_mi_foto_endpoint_api_v1_auth_yo_foto_put */
+        Body_subir_mi_foto_endpoint_api_v1_auth_yo_foto_put: {
+            /** Archivo */
+            archivo: string;
         };
         /** CambioContrasenaRequest */
         CambioContrasenaRequest: {
@@ -3217,6 +3316,17 @@ export interface components {
             /** Password */
             password: string;
         };
+        /**
+         * MadreAutoUpdate
+         * @description La madre edita sus propios datos básicos (ADR-0019, sección 3). Deliberadamente sin
+         *     `estado_certificacion` (decisión de coordinador/admin) ni identidad legal.
+         */
+        MadreAutoUpdate: {
+            /** Direccion */
+            direccion?: string | null;
+            /** Telefono */
+            telefono?: string | null;
+        };
         /** MadreCreate */
         MadreCreate: {
             /** Usuario Id */
@@ -3443,6 +3553,18 @@ export interface components {
             /** Notas */
             notas?: string | null;
         };
+        /**
+         * ProfesionalAutoUpdate
+         * @description El profesional/defensor edita sus propios datos de contacto (ADR-0019, sección 4).
+         *     Deliberadamente sin `nombres`/`apellidos`/`cargo`/`numero_registro` (identidad y rol
+         *     profesional, siguen siendo de coordinador/admin).
+         */
+        ProfesionalAutoUpdate: {
+            /** Telefono */
+            telefono?: string | null;
+            /** Especialidad */
+            especialidad?: string | null;
+        };
         /** ProfesionalCreate */
         ProfesionalCreate: {
             /** Usuario Id */
@@ -3545,6 +3667,8 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            /** Tiene Foto */
+            readonly tiene_foto: boolean;
         };
         /** RedApoyoUpdate */
         RedApoyoUpdate: {
@@ -3796,6 +3920,17 @@ export interface components {
              */
             token_type: string;
         };
+        /**
+         * UsuarioAutoUpdate
+         * @description Solo para roles sin tabla propia (coordinador/admin/auditor): madre y profesional/defensor
+         *     ya tienen su nombre en su propia tabla (ADR-0019).
+         */
+        UsuarioAutoUpdate: {
+            /** Nombres */
+            nombres?: string | null;
+            /** Apellidos */
+            apellidos?: string | null;
+        };
         /** UsuarioOut */
         UsuarioOut: {
             /**
@@ -3809,6 +3944,12 @@ export interface components {
             rol: string;
             /** Zona Id */
             zona_id?: string | null;
+            /** Nombres */
+            nombres?: string | null;
+            /** Apellidos */
+            apellidos?: string | null;
+            /** Tiene Foto */
+            readonly tiene_foto: boolean;
         };
         /** ValidationError */
         ValidationError: {
@@ -4029,6 +4170,92 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TokenOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    actualizar_mi_nombre_endpoint_api_v1_auth_yo_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UsuarioAutoUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsuarioOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_mi_foto_endpoint_api_v1_auth_yo_foto_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    subir_mi_foto_endpoint_api_v1_auth_yo_foto_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_subir_mi_foto_endpoint_api_v1_auth_yo_foto_put"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsuarioOut"];
                 };
             };
             /** @description Validation Error */
@@ -4377,6 +4604,39 @@ export interface operations {
             };
         };
     };
+    actualizar_mi_perfil_endpoint_api_v1_madres_yo_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MadreAutoUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MadreOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     cargar_mi_firma_api_v1_madres_yo_firma_put: {
         parameters: {
             query?: never;
@@ -4547,6 +4807,59 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    mi_perfil_api_v1_profesionales_yo_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfesionalOut"];
+                };
+            };
+        };
+    };
+    actualizar_mi_perfil_endpoint_api_v1_profesionales_yo_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfesionalAutoUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfesionalOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -6304,6 +6617,72 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["RedApoyoUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedApoyoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_foto_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__foto_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contacto_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    subir_foto_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__foto_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contacto_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_subir_foto_red_apoyo_endpoint_api_v1_inventario_red_apoyo__contacto_id__foto_put"];
             };
         };
         responses: {
@@ -8134,6 +8513,37 @@ export interface operations {
             header?: never;
             path: {
                 menor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    obtener_foto_de_usuario_endpoint_api_v1_usuarios__usuario_id__foto_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                usuario_id: string;
             };
             cookie?: never;
         };

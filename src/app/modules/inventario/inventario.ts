@@ -344,6 +344,7 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
             <table class="tabla-datos" aria-label="Red de apoyo">
               <thead>
                 <tr>
+                  <th scope="col">Foto</th>
                   <th scope="col">Nombre</th>
                   <th scope="col">Relación</th>
                   <th scope="col">Teléfono</th>
@@ -353,6 +354,18 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
               <tbody>
                 @for (r of redApoyo(); track r.id) {
                   <tr>
+                    <td data-etiqueta="Foto">
+                      <div class="avatar-chico">
+                        @if (urlFotoRed()[r.id]) {
+                          <img [src]="urlFotoRed()[r.id]" alt="Foto de {{ r.nombres }}" />
+                        } @else {
+                          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                          </svg>
+                        }
+                      </div>
+                    </td>
                     <td data-etiqueta="Nombre"><strong>{{ r.nombres }}</strong></td>
                     <td data-etiqueta="Relación">{{ r.relacion }}</td>
                     <td data-etiqueta="Teléfono">
@@ -371,6 +384,31 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
                       }
                     </td>
                   </tr>
+                  @if (puedeEscribir()) {
+                    <tr>
+                      <td colspan="5" data-etiqueta="Foto de perfil">
+                        @if (errorFotoRed()[r.id]) {
+                          <p class="error" role="alert">{{ errorFotoRed()[r.id] }}</p>
+                        }
+                        <form class="campos" (ngSubmit)="subirFotoRed(r)" style="margin: 0">
+                          <div class="campo">
+                            <label [attr.for]="'fotoRed' + r.id">Foto de {{ r.nombres }}</label>
+                            <input
+                              [id]="'fotoRed' + r.id"
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp"
+                              (change)="seleccionarFotoRed(r, $event)"
+                            />
+                          </div>
+                          <div class="acciones">
+                            <button type="submit" [disabled]="!archivoFotoRedSeleccionado[r.id] || subiendoFotoRed() === r.id">
+                              {{ subiendoFotoRed() === r.id ? 'Subiendo...' : 'Guardar foto' }}
+                            </button>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                  }
                 }
               </tbody>
             </table>
@@ -394,6 +432,21 @@ const MENSAJE_GENERICO = 'No se pudo completar la acción. Intente de nuevo.';
         max-height: 40vh;
         display: block;
         border-radius: 8px;
+      }
+      .avatar-chico {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        background: var(--color-primario-suave);
+        color: var(--color-primario);
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+      .avatar-chico img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
     `,
   ],
@@ -484,6 +537,13 @@ export class Inventario {
   protected readonly subiendoFoto = signal<string | null>(null);
   private readonly itemsConFotosCargadas = new Set<string>();
 
+  // Foto de perfil de cada contacto de red de apoyo (ADR-0019 sección 5): una sola por contacto,
+  // se carga al abrir la pestaña si el contacto ya tiene foto; mismo permiso que el resto de la sección.
+  protected readonly urlFotoRed = signal<Record<string, string>>({});
+  protected readonly errorFotoRed = signal<Record<string, string>>({});
+  protected readonly archivoFotoRedSeleccionado: Record<string, File | null> = {};
+  protected readonly subiendoFotoRed = signal<string | null>(null);
+
   protected nuevoItem = { tipo: 'cama', descripcion: '', cantidad: 1 };
   protected nuevoConviviente = { nombres: '', relacion_con_madre: '', fecha_desde: '' };
   protected nuevoRedApoyo = { nombres: '', relacion: '', telefono: '' };
@@ -522,10 +582,59 @@ export class Inventario {
       this.convivientes.set(convivientes);
       this.redApoyo.set(redApoyo);
       this.hogarCargado.set(true);
+      void this.cargarFotosRed(redApoyo);
     } catch (e) {
       this.error.set(this.mensajeError(e));
     } finally {
       this.cargando.set(false);
+    }
+  }
+
+  private async cargarFotosRed(contactos: RedApoyo[]): Promise<void> {
+    for (const r of contactos) {
+      if (!r.tiene_foto) continue;
+      try {
+        const blob = await firstValueFrom(
+          this.http.get(`${this.config.apiUrl}/inventario/red-apoyo/${r.id}/foto`, { responseType: 'blob' }),
+        );
+        this.urlFotoRed.set({ ...this.urlFotoRed(), [r.id]: URL.createObjectURL(blob) });
+      } catch {
+        // Sin foto o sin permiso: se muestra el ícono genérico, sin bloquear el resto de la lista.
+      }
+    }
+  }
+
+  protected seleccionarFotoRed(r: RedApoyo, evento: Event): void {
+    const input = evento.target as HTMLInputElement;
+    this.archivoFotoRedSeleccionado[r.id] = input.files?.[0] ?? null;
+  }
+
+  protected async subirFotoRed(r: RedApoyo): Promise<void> {
+    const archivo = this.archivoFotoRedSeleccionado[r.id];
+    if (!archivo) return;
+    this.subiendoFotoRed.set(r.id);
+    this.errorFotoRed.set({ ...this.errorFotoRed(), [r.id]: '' });
+    try {
+      const datos = new FormData();
+      datos.append('archivo', archivo);
+      await firstValueFrom(
+        this.http.put(`${this.config.apiUrl}/inventario/red-apoyo/${r.id}/foto`, datos),
+      );
+      const blob = await firstValueFrom(
+        this.http.get(`${this.config.apiUrl}/inventario/red-apoyo/${r.id}/foto`, { responseType: 'blob' }),
+      );
+      const anterior = this.urlFotoRed()[r.id];
+      if (anterior) URL.revokeObjectURL(anterior);
+      this.urlFotoRed.set({ ...this.urlFotoRed(), [r.id]: URL.createObjectURL(blob) });
+      this.archivoFotoRedSeleccionado[r.id] = null;
+    } catch (e) {
+      const mensaje =
+        e instanceof HttpErrorResponse && e.status === 403
+          ? 'No tiene permiso para subir la foto de este contacto.'
+          : this.mensajeError(e);
+      this.errorFotoRed.set({ ...this.errorFotoRed(), [r.id]: mensaje });
+    } finally {
+      this.subiendoFotoRed.set(null);
     }
   }
 

@@ -28,7 +28,7 @@ import { IaFlotante } from '../../shared/ia-flotante/ia-flotante';
       </div>
 
       <div class="barra-derecha">
-        <div class="usuario-info">
+        <a routerLink="/perfil" routerLinkActive="activo" class="usuario-info" title="Ver mi perfil">
           <div class="avatar-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -36,10 +36,10 @@ import { IaFlotante } from '../../shared/ia-flotante/ia-flotante';
             </svg>
           </div>
           <span class="usuario-texto">
-            <strong>{{ auth.usuario()?.email }}</strong> 
+            <strong>Mi perfil</strong>
             <span class="rol-pill">{{ auth.rol() }}</span>
           </span>
-        </div>
+        </a>
         <button type="button" class="btn-salir" (click)="auth.logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -178,6 +178,17 @@ import { IaFlotante } from '../../shared/ia-flotante/ia-flotante';
       padding: 0.35rem 0.85rem;
       border-radius: 20px;
       border: 1px solid #d8e3e0;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .usuario-info:hover {
+      background: var(--turquesa-suave);
+    }
+
+    .usuario-info:focus-visible {
+      outline: 3px solid var(--turquesa-oscuro);
+      outline-offset: 2px;
     }
 
     .avatar-icon {

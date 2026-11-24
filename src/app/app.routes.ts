@@ -11,6 +11,7 @@ export const routes: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'panel' },
       { path: 'panel', loadComponent: () => import('./features/panel/panel').then((m) => m.Panel) },
+      { path: 'perfil', loadChildren: () => import('./modules/perfil/perfil.routes') },
       { path: 'zonas-hogares', loadChildren: () => import('./modules/zonas-hogares/zonas-hogares.routes') },
       { path: 'madres', loadChildren: () => import('./modules/madres/madres.routes') },
       { path: 'profesionales', loadChildren: () => import('./modules/profesionales/profesionales.routes') },

@@ -126,7 +126,8 @@ const HISTORIAL_VISIBLE = 20;
                     }
                     @default {
                       @if (m.respuesta?.sin_resultado) {
-                        <p class="nota">No encontré información con una fuente confiable para responder. No envié la pregunta al asistente externo.</p>
+                        <p class="texto" [innerHTML]="m.respuesta?.respuesta | textoIa"></p>
+                        <p class="nota">No envié la pregunta al asistente externo.</p>
                       } @else {
                         <p class="texto" [innerHTML]="m.respuesta?.respuesta | textoIa"></p>
                         @if (fragmentosDe(m.respuesta).length > 0) {

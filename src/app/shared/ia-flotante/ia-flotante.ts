@@ -79,7 +79,8 @@ const ROLES_CON_IA: Rol[] = ['madre', 'profesional', 'defensor', 'coordinador', 
                     } @else if (i.error) {
                       <p class="error">{{ i.error }}</p>
                     } @else if (i.respuesta?.sin_resultado) {
-                      <p class="nota">No encontré información con una fuente confiable. No envié la pregunta al asistente externo.</p>
+                      <p class="texto" [innerHTML]="i.respuesta.respuesta | textoIa"></p>
+                      <p class="nota">No envié la pregunta al asistente externo.</p>
                     } @else if (i.respuesta) {
                       <p class="texto" [innerHTML]="i.respuesta.respuesta | textoIa"></p>
                       @if (fragmentosDe(i.respuesta).length > 0) {

@@ -15,7 +15,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const peticion = token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
   return next(peticion).pipe(
     catchError((error: unknown) => {
-      if (error instanceof HttpErrorResponse && error.status === 401 && !req.url.endsWith('/auth/login')) {
+      const esLoginORestaurarSesion =
+        req.url.endsWith('/auth/login') || req.url.endsWith('/auth/refrescar') || req.url.endsWith('/auth/logout');
+      if (error instanceof HttpErrorResponse && error.status === 401 && !esLoginORestaurarSesion) {
         auth.logout();
       }
       return throwError(() => error);

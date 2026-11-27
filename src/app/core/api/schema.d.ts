@@ -4058,6 +4058,12 @@ export interface components {
              * @description Formato de cita ya armado, sin nombres reales (sección 1.5 paso 6)
              */
             texto: string;
+            /**
+             * Titulo
+             * @description Título del documento, o un rótulo genérico para el reporte
+             * @default
+             */
+            titulo: string;
         };
     };
     responses: never;

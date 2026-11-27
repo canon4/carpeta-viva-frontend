@@ -135,7 +135,13 @@ const HISTORIAL_VISIBLE = 20;
                             <summary>Fuentes ({{ fragmentosDe(m.respuesta).length }})</summary>
                             <ol>
                               @for (f of fragmentosDe(m.respuesta); track $index) {
-                                <li>{{ textoFragmento(f) }}</li>
+                                <li>
+                                  @if (rutaFragmento(f)) {
+                                    <a [routerLink]="rutaFragmento(f)">{{ textoFragmento(f) }}</a>
+                                  } @else {
+                                    {{ textoFragmento(f) }}
+                                  }
+                                </li>
                               }
                             </ol>
                           </details>
@@ -357,11 +363,20 @@ export class IaConsulta {
   }
 
   protected textoFragmento(f: Record<string, unknown>): string {
-    if (typeof f['texto'] === 'string') return f['texto'];
+    const titulo = typeof f['titulo'] === 'string' ? f['titulo'] : '';
     const categoria = typeof f['categoria'] === 'string' ? f['categoria'] : '';
     const fecha = typeof f['fecha'] === 'string' ? f['fecha'] : '';
-    const texto = [categoria, fecha].filter(Boolean).join(' — ');
-    return texto || 'Fuente citada sin detalle';
+    const modulo = typeof f['modulo'] === 'string' ? f['modulo'] : '';
+    const detalle = [categoria, fecha, modulo].filter(Boolean).join(' — ');
+    if (titulo) return detalle ? `${titulo} (${detalle})` : titulo;
+    if (typeof f['texto'] === 'string') return f['texto'];
+    return detalle || 'Fuente citada sin detalle';
+  }
+
+  /** Ruta del frontend donde se encuentra la fuente citada (p. ej. `/documentos/{id}`), o null
+   * si esta fuente no tiene una pantalla propia enlazable. */
+  protected rutaFragmento(f: Record<string, unknown>): string | null {
+    return typeof f['ruta'] === 'string' && f['ruta'] ? f['ruta'] : null;
   }
 
   private mensajeError(error: unknown): string {
